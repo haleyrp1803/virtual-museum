@@ -101,22 +101,30 @@ Pass 4 adds a data-driven learning layer to the accepted Pass 3.1 notebook basel
 
 The sample activity language remains placeholder content for infrastructure testing. Activity definitions live in `src/data/modules.js` rather than inside display components so curatorial content can later change without rewriting the interaction system.
 
-## Pass 5: media and accessibility layer
 
-Pass 5 adds reusable artifact renderers for text, image, audio, and video material. The included media are locally generated interface-test assets, not historical sources.
+## Pass 5.1 — Rough aesthetic direction
 
-Accessibility foundations now include:
+This pass adds a self-contained old-classroom/library visual layer using CSS-generated wood grain, paper texture, academic green, burgundy, brass, and serif typography. It does not add external texture files, dependencies, or changes to interaction behavior.
 
-- native audio and video controls;
-- WebVTT captions for the sample video;
-- expandable transcripts for audiovisual and text artifacts;
-- concise alternative text plus optional extended image description;
-- visible rights and provenance information;
-- an external-media privacy disclosure component;
-- skip navigation;
-- route and artifact focus management;
-- keyboard-visible focus states;
-- reduced-motion and forced-colors support;
-- responsive media and notebook behavior.
 
-Before publication, each real artifact should be reviewed for accurate alt text, extended description where useful, complete captions/transcripts, rights language, source provenance, and external-provider privacy implications.
+## Pass 5.2 aesthetic correction
+
+- Removed text drop shadows throughout the interface.
+- Replaced the dark burgundy accent with a light dusty rose.
+- Retained darker rose text only on pale paper surfaces where the light accent would not meet comfortable reading contrast.
+
+
+## Pass 5.3 aesthetic correction
+
+- Restores dark burgundy for action buttons while using light parchment button labels for legibility.
+- Keeps dusty rose as a secondary decorative accent rather than a button fill.
+- Replaces the small repeating wood-grain lines with broad layered gradients that read as smoother wood grain at normal display sizes.
+- Preserves the removal of text drop shadows.
+
+
+## Pass 5.4 aesthetic/layout correction
+
+- Restores the original Pass 5.1 CSS wood texture.
+- Keeps the accepted burgundy, parchment, dusty-rose, and no-text-shadow palette.
+- Converts desktop notebook side mode into a true two-column docked layout.
+- Keeps the notebook bottom-sheet behavior on screens 900px wide and below.
