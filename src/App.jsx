@@ -1,116 +1,222 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ConsentDialog from './components/ConsentDialog.jsx'
 import ArtifactMedia from './components/ArtifactMedia.jsx'
-import LearningActivities from './components/LearningActivities.jsx'
 import Notebook from './components/Notebook.jsx'
 import StorageStatus from './components/StorageStatus.jsx'
 import { supportsIndexedDb } from './storage/workspaceDb.js'
-import { modules, sampleActivities, sampleArtifacts } from './data/modules.js'
 import { useLocalWorkspace } from './hooks/useLocalWorkspace.js'
+import { courseArtifacts, courseStops, placeholderResources, timelineSegments } from './data/course.js'
+
+const MODULE_ID = 'early-america'
+const MODULE_TITLE = 'Early America'
+
+function PlaceholderVideo({ label = 'Georga’s course welcome video' }) {
+  return (
+    <div className="placeholder-video" role="group" aria-label={`${label} placeholder`}>
+      <div className="placeholder-video-screen">
+        <span className="play-symbol" aria-hidden="true">▶</span>
+        <strong>{label}</strong>
+        <small>Video, captions, transcript, and playback controls will appear here.</small>
+      </div>
+      <details>
+        <summary>Read placeholder transcript</summary>
+        <p>This transcript area demonstrates how Georga’s complete spoken orientation will remain available independently of video playback.</p>
+      </details>
+    </div>
+  )
+}
+
+function NavigationTutorial() {
+  return (
+    <div className="navigation-tutorial" aria-labelledby="navigation-tutorial-title">
+      <h3 id="navigation-tutorial-title">Move through the course in the way that works for you</h3>
+      <ul>
+        <li><kbd>Mouse wheel</kbd> or trackpad</li>
+        <li><kbd>←</kbd> and <kbd>→</kbd> arrow keys</li>
+        <li>Previous and Next buttons</li>
+        <li>Clickable timeline segments</li>
+      </ul>
+      <p>No essential action requires dragging. Reduced-motion settings replace animated travel with direct movement.</p>
+    </div>
+  )
+}
+
+function ResourceCard({ resource }) {
+  return (
+    <article className="resource-card">
+      <p className="resource-type">{resource.type}</p>
+      <h3>{resource.title}</h3>
+      <p className="resource-creator">{resource.creator}</p>
+      <p>{resource.note}</p>
+      <p className="resource-access"><strong>Access:</strong> {resource.access}</p>
+      <button type="button" onClick={() => window.alert('Prototype only: final resources will open in a new tab with a clear external-site notice.')}>Test external resource</button>
+    </article>
+  )
+}
 
 export default function App() {
-  const [activeModuleId, setActiveModuleId] = useState(null)
-  const [activeArtifactId, setActiveArtifactId] = useState(null)
+  const [activeStopIndex, setActiveStopIndex] = useState(0)
   const [notebookMode, setNotebookMode] = useState('minimized')
-  const mainHeadingRef = useRef(null)
+  const [activityDraft, setActivityDraft] = useState('')
+  const [activitySaved, setActivitySaved] = useState(false)
+  const courseRef = useRef(null)
+  const stopRefs = useRef([])
+  const wheelLockRef = useRef(false)
   const workspace = useLocalWorkspace()
 
-  const activeModule = modules.find((module) => module.id === activeModuleId) ?? null
-  const activeArtifact = sampleArtifacts.find((artifact) => artifact.id === activeArtifactId) ?? null
-  const moduleArtifacts = activeModule ? sampleArtifacts.filter((artifact) => artifact.moduleId === activeModule.id) : []
-  const moduleActivities = activeModule ? sampleActivities.filter((activity) => activity.moduleId === activeModule.id).map((activity) => ({ ...activity, moduleTitle: activeModule.title })) : []
-  const moduleProgress = activeModule ? workspace.workspace.progress[activeModule.id] ?? { artifactsViewed: [], activitiesAttempted: [] } : { artifactsViewed: [], activitiesAttempted: [] }
-  const moduleResponses = activeModule ? workspace.workspace.responses.filter((response) => response.moduleId === activeModule.id) : []
-  const moduleQuizAttempts = activeModule ? workspace.workspace.quizAttempts.filter((attempt) => attempt.moduleId === activeModule.id) : []
+  const activeStop = courseStops[activeStopIndex]
+  const activeArtifact = activeStop?.artifactId ? courseArtifacts.find((artifact) => artifact.id === activeStop.artifactId) : null
+  const activeEra = activeStop?.eraId ?? 'introduction'
+  const reducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
   const noteContext = useMemo(() => ({
-    moduleId: activeModule?.id ?? null,
-    moduleTitle: activeModule?.title ?? null,
-    artifactId: activeArtifact?.id ?? null,
-    artifactTitle: activeArtifact?.title ?? null,
-  }), [activeArtifact, activeModule])
+    moduleId: MODULE_ID,
+    moduleTitle: MODULE_TITLE,
+    artifactId: activeArtifact?.id ?? activeStop?.id ?? null,
+    artifactTitle: activeArtifact?.title ?? activeStop?.title ?? null,
+  }), [activeArtifact, activeStop])
+
+  const scrollToStop = useCallback((index, behavior = reducedMotion ? 'auto' : 'smooth') => {
+    const bounded = Math.max(0, Math.min(courseStops.length - 1, index))
+    stopRefs.current[bounded]?.scrollIntoView({ behavior, inline: 'start', block: 'nearest' })
+    setActiveStopIndex(bounded)
+  }, [reducedMotion])
+
+  const navigateToStopId = useCallback((stopId) => {
+    const index = courseStops.findIndex((stop) => stop.id === stopId)
+    if (index >= 0) scrollToStop(index)
+  }, [scrollToStop])
 
   useEffect(() => {
-    if (workspace.consentResolved) mainHeadingRef.current?.focus()
-  }, [activeModuleId, workspace.consentResolved])
+    const root = courseRef.current
+    if (!root) return undefined
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+      if (!visible) return
+      const index = Number(visible.target.dataset.stopIndex)
+      if (Number.isFinite(index)) setActiveStopIndex(index)
+    }, { root, threshold: [0.45, 0.65, 0.85] })
+    stopRefs.current.forEach((node) => node && observer.observe(node))
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
-    if (!activeArtifactId) return
-    window.setTimeout(() => document.querySelector('.inspection-card')?.focus(), 0)
-  }, [activeArtifactId])
+    const handleKey = (event) => {
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement) return
+      if (event.key === 'ArrowRight' || event.key === 'PageDown') { event.preventDefault(); scrollToStop(activeStopIndex + 1) }
+      if (event.key === 'ArrowLeft' || event.key === 'PageUp') { event.preventDefault(); scrollToStop(activeStopIndex - 1) }
+      if (event.key === 'Home') { event.preventDefault(); scrollToStop(0) }
+      if (event.key === 'End') { event.preventDefault(); scrollToStop(courseStops.length - 1) }
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [activeStopIndex, scrollToStop])
 
-  const returnHome = () => {
-    setActiveModuleId(null)
-    setActiveArtifactId(null)
+  const handleWheel = (event) => {
+    if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return
+    event.preventDefault()
+    if (wheelLockRef.current || Math.abs(event.deltaY) < 18) return
+    wheelLockRef.current = true
+    scrollToStop(activeStopIndex + (event.deltaY > 0 ? 1 : -1))
+    window.setTimeout(() => { wheelLockRef.current = false }, reducedMotion ? 180 : 650)
   }
 
-  const inspectArtifact = (artifact) => {
-    setActiveArtifactId(artifact.id)
-    workspace.markArtifactViewed(activeModule.id, artifact.id)
+  const savePrototypeActivity = () => {
+    const text = activityDraft.trim()
+    if (!text) return
+    workspace.saveActivityResponse({
+      id: 'early-america-prototype-response',
+      moduleId: MODULE_ID,
+      moduleTitle: MODULE_TITLE,
+      activityTitle: 'Pause and Respond',
+      prompt: 'What changed in your interpretation after moving among several source formats?',
+      text,
+      type: 'written-response',
+    })
+    setActivitySaved(true)
   }
 
-  const openArtifact = ({ moduleId, artifactId }) => {
-    const targetModule = modules.find((module) => module.id === moduleId) ?? modules[0]
-    const targetArtifact = sampleArtifacts.find((artifact) => artifact.id === artifactId)
-    setActiveModuleId(targetModule.id)
-    setActiveArtifactId(targetArtifact?.id ?? null)
-    if (targetArtifact) workspace.markArtifactViewed(targetModule.id, targetArtifact.id)
-    window.setTimeout(() => document.querySelector('.inspection-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
+  const openArtifactFromNotebook = ({ artifactId }) => {
+    const index = courseStops.findIndex((stop) => stop.artifactId === artifactId || stop.artifactIds?.includes(artifactId) || stop.id === artifactId)
+    if (index >= 0) scrollToStop(index)
+    setNotebookMode('side')
   }
 
+  const markArtifact = (artifact) => workspace.markArtifactViewed(MODULE_ID, artifact.id)
   const isBookmarked = (artifactId) => workspace.workspace.bookmarks.some((bookmark) => bookmark.artifactId === artifactId)
 
   return (
-    <div className={`app-shell notebook-mode-${notebookMode}`}>
-      <a className="skip-link" href="#main-content">Skip to museum content</a>
+    <div className={`course-app notebook-mode-${notebookMode} era-${activeEra}`}>
+      <a className="skip-link" href="#course-canvas">Skip to course content</a>
       {!workspace.consentResolved && <ConsentDialog onAccept={workspace.acceptConsent} onDecline={workspace.useSessionNotebook} storageSupported={supportsIndexedDb()} />}
 
-      <header className="site-header">
-        <button className="museum-wordmark" type="button" onClick={returnHome}><span>Virtual Museum</span><small>History of Education</small></button>
-        <nav aria-label="Primary navigation">
-          <button type="button" onClick={returnHome}>Entrance Hall</button>
+      <header className="course-header">
+        <div className="course-brand"><span>History of Education</span><small>A horizontally progressing course prototype</small></div>
+        <div className="header-actions">
+          <button type="button" onClick={() => scrollToStop(0)}>Course beginning</button>
           <button type="button" onClick={() => workspace.notebookEnabled ? setNotebookMode('full') : workspace.reconsiderConsent()}>My Notebook</button>
-        </nav>
+        </div>
       </header>
 
       <StorageStatus status={workspace.storageStatus} message={workspace.storageMessage} onRetry={workspace.retryStorage} onReconsider={workspace.reconsiderConsent} />
 
-      <main id="main-content">
-        {!activeModule && <>
-          <section className="hero"><p className="eyebrow">A self-paced, professor-guided field trip</p><h1 ref={mainHeadingRef} tabIndex="-1">Explore how education became an institution—and who it included.</h1><p className="hero-copy">Move through four provisional rooms, inspect artifacts at your own pace, and keep a private field notebook stored only in your browser.</p></section>
-          <section className="module-section" aria-labelledby="rooms-title">
-            <div className="section-intro"><p className="eyebrow">Museum rooms</p><h2 id="rooms-title">Choose a place to begin</h2></div>
-            <div className="module-grid">{modules.map((module) => <article className="module-card" key={module.id}><p className="module-number">{module.number}</p><p className="module-period">{module.period}</p><h3>{module.title}</h3><p>{module.summary}</p><button className={module.status === 'prototype' ? 'primary-button' : 'secondary-button'} type="button" onClick={() => module.status === 'prototype' && setActiveModuleId(module.id)} disabled={module.status !== 'prototype'}>{module.status === 'prototype' ? 'Enter prototype room' : 'Planned room'}</button></article>)}</div>
-          </section>
-        </>}
+      <nav className="course-timeline" aria-label="Course timeline">
+        <div className="timeline-track" aria-hidden="true"><span style={{ width: `${(activeStopIndex / (courseStops.length - 1)) * 100}%` }} /></div>
+        {timelineSegments.map((segment) => {
+          const targetIndex = segment.stopId ? courseStops.findIndex((stop) => stop.id === segment.stopId) : -1
+          const current = !segment.disabled && targetIndex <= activeStopIndex && (timelineSegments.findIndex((item) => item.id === segment.id) === timelineSegments.findIndex((item) => item.id === activeEra) || courseStops[activeStopIndex]?.eraId === segment.id)
+          const visited = targetIndex >= 0 && targetIndex <= activeStopIndex
+          return <button key={segment.id} type="button" disabled={segment.disabled} className={`${current ? 'current' : ''} ${visited ? 'visited' : ''}`} onClick={() => segment.stopId && navigateToStopId(segment.stopId)}><span className="timeline-dot" aria-hidden="true" /><span>{segment.label}</span></button>
+        })}
+      </nav>
 
-        {activeModule && <section className="room-page">
-          <button className="back-button" type="button" onClick={returnHome}>← Entrance Hall</button>
-          <div className="room-header"><p className="eyebrow">Prototype room · {activeModule.period}</p><h1 ref={mainHeadingRef} tabIndex="-1">{activeModule.title}</h1><p>{activeModule.summary}</p></div>
+      <main id="course-canvas" ref={courseRef} className="horizontal-course" onWheel={handleWheel} tabIndex="-1" aria-label="Horizontal course sequence">
+        {courseStops.map((stop, index) => {
+          const artifact = stop.artifactId ? courseArtifacts.find((item) => item.id === stop.artifactId) : null
+          const pairedArtifacts = stop.artifactIds ? stop.artifactIds.map((id) => courseArtifacts.find((item) => item.id === id)).filter(Boolean) : []
+          return (
+            <section key={stop.id} id={stop.id} data-stop-index={index} ref={(node) => { stopRefs.current[index] = node }} className={`course-stop stop-${stop.type} stop-era-${stop.eraId}`} aria-labelledby={`${stop.id}-title`}>
+              <div className="stop-inner">
+                <div className="stop-heading">
+                  <p className="eyebrow">{stop.eyebrow}</p>
+                  <p className="date-marker">{stop.dateLabel}</p>
+                  <h1 id={`${stop.id}-title`}>{stop.title}</h1>
+                  {stop.summary && <p className="stop-summary">{stop.summary}</p>}
+                </div>
 
-          <section className="progress-card" aria-labelledby="progress-title">
-            <div><p className="eyebrow">Your visit</p><h2 id="progress-title">Room progress</h2></div>
-            <div className="progress-measures">
-              <div><strong>{moduleProgress.artifactsViewed?.length ?? 0} of {moduleArtifacts.length}</strong><span>artifacts explored</span></div>
-              <div><strong>{moduleProgress.activitiesAttempted?.length ?? 0} of {moduleActivities.length}</strong><span>activities attempted</span></div>
-            </div>
-            <p>Progress is descriptive, not graded. Explore in the order and depth that serve your learning.</p>
-          </section>
+                {stop.type === 'introduction' && <div className="intro-layout"><PlaceholderVideo /><NavigationTutorial /><button className="primary-button begin-course" type="button" onClick={() => scrollToStop(1)}>Begin course →</button></div>}
 
-          <div className="guide-card"><div className="guide-avatar" aria-hidden="true">GW</div><div><p className="eyebrow">Your professor-curator</p><h2>Welcome to the room</h2><p>This placeholder establishes where Georga’s recorded, written, or audiovisual guidance will orient visitors before they explore independently.</p></div></div>
-          <div className="artifact-grid" aria-label="Prototype artifact stations">{moduleArtifacts.map((artifact) => {
-            const artifactContext = { moduleId: activeModule.id, moduleTitle: activeModule.title, artifactId: artifact.id, artifactTitle: artifact.title }
-            const viewed = moduleProgress.artifactsViewed?.includes(artifact.id)
-            return <article className={`artifact-card ${activeArtifactId === artifact.id ? 'selected' : ''}`} key={artifact.id}><div className="artifact-placeholder" aria-hidden="true">{artifact.type}</div><div className="artifact-status-line"><p className="artifact-type">{artifact.type}</p>{viewed && <span>Explored</span>}</div><h2>{artifact.title}</h2><p>{artifact.description}</p><div className="artifact-actions"><button type="button" onClick={() => inspectArtifact(artifact)}>Inspect artifact</button><button type="button" onClick={() => { inspectArtifact(artifact); setNotebookMode('side') }}>Annotate</button><button type="button" aria-pressed={isBookmarked(artifact.id)} onClick={() => workspace.toggleBookmark(artifactContext)}>{isBookmarked(artifact.id) ? 'Bookmarked' : 'Bookmark'}</button></div></article>
-          })}</div>
+                {stop.type === 'era-intro' && <div className="era-threshold"><div className="era-number">01</div><div><h2>Historical cluster</h2><p>Within this era, source stops, activities, and Georga’s guidance share one visual language so they feel spatially and thematically connected.</p><button className="primary-button" type="button" onClick={() => scrollToStop(index + 1)}>Enter Early America →</button></div></div>}
 
-          {activeArtifact && <section className="inspection-card" aria-labelledby="inspection-title" tabIndex="-1"><p className="eyebrow">Artifact inspection</p><h2 id="inspection-title">{activeArtifact.title}</h2><p>{activeArtifact.description}</p><ArtifactMedia artifact={activeArtifact} /><aside className="artifact-metadata" aria-label="Prototype artifact information"><div><strong>Format</strong><span>{activeArtifact.type}</span></div><div><strong>Rights</strong><span>Prototype media for interface testing</span></div><div><strong>Provenance</strong><span>Created locally for Pass 5; not a historical source</span></div></aside><div className="guide-commentary"><p className="eyebrow">Professor-curator commentary</p><p>This placeholder shows where Georga can direct attention, identify source limitations, and connect the artifact to the room’s argument without obscuring the artifact itself.</p></div><div className="artifact-actions"><button className="primary-button" type="button" onClick={() => setNotebookMode('side')}>Add a notebook observation</button><button type="button" aria-pressed={isBookmarked(activeArtifact.id)} onClick={() => workspace.toggleBookmark(noteContext)}>{isBookmarked(activeArtifact.id) ? 'Remove bookmark' : 'Bookmark artifact'}</button></div></section>}
+                {stop.type === 'artifact' && artifact && <div className="source-stop-layout">
+                  <div className="source-stage" onMouseEnter={() => markArtifact(artifact)}><ArtifactMedia artifact={artifact} /></div>
+                  <aside className="source-guidance"><p className="eyebrow">Professor guidance</p><h2>{artifact.title}</h2><p>{artifact.description}</p><p>This placeholder indicates where Georga can direct attention without replacing the student’s own encounter with the source.</p><div className="source-actions"><button type="button" onClick={() => { markArtifact(artifact); setNotebookMode('side') }}>Annotate in notebook</button><button type="button" aria-pressed={isBookmarked(artifact.id)} onClick={() => workspace.toggleBookmark({ moduleId: MODULE_ID, moduleTitle: MODULE_TITLE, artifactId: artifact.id, artifactTitle: artifact.title })}>{isBookmarked(artifact.id) ? 'Bookmarked' : 'Bookmark source'}</button></div></aside>
+                </div>}
 
-          <LearningActivities activities={moduleActivities} responses={moduleResponses} quizAttempts={moduleQuizAttempts} onSaveResponse={workspace.saveActivityResponse} onSubmitQuiz={workspace.submitQuizAttempt} />
-        </section>}
+                {stop.type === 'media-pair' && <div className="media-pair">{pairedArtifacts.map((item) => <article key={item.id} className="media-pair-card" onMouseEnter={() => markArtifact(item)}><ArtifactMedia artifact={item} /><h2>{item.title}</h2><p>{item.description}</p><div className="source-actions"><button type="button" onClick={() => { markArtifact(item); setNotebookMode('side') }}>Take notes</button><button type="button" aria-pressed={isBookmarked(item.id)} onClick={() => workspace.toggleBookmark({ moduleId: MODULE_ID, moduleTitle: MODULE_TITLE, artifactId: item.id, artifactTitle: item.title })}>{isBookmarked(item.id) ? 'Bookmarked' : 'Bookmark'}</button></div></article>)}</div>}
+
+                {stop.type === 'activity' && <div className="activity-prototype"><label htmlFor="prototype-response">What changed in your interpretation after moving among several source formats?</label><textarea id="prototype-response" rows="8" value={activityDraft} onChange={(event) => { setActivityDraft(event.target.value); setActivitySaved(false) }} placeholder="Your response remains private in this browser or current session, according to the storage choice you made." /><div><button className="primary-button" type="button" disabled={!activityDraft.trim()} onClick={savePrototypeActivity}>Save response</button>{activitySaved && <span role="status">Saved to your private notebook.</span>}</div></div>}
+
+                {stop.type === 'synthesis' && <div className="synthesis-layout"><PlaceholderVideo label="Georga’s Module 1 synthesis" /><div className="synthesis-card"><h2>Review before leaving the module</h2><p>Students can return to previous stops, open their notebook, or continue into optional further study. Completion remains descriptive rather than graded.</p><button type="button" onClick={() => setNotebookMode('full')}>Review notebook</button></div></div>}
+
+                {stop.type === 'resources' && <div className="resource-grid">{placeholderResources.map((resource) => <ResourceCard key={resource.id} resource={resource} />)}</div>}
+
+                {stop.type === 'transition' && <div className="transition-experience"><div className="transition-domestic"><span>handwritten</span><span>household</span><span>local</span></div><div className="transition-arrow" aria-hidden="true">→</div><div className="transition-institutional"><span>printed</span><span>standardized</span><span>public</span></div><p>The visual grammar becomes more regular as the course approaches the common-school era. Final transitions may use sound, typography, archival materials, and restrained animation.</p></div>}
+
+                {stop.type === 'next-era' && <div className="next-era-landing"><div className="slate-placeholder"><span>Module 2</span><strong>Common School</strong></div><div><h2>A new visual system</h2><p>Regular grids, printed forms, slate tones, and institutional scale make the change of era perceptible before the next lesson begins.</p><button type="button" onClick={() => scrollToStop(0)}>Return to course introduction</button></div></div>}
+              </div>
+            </section>
+          )
+        })}
       </main>
 
-      {workspace.notebookEnabled && <Notebook mode={notebookMode} onModeChange={setNotebookMode} context={noteContext} notes={workspace.workspace.notes} bookmarks={workspace.workspace.bookmarks} responses={workspace.workspace.responses} quizAttempts={workspace.workspace.quizAttempts} storageStatus={workspace.storageStatus} storageMessage={workspace.storageMessage} onAddNote={workspace.addNote} onUpdateNote={workspace.updateNote} onDeleteNote={workspace.deleteNote} onToggleBookmark={workspace.toggleBookmark} onNavigateToArtifact={openArtifact} onExport={workspace.exportMarkdown} onDeleteAll={workspace.deleteAllData} />}
+      <div className="course-navigation" aria-label="Course movement controls">
+        <button type="button" onClick={() => scrollToStop(activeStopIndex - 1)} disabled={activeStopIndex === 0}>← Previous</button>
+        <div aria-live="polite"><strong>{activeStopIndex + 1} of {courseStops.length}</strong><span>{activeStop.title}</span></div>
+        <button className="primary-button" type="button" onClick={() => scrollToStop(activeStopIndex + 1)} disabled={activeStopIndex === courseStops.length - 1}>Next →</button>
+      </div>
+
+      {workspace.notebookEnabled && <Notebook mode={notebookMode} onModeChange={setNotebookMode} context={noteContext} notes={workspace.workspace.notes} bookmarks={workspace.workspace.bookmarks} responses={workspace.workspace.responses} quizAttempts={workspace.workspace.quizAttempts} storageStatus={workspace.storageStatus} storageMessage={workspace.storageMessage} onAddNote={workspace.addNote} onUpdateNote={workspace.updateNote} onDeleteNote={workspace.deleteNote} onToggleBookmark={workspace.toggleBookmark} onNavigateToArtifact={openArtifactFromNotebook} onExport={workspace.exportMarkdown} onDeleteAll={workspace.deleteAllData} />}
     </div>
   )
 }
