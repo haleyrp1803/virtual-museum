@@ -11,6 +11,7 @@ export const EMPTY_WORKSPACE = Object.freeze({
   responses: [],
   quizAttempts: [],
   glossaryEntries: [],
+  resources: [],
   preferences: {},
 })
 
@@ -23,6 +24,7 @@ function cloneEmptyWorkspace() {
     responses: [],
     quizAttempts: [],
     glossaryEntries: [],
+    resources: [],
     preferences: {},
   }
 }
@@ -38,6 +40,7 @@ export function normalizeWorkspace(value) {
     responses: Array.isArray(candidate.responses) ? candidate.responses : [],
     quizAttempts: Array.isArray(candidate.quizAttempts) ? candidate.quizAttempts : [],
     glossaryEntries: Array.isArray(candidate.glossaryEntries) ? candidate.glossaryEntries : [],
+    resources: Array.isArray(candidate.resources) ? candidate.resources : [],
     preferences: candidate.preferences && typeof candidate.preferences === 'object' ? candidate.preferences : {},
   }
 }

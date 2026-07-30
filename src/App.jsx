@@ -44,7 +44,7 @@ function NavigationTutorial() {
   )
 }
 
-function ResourceCard({ resource }) {
+function ResourceCard({ resource, saved, onToggleSave }) {
   return (
     <article className="resource-card">
       <p className="resource-type">{resource.type}</p>
@@ -52,7 +52,10 @@ function ResourceCard({ resource }) {
       <p className="resource-creator">{resource.creator}</p>
       <p>{resource.note}</p>
       <p className="resource-access"><strong>Access:</strong> {resource.access}</p>
-      <button type="button" onClick={() => window.alert('Prototype only: final resources will open in a new tab with a clear external-site notice.')}>Test external resource</button>
+      <div className="resource-card-actions">
+        <button type="button" onClick={() => window.alert('Prototype only: final resources will open in a new tab with a clear external-site notice.')}>Test external resource</button>
+        <button type="button" aria-pressed={saved} onClick={() => onToggleSave(resource)}>{saved ? 'Saved to fieldbook' : 'Save to fieldbook'}</button>
+      </div>
     </article>
   )
 }
@@ -65,6 +68,7 @@ export default function App() {
   const [selectedGlossaryTerm, setSelectedGlossaryTerm] = useState(null)
   const [notebookRequestedView, setNotebookRequestedView] = useState(null)
   const [screenMode, setScreenMode] = useState('course')
+  const [studyInitialModuleId, setStudyInitialModuleId] = useState('all')
   const courseRef = useRef(null)
   const stopRefs = useRef([])
   const wheelLockRef = useRef(false)
@@ -75,12 +79,17 @@ export default function App() {
   const activeEra = activeStop?.eraId ?? 'introduction'
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
-  const noteContext = useMemo(() => ({
-    moduleId: MODULE_ID,
-    moduleTitle: MODULE_TITLE,
-    artifactId: activeArtifact?.id ?? activeStop?.id ?? null,
-    artifactTitle: activeArtifact?.title ?? activeStop?.title ?? null,
-  }), [activeArtifact, activeStop])
+  const noteContext = useMemo(() => {
+    const isCommonSchool = activeStop?.eraId === 'common-school' || activeStop?.eraId === 'transition'
+    const moduleId = isCommonSchool ? 'common-school' : MODULE_ID
+    const moduleTitle = isCommonSchool ? 'Common School' : MODULE_TITLE
+    return {
+      moduleId,
+      moduleTitle,
+      artifactId: activeArtifact?.id ?? activeStop?.id ?? null,
+      artifactTitle: activeArtifact?.title ?? activeStop?.title ?? null,
+    }
+  }, [activeArtifact, activeStop])
 
   const scrollToStop = useCallback((index, behavior = reducedMotion ? 'auto' : 'smooth') => {
     const bounded = Math.max(0, Math.min(courseStops.length - 1, index))
@@ -168,7 +177,7 @@ export default function App() {
   }
 
   if (screenMode === 'study') {
-    return <GlossaryStudy terms={glossaryTerms} entries={workspace.workspace.glossaryEntries} onExit={() => setScreenMode('course')} />
+    return <GlossaryStudy terms={glossaryTerms} entries={workspace.workspace.glossaryEntries} initialModuleId={studyInitialModuleId} onExit={() => { setScreenMode('course'); setNotebookRequestedView(null); window.queueMicrotask(() => setNotebookRequestedView('glossary')); setNotebookMode('full') }} />
   }
 
   return (
@@ -216,7 +225,7 @@ export default function App() {
 
                 {stop.type === 'synthesis' && <div className="synthesis-layout"><PlaceholderVideo label="Georga’s Module 1 synthesis" /><div className="synthesis-card"><h2>Review before leaving the module</h2><p>Students can use <KeyTerm term={getGlossaryTerm('historical-context')} onSelect={selectGlossaryTerm} /> to reconnect earlier sources, open their notebook, or continue into optional further study.</p><button type="button" onClick={() => setNotebookMode('full')}>Review notebook</button></div></div>}
 
-                {stop.type === 'resources' && <div className="resource-grid">{placeholderResources.map((resource) => <ResourceCard key={resource.id} resource={resource} />)}</div>}
+                {stop.type === 'resources' && <div className="resource-grid">{placeholderResources.map((resource) => <ResourceCard key={resource.id} resource={resource} saved={workspace.workspace.resources.some((item) => item.resourceId === resource.id)} onToggleSave={workspace.toggleResource} />)}</div>}
 
                 {stop.type === 'transition' && <div className="transition-experience"><div className="transition-domestic"><span>handwritten</span><span>household</span><span>local</span></div><div className="transition-arrow" aria-hidden="true">→</div><div className="transition-institutional"><span>printed</span><span><KeyTerm term={getGlossaryTerm('standardization')} onSelect={selectGlossaryTerm} /></span><span>public</span></div><p>The visual grammar becomes more regular as the course approaches the common-school era. Final transitions may use sound, typography, archival materials, and restrained animation.</p></div>}
 
@@ -252,7 +261,7 @@ export default function App() {
         <button className="primary-button" type="button" onClick={() => scrollToStop(activeStopIndex + 1)} disabled={activeStopIndex === courseStops.length - 1}>Next →</button>
       </nav>
 
-      {workspace.notebookEnabled && <Notebook mode={notebookMode} onModeChange={setNotebookMode} requestedView={notebookRequestedView} context={noteContext} notes={workspace.workspace.notes} bookmarks={workspace.workspace.bookmarks} responses={workspace.workspace.responses} quizAttempts={workspace.workspace.quizAttempts} glossaryTerms={glossaryTerms} glossaryEntries={workspace.workspace.glossaryEntries} storageStatus={workspace.storageStatus} storageMessage={workspace.storageMessage} onAddNote={workspace.addNote} onUpdateNote={workspace.updateNote} onDeleteNote={workspace.deleteNote} onToggleBookmark={workspace.toggleBookmark} onNavigateToArtifact={openArtifactFromNotebook} onNavigateToStop={navigateToGlossaryLocation} onSaveGlossaryEntry={workspace.saveGlossaryEntry} onStartGlossaryStudy={() => setScreenMode('study')} onExport={workspace.exportMarkdown} onDeleteAll={workspace.deleteAllData} onReconsiderStorage={workspace.reconsiderConsent} onRetryStorage={workspace.retryStorage} />}
+      {workspace.notebookEnabled && <Notebook mode={notebookMode} onModeChange={setNotebookMode} requestedView={notebookRequestedView} context={noteContext} notes={workspace.workspace.notes} bookmarks={workspace.workspace.bookmarks} responses={workspace.workspace.responses} quizAttempts={workspace.workspace.quizAttempts} glossaryTerms={glossaryTerms} glossaryEntries={workspace.workspace.glossaryEntries} resources={workspace.workspace.resources} resourceCatalog={placeholderResources} progress={workspace.workspace.progress} courseStops={courseStops} currentStopId={courseStops[activeStopIndex]?.id} storageStatus={workspace.storageStatus} storageMessage={workspace.storageMessage} onAddNote={workspace.addNote} onUpdateNote={workspace.updateNote} onDeleteNote={workspace.deleteNote} onToggleBookmark={workspace.toggleBookmark} onNavigateToArtifact={openArtifactFromNotebook} onNavigateToStop={navigateToGlossaryLocation} onSaveGlossaryEntry={workspace.saveGlossaryEntry} onToggleResource={workspace.toggleResource} onUpdateResourceStatus={workspace.updateResourceStatus} onStartGlossaryStudy={({ moduleId } = {}) => { setStudyInitialModuleId(moduleId || 'all'); setScreenMode('study') }} onExport={workspace.exportMarkdown} onDeleteAll={workspace.deleteAllData} onReconsiderStorage={workspace.reconsiderConsent} onRetryStorage={workspace.retryStorage} />}
       {selectedGlossaryTerm && <GlossaryTermDialog term={selectedGlossaryTerm} existingEntry={workspace.workspace.glossaryEntries.find((entry) => entry.termId === selectedGlossaryTerm.id)} onSave={saveGlossaryTerm} onClose={() => setSelectedGlossaryTerm(null)} />}
     </div>
   )

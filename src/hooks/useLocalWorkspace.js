@@ -334,6 +334,46 @@ export function useLocalWorkspace() {
     return true
   }, [consentChoice])
 
+
+  const toggleResource = useCallback((resource) => {
+    if (!resource?.id) return false
+    setWorkspace((current) => {
+      const existing = current.resources.find((item) => item.resourceId === resource.id)
+      return {
+        ...current,
+        resources: existing
+          ? current.resources.filter((item) => item.resourceId !== resource.id)
+          : [...current.resources, {
+              id: createId('resource'),
+              resourceId: resource.id,
+              title: resource.title,
+              creator: resource.creator,
+              type: resource.type,
+              access: resource.access,
+              note: resource.note,
+              moduleId: resource.moduleId || 'early-america',
+              moduleTitle: resource.moduleTitle || 'Early America',
+              url: resource.url || null,
+              status: 'saved',
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            }],
+      }
+    })
+    return true
+  }, [])
+
+  const updateResourceStatus = useCallback((resourceId, status) => {
+    if (!['saved', 'started', 'finished'].includes(status)) return false
+    setWorkspace((current) => ({
+      ...current,
+      resources: current.resources.map((item) => item.resourceId === resourceId
+        ? { ...item, status, updatedAt: new Date().toISOString() }
+        : item),
+    }))
+    return true
+  }, [])
+
   const deleteAllData = useCallback(async () => {
     try {
       await clearWorkspaceDatabase()
@@ -407,6 +447,17 @@ export function useLocalWorkspace() {
       }
     }
 
+    if (workspace.resources.length) {
+      lines.push('## Saved resources', '')
+      workspace.resources.forEach((resource) => {
+        lines.push(`- **${resource.title}** — ${resource.creator || 'Creator not supplied'} (${resource.type || 'Resource'})`)
+        lines.push(`  - Module: ${resource.moduleTitle || 'Course'}`)
+        lines.push(`  - Status: ${resource.status || 'saved'}`)
+        if (resource.note) lines.push(`  - ${resource.note}`)
+      })
+      lines.push('')
+    }
+
     if (workspace.responses.length || workspace.quizAttempts.length) {
       lines.push('## Learning activities', '')
       workspace.responses.forEach((response) => {
@@ -434,7 +485,7 @@ export function useLocalWorkspace() {
     link.click()
     link.remove()
     URL.revokeObjectURL(url)
-  }, [workspace.bookmarks, workspace.glossaryEntries, workspace.notes, workspace.quizAttempts, workspace.responses])
+  }, [workspace.bookmarks, workspace.glossaryEntries, workspace.notes, workspace.quizAttempts, workspace.responses, workspace.resources])
 
   const notebookEnabled = consentChoice === 'accepted' || consentChoice === 'session'
 
@@ -457,7 +508,9 @@ export function useLocalWorkspace() {
     saveActivityResponse,
     submitQuizAttempt,
     saveGlossaryEntry,
+    toggleResource,
+    updateResourceStatus,
     deleteAllData,
     exportMarkdown,
-  }), [acceptConsent, addNote, consentChoice, deleteAllData, deleteNote, exportMarkdown, notebookEnabled, reconsiderConsent, retryStorage, storageMessage, storageStatus, submitQuizAttempt, saveGlossaryEntry, toggleBookmark, updateNote, useSessionNotebook, workspace, markArtifactViewed, saveActivityResponse])
+  }), [acceptConsent, addNote, consentChoice, deleteAllData, deleteNote, exportMarkdown, notebookEnabled, reconsiderConsent, retryStorage, storageMessage, storageStatus, submitQuizAttempt, saveGlossaryEntry, toggleBookmark, toggleResource, updateResourceStatus, updateNote, useSessionNotebook, workspace, markArtifactViewed, saveActivityResponse])
 }

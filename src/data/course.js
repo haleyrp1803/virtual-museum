@@ -117,8 +117,8 @@ export const timelineSegments = [
 export const courseArtifacts = sampleArtifacts
 
 export const placeholderResources = [
-  { id: 'book', type: 'Book', title: 'Placeholder monograph', creator: 'Author to be selected', access: 'Library or purchase', note: 'A brief annotation from Georga will explain why this resource extends the module.' },
-  { id: 'article', type: 'Article', title: 'Placeholder scholarly or public-history article', creator: 'Author to be selected', access: 'Open or library access', note: 'This slot tests citation, access notes, and external-link treatment.' },
-  { id: 'video', type: 'Video', title: 'Placeholder lecture or documentary', creator: 'Creator to be selected', access: 'External video platform', note: 'The final card can show runtime, captions, and a disclosure that the link leaves the course site.' },
-  { id: 'archive', type: 'Digital collection', title: 'Placeholder archive or digital project', creator: 'Institution to be selected', access: 'Open web resource', note: 'This slot can direct students toward further independent primary-source exploration.' },
+  { id: 'book', moduleId: 'early-america', moduleTitle: 'Early America', type: 'Book', title: 'Placeholder monograph', creator: 'Author to be selected', access: 'Library or purchase', note: 'A brief annotation from Georga will explain why this resource extends the module.' },
+  { id: 'article', moduleId: 'early-america', moduleTitle: 'Early America', type: 'Article', title: 'Placeholder scholarly or public-history article', creator: 'Author to be selected', access: 'Open or library access', note: 'This slot tests citation, access notes, and external-link treatment.' },
+  { id: 'video', moduleId: 'early-america', moduleTitle: 'Early America', type: 'Video', title: 'Placeholder lecture or documentary', creator: 'Creator to be selected', access: 'External video platform', note: 'The final card can show runtime, captions, and a disclosure that the link leaves the course site.' },
+  { id: 'archive', moduleId: 'early-america', moduleTitle: 'Early America', type: 'Digital collection', title: 'Placeholder archive or digital project', creator: 'Institution to be selected', access: 'Open web resource', note: 'This slot can direct students toward further independent primary-source exploration.' },
 ]

@@ -4,6 +4,101 @@ function contextLabel(note) {
   return note.artifactTitle || note.moduleTitle || 'General observation'
 }
 
+const NOTEBOOK_SECTIONS = [
+  { id: 'notes', label: 'Notes', icon: '✎' },
+  { id: 'glossary', label: 'Glossary', icon: 'A–Z' },
+  { id: 'activities', label: 'Activities', icon: '✓' },
+  { id: 'bookmarks', label: 'Bookmarks', icon: '◆' },
+  { id: 'resources', label: 'Resources', icon: '▤' },
+  { id: 'course-map', label: 'Course Map', icon: '↝' },
+]
+
+
+const COURSE_MAP_NODES = [
+  { id: 'course-introduction', label: 'Introduction', module: 'Course orientation', x: 22, y: 7 },
+  { id: 'early-america-introduction', label: 'Early America', module: 'Module 1', x: 68, y: 22 },
+  { id: 'early-america-text', label: 'Primary source', module: 'Early America', x: 33, y: 35, minor: true },
+  { id: 'early-america-image', label: 'Close looking', module: 'Early America', x: 68, y: 44, minor: true },
+  { id: 'early-america-media', label: 'Guided media', module: 'Early America', x: 31, y: 53, minor: true },
+  { id: 'early-america-activity', label: 'Private response', module: 'Early America', x: 69, y: 62, minor: true },
+  { id: 'early-america-synthesis', label: 'Synthesis', module: 'Early America', x: 35, y: 70, minor: true },
+  { id: 'early-america-resources', label: 'Further Study', module: 'Early America', x: 70, y: 78 },
+  { id: 'common-school-transition', label: 'Transition', module: 'Historical transition', x: 35, y: 87 },
+  { id: 'common-school-landing', label: 'Common School', module: 'Module 2', x: 69, y: 95 },
+]
+
+const COURSE_MAP_SEGMENTS = [
+  { from: 'course-introduction', to: 'early-america-introduction', d: 'M22 7 C82 11,82 20,68 22' },
+  { from: 'early-america-introduction', to: 'early-america-text', d: 'M68 22 C58 26,18 30,33 35' },
+  { from: 'early-america-text', to: 'early-america-image', d: 'M33 35 C49 37,82 39,68 44' },
+  { from: 'early-america-image', to: 'early-america-media', d: 'M68 44 C54 47,15 49,31 53' },
+  { from: 'early-america-media', to: 'early-america-activity', d: 'M31 53 C48 55,83 57,69 62' },
+  { from: 'early-america-activity', to: 'early-america-synthesis', d: 'M69 62 C54 64,20 66,35 70' },
+  { from: 'early-america-synthesis', to: 'early-america-resources', d: 'M35 70 C50 72,82 73,70 78' },
+  { from: 'early-america-resources', to: 'common-school-transition', d: 'M70 78 C55 80,18 82,35 87' },
+  { from: 'common-school-transition', to: 'common-school-landing', d: 'M35 87 C52 89,82 91,69 95' },
+]
+
+function CourseMap({ courseStops, currentStopId, progress, onNavigateToStop }) {
+  const currentIndex = Math.max(0, courseStops.findIndex((stop) => stop.id === currentStopId))
+  const stopIndex = new Map(courseStops.map((stop, index) => [stop.id, index]))
+  const earlyProgress = progress?.['early-america'] || { artifactsViewed: [], activitiesAttempted: [] }
+
+  const nodeState = (node) => {
+    const index = stopIndex.get(node.id)
+    if (node.id === currentStopId) return 'current'
+    if (index !== undefined && index < currentIndex) return 'visited'
+    return 'unvisited'
+  }
+
+  const segmentState = (segment) => {
+    const toIndex = stopIndex.get(segment.to)
+    return toIndex !== undefined && toIndex <= currentIndex ? 'visited' : 'unvisited'
+  }
+
+  return (
+    <div className="course-map-layout">
+      <div className="course-map-legend" aria-label="Course map states">
+        <span><i className="map-key current" /> Current</span>
+        <span><i className="map-key visited" /> Visited</span>
+        <span><i className="map-key unvisited" /> Not visited</span>
+      </div>
+      <div className="curved-course-map" aria-label="Curving chronological course map">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          {COURSE_MAP_SEGMENTS.map((segment) => (
+            <path
+              key={`${segment.from}-${segment.to}`}
+              className={`course-map-segment state-${segmentState(segment)}`}
+              d={segment.d}
+            />
+          ))}
+        </svg>
+        {COURSE_MAP_NODES.map((node) => {
+          const state = nodeState(node)
+          return (
+            <button
+              key={node.id}
+              type="button"
+              className={`course-map-node ${node.minor ? 'minor' : 'major'} state-${state}`}
+              style={{ left: `${node.x}%`, top: `${node.y}%` }}
+              aria-current={state === 'current' ? 'step' : undefined}
+              onClick={() => onNavigateToStop(node.id)}
+            >
+              <span className="course-map-node-mark" aria-hidden="true">{state === 'visited' ? '✓' : state === 'current' ? '●' : '○'}</span>
+              <span className="course-map-node-copy"><strong>{node.label}</strong><small>{node.module}</small></span>
+            </button>
+          )
+        })}
+      </div>
+      <section className="course-map-summary" aria-label="Current course progress summary">
+        <h4>Early America</h4>
+        <p>{earlyProgress.artifactsViewed?.length || 0} sources explored · {earlyProgress.activitiesAttempted?.length || 0} activities attempted</p>
+        <p>The map records where you have been without turning the course into a completion score.</p>
+      </section>
+    </div>
+  )
+}
+
 export default function Notebook({
   mode,
   onModeChange,
@@ -14,6 +109,11 @@ export default function Notebook({
   quizAttempts,
   glossaryTerms,
   glossaryEntries,
+  resources,
+  resourceCatalog,
+  progress,
+  courseStops,
+  currentStopId,
   storageStatus,
   storageMessage,
   onAddNote,
@@ -27,6 +127,8 @@ export default function Notebook({
   onRetryStorage,
   onNavigateToStop,
   onSaveGlossaryEntry,
+  onToggleResource,
+  onUpdateResourceStatus,
   onStartGlossaryStudy,
   requestedView,
 }) {
@@ -37,68 +139,154 @@ export default function Notebook({
   const [confirmDeleteAll, setConfirmDeleteAll] = useState(false)
   const [query, setQuery] = useState('')
   const [activeView, setActiveView] = useState('notes')
-  const [expandedTermId, setExpandedTermId] = useState(null)
+  const [selectedGlossaryTermId, setSelectedGlossaryTermId] = useState(null)
   const [glossaryEdit, setGlossaryEdit] = useState('')
+  const [glossaryModuleFilter, setGlossaryModuleFilter] = useState('all')
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [selectedNoteId, setSelectedNoteId] = useState(null)
+  const [noteModuleFilter, setNoteModuleFilter] = useState('all')
+  const [noteSort, setNoteSort] = useState('recent')
+  const [selectedActivityKey, setSelectedActivityKey] = useState(null)
+  const [activityFilter, setActivityFilter] = useState('all')
+  const [selectedBookmarkId, setSelectedBookmarkId] = useState(null)
+  const [bookmarkGroup, setBookmarkGroup] = useState('module')
+  const [noteTarget, setNoteTarget] = useState(null)
+  const [selectedResourceId, setSelectedResourceId] = useState(null)
+  const [resourceModuleFilter, setResourceModuleFilter] = useState('all')
   const fullScreenRef = useRef(null)
+  const tabRefs = useRef([])
+  const previousFocusRef = useRef(null)
 
   useEffect(() => {
-    if (mode === 'full') fullScreenRef.current?.focus()
-  }, [mode])
+    if (mode !== 'full') return undefined
+
+    const dialog = fullScreenRef.current
+    previousFocusRef.current = document.activeElement
+    dialog?.focus()
+
+    const handleDialogKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        onModeChange('side')
+        return
+      }
+      if (event.key !== 'Tab' || !dialog) return
+      const focusable = [...dialog.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+        .filter((element) => !element.hidden && element.getAttribute('aria-hidden') !== 'true')
+      if (!focusable.length) {
+        event.preventDefault()
+        dialog.focus()
+        return
+      }
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    dialog?.addEventListener('keydown', handleDialogKeyDown)
+    return () => {
+      dialog?.removeEventListener('keydown', handleDialogKeyDown)
+      const previous = previousFocusRef.current
+      if (previous?.isConnected) previous.focus()
+      else document.querySelector('.fieldbook-launcher, .header-actions button:last-child')?.focus()
+    }
+  }, [mode, onModeChange])
 
   useEffect(() => {
-    if (requestedView) setActiveView(requestedView)
+    if (requestedView && NOTEBOOK_SECTIONS.some((section) => section.id === requestedView)) {
+      setActiveView(requestedView)
+    }
   }, [requestedView])
 
   const currentArtifactBookmarked = Boolean(context?.artifactId && bookmarks.some((bookmark) => bookmark.artifactId === context.artifactId))
+  const noteModules = useMemo(() => [...new Set(notes.map((note) => note.moduleTitle || 'General observations'))].sort(), [notes])
   const filteredNotes = useMemo(() => {
     const needle = query.trim().toLowerCase()
-    if (!needle) return [...notes].reverse()
-    return [...notes].reverse().filter((note) => [note.text, note.artifactTitle, note.moduleTitle].filter(Boolean).some((value) => value.toLowerCase().includes(needle)))
-  }, [notes, query])
+    const items = notes.filter((note) => {
+      const matchesQuery = !needle || [note.text, note.artifactTitle, note.moduleTitle].filter(Boolean).some((value) => value.toLowerCase().includes(needle))
+      const matchesModule = noteModuleFilter === 'all' || (note.moduleTitle || 'General observations') === noteModuleFilter
+      return matchesQuery && matchesModule
+    })
+    return [...items].sort((a, b) => noteSort === 'earliest' ? new Date(a.updatedAt) - new Date(b.updatedAt) : new Date(b.updatedAt) - new Date(a.updatedAt))
+  }, [notes, query, noteModuleFilter, noteSort])
 
-  const groupedNotes = useMemo(() => {
+  const selectedNote = notes.find((note) => note.id === selectedNoteId) || filteredNotes[0] || null
+  const activityItems = useMemo(() => [
+    ...responses.map((item) => ({ ...item, recordType: 'response', key: `response-${item.id}`, status: 'completed' })),
+    ...quizAttempts.map((item) => ({ ...item, recordType: 'quiz', key: `quiz-${item.id}`, status: item.correct ? 'completed' : 'revisit' })),
+  ].sort((a, b) => new Date(b.updatedAt || b.attemptedAt) - new Date(a.updatedAt || a.attemptedAt)), [responses, quizAttempts])
+  const filteredActivities = activityFilter === 'all' ? activityItems : activityItems.filter((item) => item.status === activityFilter)
+  const selectedActivity = activityItems.find((item) => item.key === selectedActivityKey) || filteredActivities[0] || null
+  const selectedBookmark = bookmarks.find((bookmark) => bookmark.id === selectedBookmarkId) || bookmarks[0] || null
+  const groupedBookmarks = useMemo(() => {
     const groups = new Map()
-    filteredNotes.forEach((note) => {
-      const key = note.moduleTitle || 'General observations'
+    bookmarks.forEach((bookmark) => {
+      const key = bookmarkGroup === 'type' ? (bookmark.artifactType || 'Source') : (bookmark.moduleTitle || 'General')
       if (!groups.has(key)) groups.set(key, [])
-      groups.get(key).push(note)
+      groups.get(key).push(bookmark)
     })
     return [...groups.entries()]
-  }, [filteredNotes])
+  }, [bookmarks, bookmarkGroup])
 
+  const glossaryModules = useMemo(() => [...new Map(glossaryTerms.map((term) => [term.moduleId, term.moduleTitle])).entries()], [glossaryTerms])
   const groupedGlossaryTerms = useMemo(() => {
     const groups = new Map()
-    ;[...glossaryTerms].sort((a, b) => a.term.localeCompare(b.term)).forEach((term) => {
-      if (!groups.has(term.moduleTitle)) groups.set(term.moduleTitle, [])
-      groups.get(term.moduleTitle).push(term)
-    })
+    ;[...glossaryTerms]
+      .filter((term) => glossaryModuleFilter === 'all' || term.moduleId === glossaryModuleFilter)
+      .sort((a, b) => a.term.localeCompare(b.term))
+      .forEach((term) => {
+        if (!groups.has(term.moduleTitle)) groups.set(term.moduleTitle, [])
+        groups.get(term.moduleTitle).push(term)
+      })
     return [...groups.entries()]
-  }, [glossaryTerms])
+  }, [glossaryTerms, glossaryModuleFilter])
 
-  const openGlossaryTerm = (term) => {
-    const entry = glossaryEntries.find((item) => item.termId === term.id)
-    if (!entry) {
-      onNavigateToStop(term.locationStopId)
-      onModeChange('side')
-      return
-    }
-    const nextId = expandedTermId === term.id ? null : term.id
-    setExpandedTermId(nextId)
-    setGlossaryEdit(nextId ? entry.definition : '')
+  const glossaryEntryFor = (termId) => glossaryEntries.find((item) => item.termId === termId)
+  const selectedGlossaryTerm = glossaryTerms.find((term) => term.id === selectedGlossaryTermId && (glossaryModuleFilter === 'all' || term.moduleId === glossaryModuleFilter))
+    || groupedGlossaryTerms[0]?.[1]?.[0]
+    || null
+  const selectedGlossaryEntry = selectedGlossaryTerm ? glossaryEntryFor(selectedGlossaryTerm.id) : null
+
+  useEffect(() => {
+    setGlossaryEdit(selectedGlossaryEntry?.definition || '')
+  }, [selectedGlossaryTerm?.id, selectedGlossaryEntry?.definition])
+
+  const glossaryState = (term) => {
+    const entry = glossaryEntryFor(term.id)
+    if (!entry) return { id: 'undiscovered', symbol: '○', label: 'Not encountered' }
+    if (!entry.definition?.trim()) return { id: 'added', symbol: '◐', label: 'Added without definition' }
+    return { id: 'defined', symbol: '●', label: 'Defined' }
   }
 
-  const saveGlossaryDefinition = (term) => {
-    onSaveGlossaryEntry(term, glossaryEdit)
+  const sectionCounts = {
+    notes: notes.length,
+    glossary: `${glossaryEntries.length}/${glossaryTerms.length}`,
+    activities: responses.length + quizAttempts.length,
+    bookmarks: bookmarks.length,
+    resources: resources.length,
+  }
+
+  const openGlossaryTerm = (term) => {
+    const entry = glossaryEntryFor(term.id)
+    setSelectedGlossaryTermId(term.id)
+    setGlossaryEdit(entry?.definition || '')
+  }
+
+  const goToGlossaryLocation = (term) => {
+    if (!term) return
+    onNavigateToStop(term.locationStopId)
+    onModeChange('side')
   }
 
   const saveDraft = () => {
-    const saved = onAddNote({ text: draft, ...context })
-    if (saved) setDraft('')
-  }
-
-  const startEditing = (note) => {
-    setEditingId(note.id)
-    setEditingText(note.text)
+    const saved = onAddNote({ text: draft, ...(noteTarget || context) })
+    if (saved) { setDraft(''); setNoteTarget(null) }
   }
 
   const saveEdit = () => {
@@ -124,8 +312,9 @@ export default function Notebook({
 
   if (mode === 'minimized') {
     return (
-      <button className="notebook-launcher" type="button" onClick={() => onModeChange('side')} aria-label="Open field notebook">
-        <span aria-hidden="true">▤</span><span>Notebook</span>
+      <button className="notebook-launcher fieldbook-launcher" type="button" onClick={() => onModeChange('side')} aria-label="Open field notebook">
+        <span className="fieldbook-cover-icon" aria-hidden="true">▥</span>
+        <span>Fieldbook</span>
       </button>
     )
   }
@@ -153,7 +342,7 @@ export default function Notebook({
           <p className="note-text">{note.text}</p>
           <p className="note-date">{new Date(note.updatedAt).toLocaleString()}</p>
           <div className="inline-actions">
-            <button type="button" onClick={() => startEditing(note)}>Edit</button>
+            <button type="button" onClick={() => { setEditingId(note.id); setEditingText(note.text) }}>Edit</button>
             <button className="text-button danger-text" type="button" onClick={() => setDeleteCandidate(note.id)}>Delete</button>
           </div>
           {deleteCandidate === note.id && (
@@ -168,168 +357,263 @@ export default function Notebook({
     </article>
   )
 
+  const renderSection = () => {
+    if (activeView === 'notes') {
+      const captureContext = noteTarget || context
+      return (
+        <div className="fieldbook-section-body journal-master-detail notes-journal">
+          <section className="journal-index-panel" aria-label="Note index">
+            <div className="notebook-composer fieldbook-quick-capture">
+              <div className="section-heading-row"><h3>Quick capture</h3>{noteTarget && <button className="text-button" type="button" onClick={() => setNoteTarget(null)}>Use current lesson</button>}</div>
+              <label htmlFor="notebook-draft">{captureContext?.artifactTitle ? `Note about “${captureContext.artifactTitle}”` : 'General observation'}</label>
+              <textarea id="notebook-draft" value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Record what you notice, question, or want to remember." rows="3" />
+              <button className="primary-button" type="button" onClick={saveDraft} disabled={!draft.trim() || storageStatus === 'loading'}>Save note</button>
+            </div>
+            <div className="journal-filter-grid">
+              <label>Search<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search notes" /></label>
+              <label>Module<select value={noteModuleFilter} onChange={(event) => setNoteModuleFilter(event.target.value)}><option value="all">All modules</option>{noteModules.map((module) => <option key={module}>{module}</option>)}</select></label>
+              <label>Order<select value={noteSort} onChange={(event) => setNoteSort(event.target.value)}><option value="recent">Most recent</option><option value="earliest">Earliest</option></select></label>
+            </div>
+            <div className="journal-entry-list" role="listbox" aria-label="Notebook entries">
+              {filteredNotes.length === 0 ? <p className="empty-state">{notes.length ? 'No entries match these filters.' : 'Your observations will appear here.'}</p> : filteredNotes.map((note) => (
+                <button key={note.id} type="button" role="option" aria-selected={selectedNote?.id === note.id} className={selectedNote?.id === note.id ? 'journal-index-entry selected' : 'journal-index-entry'} onClick={() => setSelectedNoteId(note.id)}>
+                  <span className="journal-entry-kicker">{note.moduleTitle || 'General observations'}</span>
+                  <strong>{contextLabel(note)}</strong>
+                  <span>{note.text}</span>
+                  {note.updatedAt !== note.createdAt && <small>Revised</small>}
+                </button>
+              ))}
+            </div>
+          </section>
+          <section className="journal-detail-panel" aria-label="Selected note">
+            {!selectedNote ? <p className="empty-state">Select a note to review it.</p> : editingId === selectedNote.id ? (
+              <div className="note-editor"><h3>Edit note</h3><textarea value={editingText} onChange={(event) => setEditingText(event.target.value)} rows="10" /><div className="inline-actions"><button className="primary-button" type="button" onClick={saveEdit} disabled={!editingText.trim()}>Save changes</button><button type="button" onClick={() => setEditingId(null)}>Cancel</button></div></div>
+            ) : (
+              <article className="journal-detail-entry">
+                <p className="eyebrow">{selectedNote.moduleTitle || 'General observations'}</p><h3>{contextLabel(selectedNote)}</h3>
+                <p className="journal-full-text">{selectedNote.text}</p>
+                <dl className="journal-metadata"><div><dt>Created</dt><dd>{new Date(selectedNote.createdAt).toLocaleString()}</dd></div>{selectedNote.updatedAt !== selectedNote.createdAt && <div><dt>Revised</dt><dd>{new Date(selectedNote.updatedAt).toLocaleString()}</dd></div>}</dl>
+                <div className="inline-actions">{selectedNote.artifactId && <button type="button" onClick={() => navigateTo(selectedNote)}>Return to lesson</button>}<button type="button" onClick={() => { setEditingId(selectedNote.id); setEditingText(selectedNote.text) }}>Edit</button><button className="text-button danger-text" type="button" onClick={() => setDeleteCandidate(selectedNote.id)}>Delete</button></div>
+                {deleteCandidate === selectedNote.id && <div className="entry-delete-confirmation"><span>Delete this note?</span><button className="danger-button" type="button" onClick={() => { onDeleteNote(selectedNote.id); setDeleteCandidate(null); setSelectedNoteId(null) }}>Delete</button><button type="button" onClick={() => setDeleteCandidate(null)}>Cancel</button></div>}
+              </article>
+            )}
+          </section>
+        </div>
+      )
+    }
+
+    if (activeView === 'glossary') {
+      return (
+        <div className="fieldbook-section-body journal-master-detail glossary-journal">
+          <section className="journal-index-panel glossary-index-panel" aria-label="Glossary term index">
+            <div className="glossary-index-header">
+              <div>
+                <h3>Course glossary</h3>
+                <p>Build your own definitions as you encounter key terms.</p>
+              </div>
+              <button type="button" onClick={() => onStartGlossaryStudy({ moduleId: context?.moduleId })} disabled={glossaryEntries.length === 0}>Study terms</button>
+            </div>
+            <label className="journal-group-control">Show module
+              <select value={glossaryModuleFilter} onChange={(event) => { setGlossaryModuleFilter(event.target.value); setSelectedGlossaryTermId(null) }}>
+                <option value="all">All modules</option>
+                {glossaryModules.map(([moduleId, moduleTitle]) => <option key={moduleId} value={moduleId}>{moduleTitle}</option>)}
+              </select>
+            </label>
+            <div className="glossary-state-key" aria-label="Glossary state key">
+              <span><b aria-hidden="true">○</b> Not encountered</span>
+              <span><b aria-hidden="true">◐</b> Added</span>
+              <span><b aria-hidden="true">●</b> Defined</span>
+            </div>
+            <div className="glossary-index-list">
+              {groupedGlossaryTerms.map(([moduleTitle, terms]) => (
+                <section className="glossary-index-module" key={moduleTitle}>
+                  <h4>{moduleTitle}</h4>
+                  {terms.map((term) => {
+                    const state = glossaryState(term)
+                    const selected = selectedGlossaryTerm?.id === term.id
+                    return (
+                      <button key={term.id} type="button" className={`glossary-index-entry glossary-state-${state.id} ${selected ? 'selected' : ''}`} aria-current={selected ? 'true' : undefined} title={state.id === 'undiscovered' ? `Not yet added. Find this term in ${term.locationLabel}.` : `${state.label}: ${term.term}`} onClick={() => openGlossaryTerm(term)}>
+                        <span className="glossary-state-symbol" aria-hidden="true">{state.symbol}</span>
+                        <span><strong>{term.term}</strong><small>{state.label}</small></span>
+                      </button>
+                    )
+                  })}
+                </section>
+              ))}
+            </div>
+          </section>
+
+          <section className="journal-detail-panel glossary-detail-panel" aria-live="polite">
+            {!selectedGlossaryTerm ? <p className="empty-state">Select a glossary term to review it.</p> : (
+              <article className="journal-detail-entry">
+                <p className="eyebrow">{selectedGlossaryTerm.moduleTitle}</p>
+                <h3>{selectedGlossaryTerm.term}</h3>
+                {!selectedGlossaryEntry ? (
+                  <div className="glossary-undiscovered-detail">
+                    <p className="journal-state-label state-undiscovered">Not yet added</p>
+                    <p>You will encounter this term in:</p>
+                    <p className="glossary-lesson-location"><strong>{selectedGlossaryTerm.locationLabel}</strong></p>
+                    <button className="primary-button" type="button" onClick={() => goToGlossaryLocation(selectedGlossaryTerm)}>Go to lesson location</button>
+                  </div>
+                ) : (
+                  <div className="glossary-added-detail">
+                    <p className={`journal-state-label ${selectedGlossaryEntry.definition?.trim() ? 'state-defined' : 'state-added'}`}>{selectedGlossaryEntry.definition?.trim() ? 'Defined' : 'Added without definition'}</p>
+                    <label htmlFor={`glossary-edit-${selectedGlossaryTerm.id}`}>Your definition</label>
+                    <textarea id={`glossary-edit-${selectedGlossaryTerm.id}`} rows="7" value={glossaryEdit} onChange={(event) => setGlossaryEdit(event.target.value)} placeholder="Write the definition in your own words, or leave it blank for now." />
+                    <div className="inline-actions">
+                      <button className="primary-button" type="button" onClick={() => onSaveGlossaryEntry(selectedGlossaryTerm, glossaryEdit)}>Save definition</button>
+                      <button type="button" onClick={() => goToGlossaryLocation(selectedGlossaryTerm)}>Return to lesson</button>
+                    </div>
+                    {!selectedGlossaryEntry.definition?.trim() && <p className="fieldbook-pass-note">This term is in your glossary, but you have not written a definition yet.</p>}
+                  </div>
+                )}
+              </article>
+            )}
+          </section>
+        </div>
+      )
+    }
+
+    if (activeView === 'activities') {
+      return (
+        <div className="fieldbook-section-body journal-master-detail activities-journal">
+          <section className="journal-index-panel">
+            <div className="journal-status-filters" aria-label="Filter activities"><button className={activityFilter === 'all' ? 'selected' : ''} type="button" onClick={() => setActivityFilter('all')}>All</button><button className={activityFilter === 'revisit' ? 'selected' : ''} type="button" onClick={() => setActivityFilter('revisit')}>To revisit</button><button className={activityFilter === 'completed' ? 'selected' : ''} type="button" onClick={() => setActivityFilter('completed')}>Completed</button></div>
+            <div className="journal-entry-list" role="listbox" aria-label="Activity records">
+              {filteredActivities.length === 0 ? <p className="empty-state">No activities in this category.</p> : filteredActivities.map((item) => <button key={item.key} type="button" role="option" aria-selected={selectedActivity?.key === item.key} className={selectedActivity?.key === item.key ? 'journal-index-entry selected' : 'journal-index-entry'} onClick={() => setSelectedActivityKey(item.key)}><span className={`journal-state-label state-${item.status}`}>{item.status === 'revisit' ? 'To revisit' : 'Completed'}</span><strong>{item.activityTitle || 'Learning activity'}</strong><span>{item.moduleTitle || 'Course activity'}</span></button>)}
+            </div>
+          </section>
+          <section className="journal-detail-panel">
+            {!selectedActivity ? <p className="empty-state">Completed activities and items to revisit will appear here.</p> : <article className="journal-detail-entry"><p className="eyebrow">{selectedActivity.moduleTitle || 'Course activity'}</p><h3>{selectedActivity.activityTitle}</h3>{selectedActivity.prompt && <div className="journal-prompt"><strong>Prompt</strong><p>{selectedActivity.prompt}</p></div>}{selectedActivity.recordType === 'response' ? <><h4>Your response</h4><p className="journal-full-text">{selectedActivity.text}</p><p className="note-date">Saved {new Date(selectedActivity.updatedAt).toLocaleString()}</p></> : <><p className={`journal-result state-${selectedActivity.status}`}><strong>{selectedActivity.correct ? 'Completed' : 'To revisit'}</strong></p><p className="journal-full-text">{selectedActivity.feedback}</p><p className="note-date">Attempted {new Date(selectedActivity.attemptedAt).toLocaleString()}</p></>}</article>}
+          </section>
+        </div>
+      )
+    }
+
+    if (activeView === 'bookmarks') {
+      return (
+        <div className="fieldbook-section-body journal-master-detail bookmarks-journal">
+          <section className="journal-index-panel">
+            <label className="journal-group-control">Group saved evidence<select value={bookmarkGroup} onChange={(event) => setBookmarkGroup(event.target.value)}><option value="module">By module</option><option value="type">By media type</option></select></label>
+            <div className="journal-entry-list grouped-bookmark-list">
+              {bookmarks.length === 0 ? <p className="empty-state">Bookmarked sources will appear here.</p> : groupedBookmarks.map(([group, items]) => <section key={group}><h3>{group}</h3>{items.map((bookmark) => <button key={bookmark.id} type="button" className={selectedBookmark?.id === bookmark.id ? 'journal-index-entry selected' : 'journal-index-entry'} onClick={() => setSelectedBookmarkId(bookmark.id)}><span className="journal-media-icon" aria-hidden="true">◆</span><strong>{bookmark.artifactTitle || bookmark.artifactId}</strong><span>{bookmark.moduleTitle || 'Saved source'}</span></button>)}</section>)}
+            </div>
+          </section>
+          <section className="journal-detail-panel">
+            {!selectedBookmark ? <p className="empty-state">Select a saved source to review it.</p> : <article className="journal-detail-entry"><p className="eyebrow">Saved evidence</p><h3>{selectedBookmark.artifactTitle || selectedBookmark.artifactId}</h3><p>{selectedBookmark.moduleTitle || 'Course source'}</p><p className="note-date">Saved {new Date(selectedBookmark.createdAt).toLocaleString()}</p><div className="inline-actions"><button className="primary-button" type="button" onClick={() => navigateTo(selectedBookmark)}>Open source</button><button type="button" onClick={() => { setNoteTarget(selectedBookmark); setActiveView('notes') }}>Add note</button><button className="text-button danger-text" type="button" onClick={() => { onToggleBookmark(selectedBookmark); setSelectedBookmarkId(null) }}>Remove bookmark</button></div></article>}
+          </section>
+        </div>
+      )
+    }
+
+    if (activeView === 'resources') {
+      const modules = [...new Set(resourceCatalog.map((item) => item.moduleTitle || 'Course'))]
+      const filteredCatalog = resourceModuleFilter === 'all' ? resourceCatalog : resourceCatalog.filter((item) => (item.moduleTitle || 'Course') === resourceModuleFilter)
+      const selectedResource = resourceCatalog.find((item) => item.id === selectedResourceId) || filteredCatalog[0] || null
+      const savedEntry = selectedResource ? resources.find((item) => item.resourceId === selectedResource.id) : null
+      return (
+        <div className="fieldbook-section-body journal-master-detail resources-journal">
+          <section className="journal-index-panel">
+            <label className="journal-group-control">Module<select value={resourceModuleFilter} onChange={(event) => setResourceModuleFilter(event.target.value)}><option value="all">All modules</option>{modules.map((module) => <option key={module} value={module}>{module}</option>)}</select></label>
+            <div className="journal-entry-list" role="listbox" aria-label="Further-study resources">
+              {filteredCatalog.map((resource) => {
+                const saved = resources.find((item) => item.resourceId === resource.id)
+                return <button key={resource.id} type="button" role="option" aria-selected={selectedResource?.id === resource.id} className={selectedResource?.id === resource.id ? 'journal-index-entry selected' : 'journal-index-entry'} onClick={() => setSelectedResourceId(resource.id)}><span className={`journal-state-label ${saved ? `state-${saved.status}` : 'state-unsaved'}`}>{saved ? saved.status[0].toUpperCase() + saved.status.slice(1) : 'Not saved'}</span><strong>{resource.title}</strong><span>{resource.type} · {resource.creator}</span></button>
+              })}
+            </div>
+          </section>
+          <section className="journal-detail-panel">
+            {!selectedResource ? <p className="empty-state">Further-study resources will appear here.</p> : <article className="journal-detail-entry resource-detail"><p className="eyebrow">{selectedResource.moduleTitle || 'Course resource'} · {selectedResource.type}</p><h3>{selectedResource.title}</h3><p><strong>{selectedResource.creator}</strong></p><p>{selectedResource.note}</p><p><strong>Access:</strong> {selectedResource.access}</p><div className="inline-actions"><button className="primary-button" type="button" aria-pressed={Boolean(savedEntry)} onClick={() => onToggleResource(selectedResource)}>{savedEntry ? 'Remove from fieldbook' : 'Save to fieldbook'}</button><button type="button" onClick={() => window.alert('Prototype only: the final resource will open externally after a clear disclosure.')}>Open external resource</button></div>{savedEntry && <label className="resource-status-control">Your reading status<select value={savedEntry.status} onChange={(event) => onUpdateResourceStatus(selectedResource.id, event.target.value)}><option value="saved">Saved</option><option value="started">Started</option><option value="finished">Finished</option></select></label>}</article>}
+          </section>
+        </div>
+      )
+    }
+
+    return (
+      <div className="fieldbook-section-body course-map-section">
+        <p className="eyebrow">Course orientation</p>
+        <h3>Your route through the course</h3>
+        <CourseMap courseStops={courseStops} currentStopId={currentStopId} progress={progress} onNavigateToStop={(stopId) => { onNavigateToStop(stopId); onModeChange('side') }} />
+      </div>
+    )
+  }
+
+  const handleTabRailKeyDown = (event, index) => {
+    let nextIndex = null
+    if (event.key === 'ArrowDown' || event.key === 'ArrowRight') nextIndex = (index + 1) % NOTEBOOK_SECTIONS.length
+    if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') nextIndex = (index - 1 + NOTEBOOK_SECTIONS.length) % NOTEBOOK_SECTIONS.length
+    if (event.key === 'Home') nextIndex = 0
+    if (event.key === 'End') nextIndex = NOTEBOOK_SECTIONS.length - 1
+    if (nextIndex === null) return
+    event.preventDefault()
+    setActiveView(NOTEBOOK_SECTIONS[nextIndex].id)
+    tabRefs.current[nextIndex]?.focus()
+  }
+
+  const contextTitle = context?.artifactTitle || context?.stopTitle || context?.moduleTitle || 'Course overview'
+  const contextModule = context?.moduleTitle || 'Current lesson'
+
   const content = (
-    <>
-      <header className="notebook-header">
-        <div><p className="eyebrow">Private workspace</p><h2>Field Notebook</h2></div>
+    <div className="fieldbook-shell">
+      <header className="notebook-header fieldbook-header">
+        <div className="fieldbook-title-lockup">
+          <span className="fieldbook-cover-icon" aria-hidden="true">▥</span>
+          <div><p className="eyebrow">Private course workspace</p><h2 id="fieldbook-dialog-title">Field Notebook</h2></div>
+        </div>
         <div className="notebook-header-actions">
-          {mode === 'side' && <button type="button" onClick={() => onModeChange('full')}>Full screen</button>}
-          {mode === 'full' && <button type="button" onClick={() => onModeChange('side')}>Side panel</button>}
-          <button type="button" onClick={() => onModeChange('minimized')}>Minimize</button>
+          {mode === 'side' && <button type="button" onClick={() => onModeChange('full')}>Expand</button>}
+          {mode === 'full' && <button type="button" onClick={() => onModeChange('side')}>Dock right</button>}
+          <button type="button" onClick={() => onModeChange('minimized')}>Close</button>
         </div>
       </header>
 
-      <div className={`notebook-storage-line storage-${storageStatus}`} aria-live="polite">
-        <span aria-hidden="true">●</span>
-        <span>{storageMessage}</span>
-        <div className="notebook-storage-actions">
-          {(storageStatus === 'error' || storageStatus === 'unavailable') && <button type="button" onClick={onRetryStorage}>Retry</button>}
-          <button type="button" onClick={onReconsiderStorage}>Notebook storage choices</button>
-        </div>
-      </div>
-
-      <div className="notebook-tabs notebook-tabs-four" role="tablist" aria-label="Notebook sections">
-        <button type="button" role="tab" aria-selected={activeView === 'notes'} onClick={() => setActiveView('notes')}>Notes <span>{notes.length}</span></button>
-        <button type="button" role="tab" aria-selected={activeView === 'glossary'} onClick={() => setActiveView('glossary')}>Glossary <span>{glossaryEntries.length}/{glossaryTerms.length}</span></button>
-        <button type="button" role="tab" aria-selected={activeView === 'activities'} onClick={() => setActiveView('activities')}>Activities <span>{responses.length + quizAttempts.length}</span></button>
-        <button type="button" role="tab" aria-selected={activeView === 'bookmarks'} onClick={() => setActiveView('bookmarks')}>Bookmarks <span>{bookmarks.length}</span></button>
-      </div>
-
-      {activeView === 'notes' && (
-        <>
-          <div className="notebook-composer">
-            <label htmlFor="notebook-draft">{context?.artifactTitle ? `Note about “${context.artifactTitle}”` : 'General observation'}</label>
-            <textarea id="notebook-draft" value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Record what you notice, question, or want to remember." rows="5" />
-            <div className="composer-actions">
-              <button className="primary-button" type="button" onClick={saveDraft} disabled={!draft.trim() || storageStatus === 'loading'}>Save note</button>
-              {context?.artifactId && <button type="button" onClick={() => onToggleBookmark(context)}>{currentArtifactBookmarked ? 'Remove bookmark' : 'Bookmark artifact'}</button>}
-            </div>
-          </div>
-
-          <div className="notebook-tools">
-            <label htmlFor="notebook-search">Search notebook</label>
-            <input id="notebook-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search notes, modules, or artifacts" />
-          </div>
-
-          <div className="notebook-notes" aria-live="polite">
-            <div className="section-heading-row"><h3>Notebook entries</h3><span>{filteredNotes.length}</span></div>
-            {filteredNotes.length === 0 ? <p className="empty-state">{notes.length ? 'No entries match this search.' : 'Your observations will appear here.'}</p> : groupedNotes.map(([moduleTitle, moduleNotes]) => (
-              <section className="note-group" key={moduleTitle} aria-labelledby={`group-${moduleTitle.replace(/\W+/g, '-').toLowerCase()}`}>
-                <h4 id={`group-${moduleTitle.replace(/\W+/g, '-').toLowerCase()}`}>{moduleTitle}</h4>
-                {moduleNotes.map(renderNote)}
-              </section>
-            ))}
-          </div>
-        </>
-      )}
-
-      {activeView === 'glossary' && (
-        <div className="notebook-glossary">
-          <div className="glossary-heading-row">
-            <div>
-              <h3>Course glossary</h3>
-              <p>Terms begin faded. Select underlined terms in the lesson to add them and write definitions in your own words.</p>
-            </div>
-            <button type="button" onClick={onStartGlossaryStudy} disabled={glossaryEntries.length === 0}>Study as flashcards</button>
-          </div>
-          {groupedGlossaryTerms.map(([moduleTitle, terms]) => (
-            <section className="glossary-module" key={moduleTitle}>
-              <h4>{moduleTitle}</h4>
-              <ul className="glossary-list">
-                {terms.map((term) => {
-                  const entry = glossaryEntries.find((item) => item.termId === term.id)
-                  const expanded = expandedTermId === term.id
-                  const unavailableMessage = `Not yet added. Find this term in ${term.locationLabel}.`
-                  return (
-                    <li key={term.id} className={entry ? 'glossary-term-added' : 'glossary-term-unadded'}>
-                      <button
-                        type="button"
-                        title={entry ? `Show your definition of ${term.term}` : unavailableMessage}
-                        aria-label={entry ? `${term.term}. Added to glossary. Select to show your definition.` : `${term.term}. ${unavailableMessage}`}
-                        onClick={() => openGlossaryTerm(term)}
-                      >
-                        {term.term}
-                      </button>
-                      {!entry && <span className="glossary-location">{term.locationLabel}</span>}
-                      {entry && expanded && (
-                        <div className="glossary-definition-panel">
-                          <p><strong>Your definition</strong></p>
-                          <p>{entry.definition || 'No definition added yet.'}</p>
-                          <label htmlFor={`glossary-edit-${term.id}`}>Edit your definition</label>
-                          <textarea id={`glossary-edit-${term.id}`} rows="4" value={glossaryEdit} onChange={(event) => setGlossaryEdit(event.target.value)} />
-                          <button type="button" onClick={() => saveGlossaryDefinition(term)}>Save definition</button>
-                        </div>
-                      )}
-                    </li>
-                  )
-                })}
-              </ul>
-            </section>
+      <div className="fieldbook-workspace">
+        <nav className="fieldbook-tab-rail" aria-label="Field notebook sections">
+          {NOTEBOOK_SECTIONS.map((section) => (
+            <button key={section.id} id={`fieldbook-tab-${section.id}`} ref={(node) => { tabRefs.current[NOTEBOOK_SECTIONS.findIndex((item) => item.id === section.id)] = node }} type="button" className={activeView === section.id ? 'fieldbook-tab-active' : ''} aria-current={activeView === section.id ? 'page' : undefined} aria-controls="fieldbook-section-panel" onKeyDown={(event) => handleTabRailKeyDown(event, NOTEBOOK_SECTIONS.findIndex((item) => item.id === section.id))} onClick={() => setActiveView(section.id)}>
+              <span className="fieldbook-tab-icon" aria-hidden="true">{section.icon}</span>
+              <span className="fieldbook-tab-label">{section.label}</span>
+              {sectionCounts[section.id] !== undefined && <span className="fieldbook-tab-count">{sectionCounts[section.id]}</span>}
+            </button>
           ))}
-        </div>
-      )}
+        </nav>
+        <span className="sr-only" aria-live="polite">{NOTEBOOK_SECTIONS.find((section) => section.id === activeView)?.label} section selected.</span>
 
-      {activeView === 'activities' && (
-        <div className="notebook-activities">
-          <div className="section-heading-row"><h3>Learning activity responses</h3><span>{responses.length + quizAttempts.length}</span></div>
-          {responses.length === 0 && quizAttempts.length === 0 ? <p className="empty-state">Written responses and knowledge checks will appear here.</p> : (
-            <div>
-              {[...responses].reverse().map((response) => (
-                <article className="notebook-entry activity-entry" key={response.id}>
-                  <p className="note-source">{response.activityTitle}</p>
-                  {response.moduleTitle && <p className="note-module">{response.moduleTitle}</p>}
-                  {response.prompt && <p className="activity-record-prompt">{response.prompt}</p>}
-                  <p className="note-text">{response.text}</p>
-                  <p className="note-date">Saved {new Date(response.updatedAt).toLocaleString()}</p>
-                </article>
-              ))}
-              {[...quizAttempts].reverse().map((attempt) => (
-                <article className="notebook-entry activity-entry" key={attempt.id}>
-                  <p className="note-source">{attempt.activityTitle}</p>
-                  {attempt.moduleTitle && <p className="note-module">{attempt.moduleTitle}</p>}
-                  {attempt.prompt && <p className="activity-record-prompt">{attempt.prompt}</p>}
-                  <p><strong>{attempt.correct ? 'Supported by the prototype evidence' : 'Revisit the room'}</strong></p>
-                  <p className="note-text">{attempt.feedback}</p>
-                  <p className="note-date">Attempted {new Date(attempt.attemptedAt).toLocaleString()}</p>
-                </article>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+        <div className="fieldbook-page">
+          <section className="fieldbook-context-card" aria-label="Current course location">
+            <div><p className="eyebrow">Current location</p><strong>{contextModule}</strong><span>{contextTitle}</span></div>
+            {context?.artifactId && <button type="button" onClick={() => onToggleBookmark(context)}>{currentArtifactBookmarked ? 'Bookmarked' : 'Bookmark source'}</button>}
+          </section>
 
-      {activeView === 'bookmarks' && (
-        <div className="notebook-bookmarks">
-          <div className="section-heading-row"><h3>Bookmarked artifacts</h3><span>{bookmarks.length}</span></div>
-          {bookmarks.length === 0 ? <p className="empty-state">Bookmarked artifacts will appear here.</p> : (
-            <ul>
-              {[...bookmarks].reverse().map((bookmark) => (
-                <li key={bookmark.id}>
-                  <div><strong>{bookmark.artifactTitle || bookmark.artifactId}</strong>{bookmark.moduleTitle && <span>{bookmark.moduleTitle}</span>}</div>
-                  <div className="inline-actions">
-                    <button type="button" onClick={() => navigateTo(bookmark)}>Open artifact</button>
-                    <button className="text-button danger-text" type="button" onClick={() => onToggleBookmark(bookmark)}>Remove</button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-
-      <footer className="notebook-footer">
-        <button type="button" onClick={onExport}>Export Markdown</button>
-        {!confirmDeleteAll ? <button className="danger-button" type="button" onClick={() => setConfirmDeleteAll(true)}>Clear notebook and storage choices</button> : (
-          <div className="delete-confirmation" role="group" aria-label="Confirm clearing notebook and storage choices">
-            <strong>Clear every note, bookmark, and storage choice?</strong>
-            <button className="danger-button" type="button" onClick={handleDeleteAll}>Yes, clear everything</button>
-            <button type="button" onClick={() => setConfirmDeleteAll(false)}>Cancel</button>
+          <div className="fieldbook-page-heading">
+            <div><p className="eyebrow">Fieldbook section</p><h3 id="fieldbook-section-heading">{NOTEBOOK_SECTIONS.find((section) => section.id === activeView)?.label}</h3></div>
+            <button className="fieldbook-settings-button" type="button" aria-expanded={settingsOpen} onClick={() => setSettingsOpen((value) => !value)}>Settings</button>
           </div>
-        )}
-      </footer>
-    </>
+
+          {settingsOpen && (
+            <section className={`fieldbook-settings storage-${storageStatus}`} aria-label="Notebook storage and export settings">
+              <div aria-live="polite"><strong>Storage</strong><p>{storageMessage}</p></div>
+              <div className="inline-actions">
+                {(storageStatus === 'error' || storageStatus === 'unavailable') && <button type="button" onClick={onRetryStorage}>Retry storage</button>}
+                <button type="button" onClick={onReconsiderStorage}>Change storage choice</button>
+                <button type="button" onClick={onExport}>Export Markdown</button>
+              </div>
+              {!confirmDeleteAll ? <button className="danger-button" type="button" onClick={() => setConfirmDeleteAll(true)}>Clear local notebook data</button> : (
+                <div className="delete-confirmation" role="group" aria-label="Confirm clearing notebook and storage choices">
+                  <strong>Clear every note, bookmark, glossary entry, and storage choice?</strong>
+                  <button className="danger-button" type="button" onClick={handleDeleteAll}>Yes, clear everything</button>
+                  <button type="button" onClick={() => setConfirmDeleteAll(false)}>Cancel</button>
+                </div>
+              )}
+            </section>
+          )}
+
+          <main id="fieldbook-section-panel" className="fieldbook-page-content" role="region" aria-labelledby="fieldbook-section-heading">{renderSection()}</main>
+        </div>
+      </div>
+    </div>
   )
 
-  if (mode === 'full') return <div className="notebook-full-backdrop"><section className="notebook notebook-panel notebook-full" role="dialog" aria-modal="true" aria-label="Full-screen field notebook" tabIndex="-1" ref={fullScreenRef}>{content}</section></div>
-  return <aside className="notebook notebook-panel notebook-side" aria-label="Field notebook side panel">{content}</aside>
+  if (mode === 'full') return <div className="notebook-full-backdrop"><section className="notebook notebook-panel notebook-full fieldbook-full" role="dialog" aria-modal="true" aria-labelledby="fieldbook-dialog-title" aria-describedby="fieldbook-keyboard-hint" tabIndex="-1" ref={fullScreenRef}><p id="fieldbook-keyboard-hint" className="sr-only">Use the labeled section tabs to move through the field notebook. Press Escape to return to the docked notebook.</p>{content}</section></div>
+  return <aside className="notebook notebook-panel notebook-side fieldbook-side" aria-label="Field notebook side panel">{content}</aside>
 }
