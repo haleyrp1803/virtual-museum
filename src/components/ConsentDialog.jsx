@@ -18,7 +18,7 @@ export default function ConsentDialog({ onAccept, onDecline, storageSupported = 
             complete notebook only for the current browser session.
           </p>
           <p>
-            Nothing is sent to the museum or visible to its curators. Session-only work disappears when the browser session
+            Nothing is sent to the course project or visible to its creators. Session-only work disappears when the browser session
             ends. Persistently saved work may be erased if you clear browser data or change devices. You can export your
             notebook as a Markdown file in either mode.
           </p>

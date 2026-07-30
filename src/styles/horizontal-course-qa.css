@@ -13,9 +13,6 @@
    relocates notebook storage choices into the notebook itself.
    -------------------------------------------------------------------------- */
 
-/* The timeline now occupies the space immediately beneath the header. */
-.course-app > .storage-status { display: none; }
-
 /* Burgundy is the readable text accent on paper; dusty rose is reserved for
    dark historical surfaces. */
 .eyebrow { color: var(--burgundy); }

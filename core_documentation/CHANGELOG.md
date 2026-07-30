@@ -20,12 +20,12 @@ This document owns the detailed current checkpoint, milestone chronology, redire
 ## 1. Current Synchronized Checkpoint
 
 ```text
-0a90da2 — Complete field notebook redesign and course map
+bead569 — Remove obsolete stylesheet compatibility rules
 Branch: main
 Status: local and origin/main aligned after the latest sync ritual
 ```
 
-This checkpoint establishes the accepted Field Notebook and horizontal-course baseline:
+This checkpoint establishes the accepted horizontally progressing course plus the completed architecture-stabilization baseline:
 
 - horizontally progressing desktop course;
 - combined bottom Previous / timeline / Next navigation;
@@ -35,9 +35,23 @@ This checkpoint establishes the accepted Field Notebook and horizontal-course ba
 - glossary discovery, learner-authored definitions, and flashcard study;
 - saved Further Study resources;
 - vertically curving Course Map with discrete complete solid/dotted route segments;
-- accessibility and visual integration pass for notebook focus, keyboard, contrast, motion, and empty states.
+- accessibility and visual integration pass for notebook focus, keyboard, contrast, motion, and empty states;
+- development-time course-data validation;
+- decomposed notebook sections, workspace logic, persistence, course rendering, navigation, and stylesheet cascade;
+- human-facing ownership comments across active source files;
+- removal of obsolete standalone storage-status and stylesheet compatibility paths.
 
 ## 2. Recent Milestones, Newest First
+
+### Architecture stabilization and codebase decomposition — 2026-07-30
+
+- Added development-time validation for duplicate IDs and broken course, artifact, glossary, resource, activity, timeline, and Course Map references.
+- Extracted Course Map layout, notebook section renderers, pure workspace actions, Markdown export, browser persistence lifecycle, course-stop renderers, and course navigation into explicit owners.
+- Preserved the stable `useLocalWorkspace()` API, workspace schema, IndexedDB/session keys, learner data, CSS selectors, navigation inputs, and notebook behavior across the migration.
+- Decomposed the 2,183-line stylesheet into six documented ordered layers without changing the cascade, then removed only proven-inactive compatibility rules.
+- Restored artifact-note and Pause and Respond save paths discovered during regression testing.
+- Added human-readable comments documenting ownership, data flow, fragile coupling, and compatibility boundaries.
+- Accepted commits: **`2de85f1`**, **`5dc11fd`**, **`828b55c`**, **`804ccd7`**, **`9229162`**, **`8a96c57`**, **`20e6836`**, **`f821d12`**, and **`bead569`**.
 
 ### Field Notebook redesign and Course Map — 2026-07-30
 
@@ -135,7 +149,17 @@ The Field Notebook can classify completed and to-revisit activity records. It do
 
 | Date | Commit | Message | Decoration |
 |---|---|---|---|
-| 2026-07-30 | `0a90da2` | Complete field notebook redesign and course map | HEAD → main, origin/main |
+| 2026-07-30 | `bead569` | Remove obsolete stylesheet compatibility rules | HEAD → main, origin/main |
+| 2026-07-30 | `f821d12` | Decompose stylesheet cascade | |
+| 2026-07-30 | `20e6836` | Extract course navigation logic | |
+| 2026-07-30 | `8a96c57` | Decompose course stop rendering | |
+| 2026-07-30 | `9229162` | Separate workspace persistence lifecycle | |
+| 2026-07-30 | `804ccd7` | Complete field notebook section extraction | |
+| 2026-07-30 | `828b55c` | Split notebook sections and restore activity saves | |
+| 2026-07-30 | `5dc11fd` | Extract workspace logic and notebook model | |
+| 2026-07-30 | `2de85f1` | Add architecture safeguards and stabilize artifact notes | |
+| 2026-07-30 | `79efc03` | Add core project documentation | |
+| 2026-07-30 | `0a90da2` | Complete field notebook redesign and course map | |
 | 2026-07-30 | `87d370e` | Add glossary workflow and flashcard study mode | |
 | 2026-07-29 | `083b8c6` | Build horizontal course vertical slice prototype | |
 | 2026-07-29 | `ddc5e0e` | Refine classroom aesthetic and dock notebook side panel | |

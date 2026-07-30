@@ -29,7 +29,7 @@ This document owns current architecture, source/module ownership, state and data
 Current synchronized checkpoint:
 
 ```text
-0a90da2 — Complete field notebook redesign and course map
+bead569 — Remove obsolete stylesheet compatibility rules
 Branch: main
 Status: local and origin/main aligned after the latest sync ritual
 ```
@@ -46,7 +46,7 @@ The active application is a static, client-side React application built with Vit
 |---|---|
 | UI | React 19 |
 | Build system | Vite 8 |
-| Styling | One shared stylesheet: `src/styles/global.css` |
+| Styling | Ordered plain-CSS layers imported by `src/styles/global.css` |
 | Persistence | IndexedDB or session storage |
 | Deployment | GitHub Actions → GitHub Pages |
 | Routing | Stateful single-page course; no external router |
@@ -59,27 +59,33 @@ The active application is a static, client-side React application built with Vit
 - Active branch: `main`
 - Repository: `https://github.com/haleyrp1803/virtual-museum`
 - Live site: `https://haleyrp1803.github.io/virtual-museum/`
-- Active checkpoint: `0a90da2`
+- Active checkpoint: `bead569`
 
 ### Application-boundary inventory
 
 | System | Primary owner | Core responsibility | Sensitive coupling | Minimum regression check |
 |---|---|---|---|---|
-| Top-level course orchestration | `src/App.jsx` | course position, wheel/keyboard navigation, stop rendering, Field Notebook mode, glossary dialog, study mode | horizontal viewport, bottom timeline, notebook context | traverse every stop by all navigation methods |
-| Course structure | `src/data/course.js` | ordered stops, timeline segments, Further Study catalog | Course Map IDs, notebook backlinks, visual era classes | every stop/timeline/map link resolves |
-| Field Notebook | `src/components/Notebook.jsx` | six-section fieldbook, master–detail views, settings, Course Map | workspace schema, current context, focus trap, global CSS | minimized/docked/full, all tabs, all actions |
-| Learner workspace hook | `src/hooks/useLocalWorkspace.js` | persistence mode, CRUD operations, progress, export | IndexedDB, session storage, data shape | persistent and session-only complete workflows |
-| IndexedDB adapter | `src/storage/workspaceDb.js` | database open/read/write/delete and schema normalization | browser support, blocked tabs, schema compatibility | reopen, save, delete, error/retry |
-| Glossary study | `GlossaryStudy.jsx` and glossary components | learner definitions and flashcards | glossary IDs, module IDs, lesson backlinks | add, define, edit, study, return |
-| Media | `ArtifactMedia.jsx` | text/image/audio/video rendering and alternatives | asset paths, transcripts, captions | each media type and accessibility alternative |
-| Activities | `LearningActivities.jsx` | written responses, quizzes, compare response | workspace responses and quiz attempts | save, revise, feedback, notebook display |
-| Styling | `src/styles/global.css` | full visual system and layout | course viewport, notebook docking, timeline height, high-contrast rules | full course and notebook visual regression |
+| Top-level composition | `src/App.jsx` | screen mode, notebook coordination, glossary/study flows, workspace callbacks | course shell, notebook context, bottom navigation | traverse all screens and notebook entry points |
+| Course navigation | `src/hooks/useCourseNavigation.js` | active stop, refs, wheel/keyboard movement, observer synchronization | stable stop IDs, focus-field exclusions, reduced motion | every navigation method and form-field protection |
+| Course-stop dispatch | `src/components/CourseStop.jsx` | shared stop wrapper and stop-type dispatch | section IDs/classes/refs, renderer contract | every stop type renders and remains observable |
+| Stop renderers | `src/components/courseStops/` | type-specific course-stop presentation | course data fields, artifact/resource callbacks | each stop type and action path |
+| Course structure | `src/data/course.js` | ordered stops, timeline segments, Further Study catalog | Course Map IDs, backlinks, visual era classes | validation passes and every target resolves |
+| Course data validation | `src/data/validateCourseData.js` | development-time duplicate and reference checks | course, artifact, glossary, activity, resource, and map IDs | app starts without validation errors |
+| Field Notebook shell | `src/components/Notebook.jsx` | modes, focus, section navigation, shared state, settings | section contracts, workspace API, docking CSS | minimized/docked/full, focus, all sections |
+| Notebook sections | `src/components/notebookSections/` | Notes, Glossary, Activities, Bookmarks, Resources, Course Map interfaces | shell-owned filters/selections, callbacks | each section’s full workflow |
+| Course Map | `CourseMap.jsx` and `data/courseMapLayout.js` | rendering and fixed route geometry | course stop IDs, visited-state semantics | all nodes and complete solid/dotted segments |
+| Workspace facade | `src/hooks/useLocalWorkspace.js` | UI-facing learner action API and identifiers/timestamps | pure actions, persistence hook, export | all 22 returned API properties and workflows |
+| Persistence lifecycle | `src/hooks/useWorkspacePersistence.js` | consent, load/save effects, storage states, retry, clearing | IndexedDB adapter and compatibility keys | persistent/session/upgrade/error paths |
+| Pure workspace actions | `src/storage/workspaceActions.js` | immutable domain transformations | workspace schema and action metadata | notes, bookmarks, activities, glossary, resources |
+| Workspace export | `src/storage/workspaceExport.js` | Markdown construction and download | workspace record shapes and learner-facing terminology | populated export audit |
+| IndexedDB adapter | `src/storage/workspaceDb.js` | schema normalization and database mechanics | compatibility identifiers and blocked-tab behavior | reopen, save, delete, error/retry |
+| Styling | `src/styles/global.css` plus six imported layers | documented cascade and system-level visual ownership | import order, docking, viewport, accessibility overrides | full visual regression after any stylesheet change |
 
 ## 2. Application and Navigation Model
 
 ### Active course model
 
-The site is one horizontally scrolling course canvas. `App.jsx` renders `courseStops` in order and tracks `activeStopIndex`.
+The site is one horizontally scrolling course canvas. `App.jsx` composes the course, while `useCourseNavigation.js` owns `activeStopIndex`, course refs, and all movement/observer synchronization. `CourseStop.jsx` preserves the shared section wrapper and dispatches each stop to a type-specific renderer.
 
 The active prototype sequence is:
 
@@ -98,7 +104,7 @@ Introduction
 
 ### Navigation inputs
 
-`App.jsx` supports:
+`useCourseNavigation.js` supports:
 
 - wheel-to-next/previous translation;
 - native horizontal trackpad input;
@@ -229,7 +235,7 @@ The component must render both `notebook` and `notebook-panel` classes. Earlier 
 
 ### Permanent sections
 
-`NOTEBOOK_SECTIONS` defines:
+`NOTEBOOK_SECTIONS` in `notebookModel.js` defines:
 
 1. Notes
 2. Glossary
@@ -351,23 +357,9 @@ Error states must allow retry. Storage choice must remain available inside noteb
 
 ### Workspace operations
 
-`useLocalWorkspace.js` owns:
+`useLocalWorkspace.js` is the stable UI-facing facade. It owns action validation, IDs/timestamps, delegation to pure transformations, and export initiation. `useWorkspacePersistence.js` owns consent, loading, IndexedDB/session synchronization, retry, status transitions, and clearing browser storage. `workspaceActions.js` owns immutable note, bookmark, progress, activity, glossary, and resource updates.
 
-- consent selection;
-- loading;
-- retry;
-- note CRUD;
-- bookmarking;
-- artifact viewed state;
-- activity attempted state;
-- written responses;
-- quiz attempts;
-- glossary entries;
-- saved resources and status;
-- clear-all;
-- Markdown export.
-
-All writes must go through this hook rather than directly mutating browser storage.
+All UI writes must go through this facade rather than directly mutating browser storage. Pure transformations belong in `workspaceActions.js`; browser lifecycle work belongs in `useWorkspacePersistence.js`.
 
 ### Markdown export
 
@@ -445,18 +437,29 @@ without an explicit privacy/security review.
 
 ## 8. Styling and Visual Transitions
 
-### Shared stylesheet
+### Ordered stylesheet layers
 
-`src/styles/global.css` currently owns the complete design system and all component styling. At more than two thousand lines, it is a high-risk shared file.
+`src/styles/global.css` is now a short import ledger rather than a monolith. Its order is behavioral and must remain:
 
-Before editing:
+```css
+@import './foundation.css';
+@import './classroom-aesthetic.css';
+@import './horizontal-course.css';
+@import './horizontal-course-qa.css';
+@import './glossary-study.css';
+@import './field-notebook.css';
+```
 
-- read the complete current file;
-- verify selectors against current component markup;
-- avoid full-file replacement from a stale pass;
-- preserve course layout, notebook docking, Course Map, flashcard animation, contrast modes, and reduced-motion rules.
+Ownership:
 
-A future stylesheet decomposition may be appropriate, but it must be a dedicated structural pass.
+- `foundation.css`: reset, base elements, early shared component rules;
+- `classroom-aesthetic.css`: paper/wood visual system and accepted classroom styling;
+- `horizontal-course.css`: fixed course viewport, stops, eras, timeline;
+- `horizontal-course-qa.css`: accepted containment and navigation corrections;
+- `glossary-study.css`: key terms, glossary dialog/study, flashcards;
+- `field-notebook.css`: current notebook shell, section layouts, Course Map, final accessibility refinements.
+
+Before editing, read the import ledger and the complete affected layer. Verify selectors against current markup. Do not reorder imports or consolidate cross-layer overrides casually. Pass 6B found that most repeated selectors were partial overrides rather than safe duplicates; only demonstrably inactive compatibility rules were removed.
 
 ### Era transitions
 
@@ -473,42 +476,59 @@ Aesthetic differences carry pedagogical meaning. They should be documented in th
 
 ### `src/App.jsx`
 
-Top-level orchestration. Owns:
+Top-level composition and cross-feature coordination. Owns notebook mode/context, glossary dialog, study screen, activity draft state, workspace callbacks, and course/timeline composition. Navigation mechanics and stop rendering no longer belong here.
 
-- active stop;
-- navigation;
-- `IntersectionObserver`;
-- wheel-lock timing;
-- notebook mode;
-- glossary dialog;
-- flashcard screen;
-- active note context;
-- course-stop rendering;
-- Further Study save actions.
+### `src/hooks/useCourseNavigation.js`
 
-This file is already concentrated. Do not casually add more feature systems without considering extraction.
+Single owner of active stop state, refs, bounded navigation, stable-ID navigation, keyboard/wheel handling, `IntersectionObserver`, wheel locking, reduced-motion behavior, and form-field exclusions.
+
+### `src/components/CourseStop.jsx`
+
+Preserves the shared stop section markup, IDs, classes, refs, headings, and accessibility contract. Dispatches by `stop.type` to `src/components/courseStops/`.
+
+### `src/components/courseStops/`
+
+Presentational stop-type renderers. They receive only needed data and callbacks and must not acquire navigation or persistence ownership.
 
 ### `src/components/Notebook.jsx`
 
-Largest component and primary Field Notebook owner. It contains:
+Field Notebook shell and shared state coordinator. Owns modes, focus trap/restoration, section navigation, filters/selections/edit state, settings, and dispatch to the six section renderers.
 
-- section vocabulary;
-- Course Map node and segment definitions;
-- full-screen focus trap;
-- section navigation;
-- all section master–detail views;
-- settings;
-- export/delete controls.
+### `src/components/notebookSections/`
 
-This is a fragile file. New section-level work should be bounded, and future decomposition is likely warranted.
+Feature renderers for Notes, Glossary, Activities, Bookmarks, Resources, and Course Map. Persistence remains callback-driven; section state deliberately remains in the shell so it survives section changes.
+
+### `src/components/notebookModel.js`
+
+Stable notebook section vocabulary and pure display selectors.
+
+### `src/components/CourseMap.jsx` and `src/data/courseMapLayout.js`
+
+Course Map rendering and fixed geometry. Semantic IDs remain validated against `courseStops`.
 
 ### `src/hooks/useLocalWorkspace.js`
 
-Single learner-state authority. It should remain the only normal path for workspace mutations.
+Stable UI-facing workspace facade. Do not bypass it from components.
+
+### `src/hooks/useWorkspacePersistence.js`
+
+Browser persistence lifecycle. Existing `virtual-museum-*` storage identifiers are compatibility contracts and must not be renamed without an explicit migration.
+
+### `src/storage/workspaceActions.js`
+
+Pure immutable workspace transformations.
+
+### `src/storage/workspaceExport.js`
+
+Human-readable Markdown construction and browser download. It is not a restorable backup format.
 
 ### `src/storage/workspaceDb.js`
 
-Pure persistence adapter and schema normalizer.
+IndexedDB adapter and additive schema normalizer. Database name, store, key, and schema version are compatibility-sensitive.
+
+### `src/data/validateCourseData.js`
+
+Development-time validation of unique IDs and cross-file references. New data families should be added to this validator when they create shared identifiers.
 
 ### `src/components/GlossaryStudy.jsx`
 
@@ -524,7 +544,7 @@ Inline lesson-term trigger.
 
 ### `src/components/LearningActivities.jsx`
 
-Activity renderers and save/submit behavior.
+Reusable activity renderers. The vertical-slice Pause and Respond stop uses the same two-argument save contract: `(activity, response)`.
 
 ### `src/components/ArtifactMedia.jsx`
 
@@ -532,27 +552,15 @@ Artifact media and accessibility alternatives.
 
 ### `src/components/ConsentDialog.jsx`
 
-First-use storage consent.
+First-use storage choice. It reports the learner’s decision to the workspace facade and does not write storage directly.
 
-### `src/components/StorageStatus.jsx`
+### `src/data/course.js`, `src/data/glossary.js`, and `src/data/modules.js`
 
-Legacy status component. The active horizontal-course interface moved persistent storage controls into the Field Notebook. Confirm active usage before changing or removing this file.
+Authoritative course, vocabulary, artifact, and activity catalogs. Shared IDs are checked by `validateCourseData.js`.
 
-### `src/data/course.js`
+### `src/styles/global.css` and imported layers
 
-Active horizontal course structure and Further Study catalog.
-
-### `src/data/glossary.js`
-
-Fixed vocabulary catalog.
-
-### `src/data/modules.js`
-
-Current placeholder artifact and activity catalog. Its earlier module-array structures reflect prototype ancestry; confirm actual imports before assuming every export is active.
-
-### `src/styles/global.css`
-
-Shared visual and layout contract.
+The import ledger and ordered visual-system layers described in Section 8.
 
 ## 10. Fragile Zones and Regression Matrix
 
@@ -569,7 +577,7 @@ Shared visual and layout contract.
 | Course Map | line fragments, incorrect node state, bad backlink | every current stop, visited/unvisited segments |
 | Resources | catalog/saved state mismatch | save, status change, remove, export |
 | Markdown export | missing learner records or invalid context | populate every section and export |
-| `global.css` | unrelated accepted style silently overwritten | full-course visual audit after any CSS pass |
+| Stylesheet import order/layers | accepted overrides lost or moved earlier in cascade | verify ledger order and full-course visual audit |
 
 ## 11. Active Technical Backlog
 
@@ -577,14 +585,13 @@ Shared visual and layout contract.
 2. Define the complete course structure beyond the current vertical slice.
 3. Finalize public title and branding.
 4. Decide whether to remove the tracked `virtual-museum-prototype-pass2/` archive.
-5. Consider decomposing `Notebook.jsx` and `global.css` after concrete maintenance pressure justifies it.
-6. Add explicit activity-skip records if the teaching design requires them.
-7. Add a machine-readable workspace backup/import format if personal continuity across devices becomes a priority.
-8. Establish published-lesson stability, correction, and versioning policy.
-9. Review external media providers individually before embedding.
-10. Perform usability testing with intended public learners and disabled users.
-11. Revisit desktop minimum viewport and browser support statement.
-12. Add automated validation for course stop IDs, artifact references, glossary locations, captions, transcripts, rights, and alt text.
+5. Add explicit activity-skip records if the teaching design requires them.
+6. Add a machine-readable workspace backup/import format if personal continuity across devices becomes a priority.
+7. Establish published-lesson stability, correction, and versioning policy.
+8. Review external media providers individually before embedding.
+9. Perform usability testing with intended public learners and disabled users.
+10. Revisit desktop minimum viewport and browser support statement.
+11. Extend automated validation to captions, transcripts, rights, alt text, and future content completeness requirements.
 
 ## 12. Archived and Compatibility Paths
 
@@ -596,13 +603,13 @@ Commits before `083b8c6` preserve the earlier room/module museum metaphor. It is
 
 `virtual-museum-prototype-pass2/` is tracked inside the repository. The active app uses root-level `src/`, `public/`, and configuration files. Treat the nested folder as an archival snapshot, not a second source of truth.
 
-### `StorageStatus.jsx`
+### Removed standalone storage-status path
 
-This component remains present from the earlier persistent-banner implementation. The active design moved storage messaging into the Field Notebook. Verify whether it is imported before deletion.
+`StorageStatus.jsx` and its dead `.storage-status` CSS were removed after an import audit confirmed that the active interface uses only the Field Notebook settings panel. The workspace `storageStatus` state remains active and is not related to the deleted presentation component.
 
 ### Mobile CSS ancestry
 
-Some early responsive rules remain in `global.css`, but the current product decision is desktop-only. Do not treat those rules as a supported mobile contract.
+Some early responsive rules remain across the imported stylesheet layers, but the current product decision is desktop-only. Do not treat those rules as a supported mobile contract.
 
 ## 13. Fresh-Chat Handoff Essentials
 
@@ -611,7 +618,7 @@ A future chat should begin with:
 ```text
 Source of truth: C:\Users\haley\OneDrive\Desktop\virtual-museum\
 Branch: main
-Checkpoint: 0a90da2 — Complete field notebook redesign and course map
+Checkpoint: bead569 — Remove obsolete stylesheet compatibility rules
 ```
 
 It should also be told:
@@ -625,7 +632,8 @@ It should also be told:
 - session-only use retains full notebook functionality;
 - the Field Notebook has Notes, Glossary, Activities, Bookmarks, Resources, and Course Map;
 - Course Map connectors use discrete complete solid/dotted segments;
-- `Notebook.jsx` and `global.css` are fragile;
+- navigation, notebook shell/sections, workspace logic, persistence, course rendering, and styles now have explicit ownership boundaries;
+- `Notebook.jsx`, `useCourseNavigation.js`, `useWorkspacePersistence.js`, and stylesheet import order remain fragile contracts;
 - the nested Pass 2 folder is archival, not active;
 - documentation is additive and exhaustive by default.
 

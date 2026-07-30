@@ -130,7 +130,7 @@ export async function clearWorkspaceDatabase() {
     const request = window.indexedDB.deleteDatabase(DB_NAME)
     request.onsuccess = () => resolve()
     request.onerror = () => reject(request.error ?? new Error('Could not delete the local workspace database.'))
-    request.onblocked = () => reject(new Error('Close other museum tabs before deleting local data.'))
+    request.onblocked = () => reject(new Error('Close other course tabs before deleting local data.'))
   })
 }
 

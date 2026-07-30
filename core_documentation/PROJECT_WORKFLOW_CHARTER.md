@@ -24,7 +24,7 @@ This Charter owns mandatory process rules, source-of-truth continuity, delivery/
 Current synchronized checkpoint:
 
 ```text
-0a90da2 — Complete field notebook redesign and course map
+bead569 — Remove obsolete stylesheet compatibility rules
 Branch: main
 Status: local and origin/main aligned after the latest sync ritual
 ```
@@ -83,9 +83,13 @@ This is mandatory for fragile files including:
 
 - `src/App.jsx`
 - `src/components/Notebook.jsx`
+- `src/components/CourseStop.jsx`
+- `src/hooks/useCourseNavigation.js`
 - `src/hooks/useLocalWorkspace.js`
-- `src/styles/global.css`
+- `src/hooks/useWorkspacePersistence.js`
+- `src/styles/global.css` and the affected imported stylesheet layer
 - `src/data/course.js`
+- `src/data/validateCourseData.js`
 
 Do not patch from remembered snippets or an older prototype archive.
 
@@ -96,18 +100,21 @@ Small targeted edits are allowed only after full-file review and only when:
 - stale code cannot be reintroduced;
 - risk is lower than a complete replacement.
 
-### 1.5 Shared stylesheet safeguard
+### 1.5 Ordered stylesheet safeguard
 
-`src/styles/global.css` is a high-risk shared dependency.
+`src/styles/global.css` is an import ledger for six ordered plain-CSS layers. The import order is a high-risk shared dependency because later layers intentionally preserve accepted overrides.
 
-For a small styling correction:
+For a styling correction:
 
-- start from the exact latest file;
-- identify unrelated accepted behaviors that must survive;
+- read `global.css` and the complete affected layer;
+- identify which later layers may override the same selectors;
+- verify selectors against current component markup;
+- preserve the import order unless the pass explicitly changes cascade architecture;
 - prefer a narrow source-verified edit;
-- do not deliver a stale full stylesheet for convenience.
+- do not copy rules into a different layer merely for thematic neatness;
+- do not assume repeated selectors are duplicates—many are partial historical overrides.
 
-Earlier notebook anchoring defects were caused by class/selector mismatch. Inspect both component markup and CSS expectations before changing docking behavior.
+Earlier notebook anchoring defects were caused by class/selector mismatch. Pass 6B also confirmed that most repeated selectors could not be deleted safely. Inspect both markup and all relevant cascade layers before changing docking or viewport behavior.
 
 ### 1.6 Human-readable comments
 
@@ -447,7 +454,7 @@ A fresh-chat handoff should include:
 ```text
 Source: C:\Users\haley\OneDrive\Desktop\virtual-museum\
 Branch: main
-Checkpoint: 0a90da2 — Complete field notebook redesign and course map
+Checkpoint: bead569 — Remove obsolete stylesheet compatibility rules
 ```
 
 It should also include the narrow current task and the affected current source files. Before development, read the root README and all four core documents.

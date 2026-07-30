@@ -8,9 +8,9 @@
 
 export function buildWorkspaceMarkdown(workspace, exportedAt = new Date()) {
   const lines = [
-    '# My Virtual Museum Field Notebook', '',
+    '# My History of Education Field Notebook', '',
     `Exported: ${exportedAt.toLocaleString()}`, '',
-    '> This file contains private notes exported from the Virtual Museum. The museum did not receive or store this work.', '',
+    '> This file contains private notes exported from the History of Education course. The course project did not receive or store this work.', '',
   ]
 
   if (workspace.bookmarks.length) {
@@ -83,7 +83,7 @@ export function buildWorkspaceMarkdown(workspace, exportedAt = new Date()) {
       lines.push(`### ${attempt.activityTitle || 'Knowledge check'}`, '')
       if (attempt.prompt) lines.push(`**Prompt:** ${attempt.prompt}`, '')
       lines.push(`Selected option: \`${attempt.selectedOptionId}\``, '')
-      lines.push(`Result: ${attempt.correct ? 'Supported by the prototype evidence' : 'Revisit the room'}`, '')
+      lines.push(`Result: ${attempt.correct ? 'Supported by the prototype evidence' : 'Revisit the lesson'}`, '')
       if (attempt.feedback) lines.push(attempt.feedback, '')
       lines.push(`_Attempted ${new Date(attempt.attemptedAt).toLocaleString()}_`, '')
     })
@@ -99,7 +99,7 @@ export function downloadWorkspaceMarkdown(workspace) {
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = `virtual-museum-field-notebook-${exportedAt.toISOString().slice(0, 10)}.md`
+  link.download = `history-of-education-field-notebook-${exportedAt.toISOString().slice(0, 10)}.md`
   document.body.appendChild(link)
   link.click()
   link.remove()

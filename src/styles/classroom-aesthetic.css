@@ -100,8 +100,7 @@ select {
 .notebook-header-actions button,
 .notebook-footer button,
 .artifact-actions button,
-.back-button,
-.storage-status-actions button {
+.back-button {
   border-color: #9c7b47;
   border-radius: 5px;
   color: #f8edd4;
@@ -113,8 +112,7 @@ select {
 .notebook-header-actions button:hover,
 .notebook-footer button:hover,
 .artifact-actions button:hover,
-.back-button:hover,
-.storage-status-actions button:hover {
+.back-button:hover {
   background: linear-gradient(#7a5439, #583522);
 }
 
@@ -345,15 +343,11 @@ select {
   color: #d8c28d;
 }
 
-.notebook-storage-line,
-.storage-status {
+.notebook-storage-line {
   background-color: #dfd1b5;
   border-color: #b59e72;
 }
 
-.storage-disabled {
-  background: #d9cbb2;
-}
 
 .storage-error,
 .storage-unavailable {

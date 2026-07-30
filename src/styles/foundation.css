@@ -125,15 +125,6 @@ main { min-height: calc(100vh - 74px); }
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
 }
 
-.storage-status { position: relative; z-index: 19; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.7rem clamp(1rem, 4vw, 4rem); border-bottom: 1px solid var(--line); background: #eef2ef; color: var(--ink); font-size: 0.92rem; }
-.storage-status > div:first-child { display: flex; flex-wrap: wrap; gap: 0.45rem 0.85rem; }
-.storage-status strong { color: var(--green-dark); }
-.storage-status-actions { display: flex; gap: 0.45rem; }
-.storage-status-actions button { border: 1px solid var(--line); border-radius: 999px; padding: 0.4rem 0.7rem; background: var(--paper); }
-.storage-disabled { background: #f1ede4; }
-.storage-error, .storage-unavailable { background: #f7e8e4; }
-.storage-saving { background: #f7f1df; }
-
 .consent-actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.5rem; }
 .status-message { padding: 0.8rem 1rem; border-radius: 10px; }
 .status-error { background: #f7e8e4; color: #6f2c25; }
@@ -144,11 +135,6 @@ main { min-height: calc(100vh - 74px); }
 .notebook-storage-line.storage-error > span:first-child, .notebook-storage-line.storage-unavailable > span:first-child { color: #8b392f; }
 .delete-confirmation { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; padding: 0.85rem; border: 1px solid #c6a39f; border-radius: 12px; background: #fbefec; }
 .delete-confirmation strong { flex-basis: 100%; }
-
-@media (max-width: 640px) {
-  .storage-status { align-items: flex-start; }
-  .storage-status, .storage-status > div:first-child { flex-direction: column; }
-}
 
 
 /* Pass 3 notebook system */
