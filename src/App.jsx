@@ -1,13 +1,13 @@
 /**
  * Top-level course application coordinator.
  *
- * Owns course position, navigation inputs, active lesson context, Field
- * Notebook presentation mode, glossary dialogs, and the full-screen study
- * view. Course content comes from `data/`; learner data and mutations come
- * through `useLocalWorkspace`; feature rendering is delegated to components.
+ * Coordinates the active lesson context, Field Notebook presentation mode,
+ * glossary dialogs, full-screen study view, learner actions, and top-level
+ * rendering. Course navigation is delegated to `useCourseNavigation`; course
+ * content comes from `data/`; learner data comes through `useLocalWorkspace`.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import ConsentDialog from './components/ConsentDialog.jsx'
 import Notebook from './components/Notebook.jsx'
 import GlossaryTermDialog from './components/GlossaryTermDialog.jsx'
@@ -15,6 +15,7 @@ import GlossaryStudy from './components/GlossaryStudy.jsx'
 import CourseStop from './components/CourseStop.jsx'
 import { supportsIndexedDb } from './storage/workspaceDb.js'
 import { useLocalWorkspace } from './hooks/useLocalWorkspace.js'
+import { useCourseNavigation } from './hooks/useCourseNavigation.js'
 import { courseArtifacts, courseStops, placeholderResources, timelineSegments } from './data/course.js'
 import { glossaryTerms } from './data/glossary.js'
 
@@ -22,7 +23,6 @@ const MODULE_ID = 'early-america'
 const MODULE_TITLE = 'Early America'
 
 export default function App() {
-  const [activeStopIndex, setActiveStopIndex] = useState(0)
   const [notebookMode, setNotebookMode] = useState('minimized')
   const [activityDraft, setActivityDraft] = useState('')
   const [activitySaved, setActivitySaved] = useState(false)
@@ -31,15 +31,19 @@ export default function App() {
   const [notebookNoteContext, setNotebookNoteContext] = useState(null)
   const [screenMode, setScreenMode] = useState('course')
   const [studyInitialModuleId, setStudyInitialModuleId] = useState('all')
-  const courseRef = useRef(null)
-  const stopRefs = useRef([])
-  const wheelLockRef = useRef(false)
   const workspace = useLocalWorkspace()
+  const {
+    activeStopIndex,
+    courseRef,
+    registerStopRef,
+    scrollToStop,
+    navigateToStopId,
+    handleWheel,
+  } = useCourseNavigation(courseStops)
 
   const activeStop = courseStops[activeStopIndex]
   const activeArtifact = activeStop?.artifactId ? courseArtifacts.find((artifact) => artifact.id === activeStop.artifactId) : null
   const activeEra = activeStop?.eraId ?? 'introduction'
-  const reducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
   const lessonNoteContext = useMemo(() => {
     const isCommonSchool = activeStop?.eraId === 'common-school' || activeStop?.eraId === 'transition'
@@ -79,51 +83,6 @@ export default function App() {
     window.queueMicrotask(() => setNotebookRequestedView('notes'))
     setNotebookMode('side')
   }, [])
-
-  const scrollToStop = useCallback((index, behavior = reducedMotion ? 'auto' : 'smooth') => {
-    const bounded = Math.max(0, Math.min(courseStops.length - 1, index))
-    stopRefs.current[bounded]?.scrollIntoView({ behavior, inline: 'start', block: 'nearest' })
-    setActiveStopIndex(bounded)
-  }, [reducedMotion])
-
-  const navigateToStopId = useCallback((stopId) => {
-    const index = courseStops.findIndex((stop) => stop.id === stopId)
-    if (index >= 0) scrollToStop(index)
-  }, [scrollToStop])
-
-  useEffect(() => {
-    const root = courseRef.current
-    if (!root) return undefined
-    const observer = new IntersectionObserver((entries) => {
-      const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
-      if (!visible) return
-      const index = Number(visible.target.dataset.stopIndex)
-      if (Number.isFinite(index)) setActiveStopIndex(index)
-    }, { root, threshold: [0.45, 0.65, 0.85] })
-    stopRefs.current.forEach((node) => node && observer.observe(node))
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const handleKey = (event) => {
-      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement) return
-      if (event.key === 'ArrowRight' || event.key === 'PageDown') { event.preventDefault(); scrollToStop(activeStopIndex + 1) }
-      if (event.key === 'ArrowLeft' || event.key === 'PageUp') { event.preventDefault(); scrollToStop(activeStopIndex - 1) }
-      if (event.key === 'Home') { event.preventDefault(); scrollToStop(0) }
-      if (event.key === 'End') { event.preventDefault(); scrollToStop(courseStops.length - 1) }
-    }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [activeStopIndex, scrollToStop])
-
-  const handleWheel = (event) => {
-    if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return
-    event.preventDefault()
-    if (wheelLockRef.current || Math.abs(event.deltaY) < 18) return
-    wheelLockRef.current = true
-    scrollToStop(activeStopIndex + (event.deltaY > 0 ? 1 : -1))
-    window.setTimeout(() => { wheelLockRef.current = false }, reducedMotion ? 180 : 650)
-  }
 
   const savePrototypeActivity = () => {
     const text = activityDraft.trim()
@@ -202,7 +161,7 @@ export default function App() {
               key={stop.id}
               stop={stop}
               index={index}
-              sectionRef={(node) => { stopRefs.current[index] = node }}
+              sectionRef={(node) => registerStopRef(index, node)}
               artifact={artifact}
               pairedArtifacts={pairedArtifacts}
               activityDraft={activityDraft}
