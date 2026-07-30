@@ -9,65 +9,17 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ConsentDialog from './components/ConsentDialog.jsx'
-import ArtifactMedia from './components/ArtifactMedia.jsx'
 import Notebook from './components/Notebook.jsx'
-import KeyTerm from './components/KeyTerm.jsx'
 import GlossaryTermDialog from './components/GlossaryTermDialog.jsx'
 import GlossaryStudy from './components/GlossaryStudy.jsx'
+import CourseStop from './components/CourseStop.jsx'
 import { supportsIndexedDb } from './storage/workspaceDb.js'
 import { useLocalWorkspace } from './hooks/useLocalWorkspace.js'
 import { courseArtifacts, courseStops, placeholderResources, timelineSegments } from './data/course.js'
-import { getGlossaryTerm, glossaryTerms } from './data/glossary.js'
+import { glossaryTerms } from './data/glossary.js'
 
 const MODULE_ID = 'early-america'
 const MODULE_TITLE = 'Early America'
-
-function PlaceholderVideo({ label = 'Georga’s course welcome video' }) {
-  return (
-    <div className="placeholder-video" role="group" aria-label={`${label} placeholder`}>
-      <div className="placeholder-video-screen">
-        <span className="play-symbol" aria-hidden="true">▶</span>
-        <strong>{label}</strong>
-        <small>Video, captions, transcript, and playback controls will appear here.</small>
-      </div>
-      <details>
-        <summary>Read placeholder transcript</summary>
-        <p>This transcript area demonstrates how Georga’s complete spoken orientation will remain available independently of video playback.</p>
-      </details>
-    </div>
-  )
-}
-
-function NavigationTutorial() {
-  return (
-    <div className="navigation-tutorial" aria-labelledby="navigation-tutorial-title">
-      <h3 id="navigation-tutorial-title">Move through the course in the way that works for you</h3>
-      <ul>
-        <li><kbd>Mouse wheel</kbd> or trackpad</li>
-        <li><kbd>←</kbd> and <kbd>→</kbd> arrow keys</li>
-        <li>Previous and Next buttons</li>
-        <li>Clickable timeline segments</li>
-      </ul>
-      <p>No essential action requires dragging. Reduced-motion settings replace animated travel with direct movement.</p>
-    </div>
-  )
-}
-
-function ResourceCard({ resource, saved, onToggleSave }) {
-  return (
-    <article className="resource-card">
-      <p className="resource-type">{resource.type}</p>
-      <h3>{resource.title}</h3>
-      <p className="resource-creator">{resource.creator}</p>
-      <p>{resource.note}</p>
-      <p className="resource-access"><strong>Access:</strong> {resource.access}</p>
-      <div className="resource-card-actions">
-        <button type="button" onClick={() => window.alert('Prototype only: final resources will open in a new tab with a clear external-site notice.')}>Test external resource</button>
-        <button type="button" aria-pressed={saved} onClick={() => onToggleSave(resource)}>{saved ? 'Saved to fieldbook' : 'Save to fieldbook'}</button>
-      </div>
-    </article>
-  )
-}
 
 export default function App() {
   const [activeStopIndex, setActiveStopIndex] = useState(0)
@@ -239,40 +191,40 @@ export default function App() {
 
       <main id="course-canvas" ref={courseRef} className="horizontal-course" onWheel={handleWheel} tabIndex="-1" aria-label="Horizontal course sequence">
         {courseStops.map((stop, index) => {
+          // CourseStop preserves the shared section wrapper and delegates only
+          // the stop-specific body. All navigation and learner-state callbacks
+          // remain defined in this top-level coordinator.
           const artifact = stop.artifactId ? courseArtifacts.find((item) => item.id === stop.artifactId) : null
           const pairedArtifacts = stop.artifactIds ? stop.artifactIds.map((id) => courseArtifacts.find((item) => item.id === id)).filter(Boolean) : []
+
           return (
-            <section key={stop.id} id={stop.id} data-stop-index={index} ref={(node) => { stopRefs.current[index] = node }} className={`course-stop stop-${stop.type} stop-era-${stop.eraId}`} aria-labelledby={`${stop.id}-title`}>
-              <div className="stop-inner">
-                <div className="stop-heading">
-                  <p className="eyebrow">{stop.eyebrow}</p>
-                  <p className="date-marker">{stop.dateLabel}</p>
-                  <h1 id={`${stop.id}-title`}>{stop.title}</h1>
-                  {stop.summary && <p className="stop-summary">{stop.summary}</p>}
-                </div>
-
-                {stop.type === 'introduction' && <div className="intro-layout"><PlaceholderVideo /><NavigationTutorial /><button className="primary-button begin-course" type="button" onClick={() => scrollToStop(1)}>Begin course →</button></div>}
-
-                {stop.type === 'era-intro' && <div className="era-threshold"><div className="era-number">01</div><div><h2>Historical cluster</h2><p>Within this era, sources and activities explore <KeyTerm term={getGlossaryTerm('household-education')} onSelect={selectGlossaryTerm} /> while Georga’s guidance keeps the historical cluster spatially and thematically connected.</p><button className="primary-button" type="button" onClick={() => scrollToStop(index + 1)}>Enter Early America →</button></div></div>}
-
-                {stop.type === 'artifact' && artifact && <div className="source-stop-layout">
-                  <div className="source-stage" onMouseEnter={() => markArtifact(artifact)}><ArtifactMedia artifact={artifact} /></div>
-                  <aside className="source-guidance"><p className="eyebrow">Professor guidance</p><h2>{artifact.title}</h2><p>{artifact.description}</p>{artifact.id === 'family-text-01' ? <p>This <KeyTerm term={getGlossaryTerm('primary-source')} onSelect={selectGlossaryTerm} /> invites <KeyTerm term={getGlossaryTerm('close-reading')} onSelect={selectGlossaryTerm} /> before Georga directs attention to its historical significance.</p> : <p>This placeholder indicates where Georga can direct attention without replacing the student’s own encounter with the source.</p>}<div className="source-actions"><button type="button" onClick={() => { markArtifact(artifact); openNotebookForNotes(artifact) }}>Annotate in notebook</button><button type="button" aria-pressed={isBookmarked(artifact.id)} onClick={() => workspace.toggleBookmark({ moduleId: MODULE_ID, moduleTitle: MODULE_TITLE, artifactId: artifact.id, artifactTitle: artifact.title })}>{isBookmarked(artifact.id) ? 'Bookmarked' : 'Bookmark source'}</button></div></aside>
-                </div>}
-
-                {stop.type === 'media-pair' && <div className="media-pair">{pairedArtifacts.map((item) => <article key={item.id} className="media-pair-card" onMouseEnter={() => markArtifact(item)}><ArtifactMedia artifact={item} /><h2>{item.title}</h2><p>{item.description}</p>{item.id === 'family-audio-01' && <p>The final lesson can identify this source as an <KeyTerm term={getGlossaryTerm('oral-history')} onSelect={selectGlossaryTerm} /> and ask students to define the form in their own words.</p>}<div className="source-actions"><button type="button" onClick={() => { markArtifact(item); openNotebookForNotes(item) }}>Take notes</button><button type="button" aria-pressed={isBookmarked(item.id)} onClick={() => workspace.toggleBookmark({ moduleId: MODULE_ID, moduleTitle: MODULE_TITLE, artifactId: item.id, artifactTitle: item.title })}>{isBookmarked(item.id) ? 'Bookmarked' : 'Bookmark'}</button></div></article>)}</div>}
-
-                {stop.type === 'activity' && <div className="activity-prototype"><label htmlFor="prototype-response">What changed in your interpretation after moving among several source formats?</label><textarea id="prototype-response" rows="8" value={activityDraft} onChange={(event) => { setActivityDraft(event.target.value); setActivitySaved(false) }} placeholder="Your response remains private in this browser or current session, according to the storage choice you made." /><div><button className="primary-button" type="button" disabled={!activityDraft.trim()} onClick={savePrototypeActivity}>Save response</button>{activitySaved && <span role="status">Saved to your private notebook.</span>}</div></div>}
-
-                {stop.type === 'synthesis' && <div className="synthesis-layout"><PlaceholderVideo label="Georga’s Module 1 synthesis" /><div className="synthesis-card"><h2>Review before leaving the module</h2><p>Students can use <KeyTerm term={getGlossaryTerm('historical-context')} onSelect={selectGlossaryTerm} /> to reconnect earlier sources, open their notebook, or continue into optional further study.</p><button type="button" onClick={() => setNotebookMode('full')}>Review notebook</button></div></div>}
-
-                {stop.type === 'resources' && <div className="resource-grid">{placeholderResources.map((resource) => <ResourceCard key={resource.id} resource={resource} saved={workspace.workspace.resources.some((item) => item.resourceId === resource.id)} onToggleSave={workspace.toggleResource} />)}</div>}
-
-                {stop.type === 'transition' && <div className="transition-experience"><div className="transition-domestic"><span>handwritten</span><span>household</span><span>local</span></div><div className="transition-arrow" aria-hidden="true">→</div><div className="transition-institutional"><span>printed</span><span><KeyTerm term={getGlossaryTerm('standardization')} onSelect={selectGlossaryTerm} /></span><span>public</span></div><p>The visual grammar becomes more regular as the course approaches the common-school era. Final transitions may use sound, typography, archival materials, and restrained animation.</p></div>}
-
-                {stop.type === 'next-era' && <div className="next-era-landing"><div className="slate-placeholder"><span>Module 2</span><strong>Common School</strong></div><div><h2>A new visual system</h2><p>The <KeyTerm term={getGlossaryTerm('common-school')} onSelect={selectGlossaryTerm} /> movement and expanding <KeyTerm term={getGlossaryTerm('public-schooling')} onSelect={selectGlossaryTerm} /> introduce a more regular, institutional visual system.</p><button type="button" onClick={() => scrollToStop(0)}>Return to course introduction</button></div></div>}
-              </div>
-            </section>
+            <CourseStop
+              key={stop.id}
+              stop={stop}
+              index={index}
+              sectionRef={(node) => { stopRefs.current[index] = node }}
+              artifact={artifact}
+              pairedArtifacts={pairedArtifacts}
+              activityDraft={activityDraft}
+              activitySaved={activitySaved}
+              resources={placeholderResources}
+              onScrollToStop={scrollToStop}
+              onSelectGlossaryTerm={selectGlossaryTerm}
+              onMarkArtifact={markArtifact}
+              onOpenNotebookForNotes={openNotebookForNotes}
+              isBookmarked={isBookmarked}
+              onToggleArtifactBookmark={(item) => workspace.toggleBookmark({
+                moduleId: MODULE_ID,
+                moduleTitle: MODULE_TITLE,
+                artifactId: item.id,
+                artifactTitle: item.title,
+              })}
+              onActivityDraftChange={(value) => { setActivityDraft(value); setActivitySaved(false) }}
+              onSaveActivity={savePrototypeActivity}
+              onReviewNotebook={() => setNotebookMode('full')}
+              isResourceSaved={(resourceId) => workspace.workspace.resources.some((item) => item.resourceId === resourceId)}
+              onToggleResource={workspace.toggleResource}
+            />
           )
         })}
       </main>
