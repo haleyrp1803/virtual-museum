@@ -20,7 +20,7 @@ This document owns the detailed current checkpoint, milestone chronology, redire
 ## 1. Current Synchronized Checkpoint
 
 ```text
-bead569 — Remove obsolete stylesheet compatibility rules
+68b2fd4 — Complete architecture cleanup and documentation sync
 Branch: main
 Status: local and origin/main aligned after the latest sync ritual
 ```
@@ -51,7 +51,7 @@ This checkpoint establishes the accepted horizontally progressing course plus th
 - Decomposed the 2,183-line stylesheet into six documented ordered layers without changing the cascade, then removed only proven-inactive compatibility rules.
 - Restored artifact-note and Pause and Respond save paths discovered during regression testing.
 - Added human-readable comments documenting ownership, data flow, fragile coupling, and compatibility boundaries.
-- Accepted commits: **`2de85f1`**, **`5dc11fd`**, **`828b55c`**, **`804ccd7`**, **`9229162`**, **`8a96c57`**, **`20e6836`**, **`f821d12`**, and **`bead569`**.
+- Accepted commits: **`2de85f1`**, **`5dc11fd`**, **`828b55c`**, **`804ccd7`**, **`9229162`**, **`8a96c57`**, **`20e6836`**, **`f821d12`**, **`bead569`**, and **`68b2fd4`**.
 
 ### Field Notebook redesign and Course Map — 2026-07-30
 
@@ -149,7 +149,8 @@ The Field Notebook can classify completed and to-revisit activity records. It do
 
 | Date | Commit | Message | Decoration |
 |---|---|---|---|
-| 2026-07-30 | `bead569` | Remove obsolete stylesheet compatibility rules | HEAD → main, origin/main |
+| 2026-07-30 | `68b2fd4` | Complete architecture cleanup and documentation sync | HEAD → main, origin/main |
+| 2026-07-30 | `bead569` | Remove obsolete stylesheet compatibility rules | |
 | 2026-07-30 | `f821d12` | Decompose stylesheet cascade | |
 | 2026-07-30 | `20e6836` | Extract course navigation logic | |
 | 2026-07-30 | `8a96c57` | Decompose course stop rendering | |

@@ -24,7 +24,7 @@ This Charter owns mandatory process rules, source-of-truth continuity, delivery/
 Current synchronized checkpoint:
 
 ```text
-bead569 — Remove obsolete stylesheet compatibility rules
+68b2fd4 — Complete architecture cleanup and documentation sync
 Branch: main
 Status: local and origin/main aligned after the latest sync ritual
 ```
@@ -454,7 +454,7 @@ A fresh-chat handoff should include:
 ```text
 Source: C:\Users\haley\OneDrive\Desktop\virtual-museum\
 Branch: main
-Checkpoint: bead569 — Remove obsolete stylesheet compatibility rules
+Checkpoint: 68b2fd4 — Complete architecture cleanup and documentation sync
 ```
 
 It should also include the narrow current task and the affected current source files. Before development, read the root README and all four core documents.

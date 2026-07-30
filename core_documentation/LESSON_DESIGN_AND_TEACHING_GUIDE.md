@@ -27,7 +27,7 @@ This document owns lesson-design principles, course/module structure, curatorial
 Current synchronized checkpoint:
 
 ```text
-bead569 — Remove obsolete stylesheet compatibility rules
+68b2fd4 — Complete architecture cleanup and documentation sync
 Branch: main
 Status: local and origin/main aligned after the latest sync ritual
 ```

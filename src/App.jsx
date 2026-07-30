@@ -89,8 +89,9 @@ export default function App() {
     if (!text) return
 
     // The workspace API keeps activity metadata separate from the learner's
-    // response payload. This mirrors LearningActivities.jsx and lets the
-    // workspace layer store one stable record per activity ID.
+    // response payload. The active ActivityStop renderer supplies the
+    // activity record, while the workspace layer stores one stable response
+    // per activity ID.
     const saved = workspace.saveActivityResponse({
       id: 'early-america-prototype-response',
       moduleId: MODULE_ID,

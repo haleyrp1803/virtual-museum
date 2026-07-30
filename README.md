@@ -25,7 +25,7 @@ This README owns public orientation, the current learner-facing workflow, basic 
 Current synchronized checkpoint:
 
 ```text
-bead569 — Remove obsolete stylesheet compatibility rules
+68b2fd4 — Complete architecture cleanup and documentation sync
 Branch: main
 Status: local and origin/main aligned after the latest sync ritual
 ```

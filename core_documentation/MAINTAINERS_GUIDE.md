@@ -29,7 +29,7 @@ This document owns current architecture, source/module ownership, state and data
 Current synchronized checkpoint:
 
 ```text
-bead569 — Remove obsolete stylesheet compatibility rules
+68b2fd4 — Complete architecture cleanup and documentation sync
 Branch: main
 Status: local and origin/main aligned after the latest sync ritual
 ```
@@ -59,7 +59,7 @@ The active application is a static, client-side React application built with Vit
 - Active branch: `main`
 - Repository: `https://github.com/haleyrp1803/virtual-museum`
 - Live site: `https://haleyrp1803.github.io/virtual-museum/`
-- Active checkpoint: `bead569`
+- Active checkpoint: `68b2fd4`
 
 ### Application-boundary inventory
 
@@ -70,7 +70,7 @@ The active application is a static, client-side React application built with Vit
 | Course-stop dispatch | `src/components/CourseStop.jsx` | shared stop wrapper and stop-type dispatch | section IDs/classes/refs, renderer contract | every stop type renders and remains observable |
 | Stop renderers | `src/components/courseStops/` | type-specific course-stop presentation | course data fields, artifact/resource callbacks | each stop type and action path |
 | Course structure | `src/data/course.js` | ordered stops, timeline segments, Further Study catalog | Course Map IDs, backlinks, visual era classes | validation passes and every target resolves |
-| Course data validation | `src/data/validateCourseData.js` | development-time duplicate and reference checks | course, artifact, glossary, activity, resource, and map IDs | app starts without validation errors |
+| Course and architecture validation | `src/data/validateCourseData.js` and `scripts/validate-architecture.mjs` | browser-time data checks plus dependency-free import, reachability, cycle, stylesheet, storage-key, and data-contract checks | shared IDs, source graph, cascade order, compatibility identifiers | app starts cleanly and `npm.cmd run validate:architecture` passes |
 | Field Notebook shell | `src/components/Notebook.jsx` | modes, focus, section navigation, shared state, settings | section contracts, workspace API, docking CSS | minimized/docked/full, focus, all sections |
 | Notebook sections | `src/components/notebookSections/` | Notes, Glossary, Activities, Bookmarks, Resources, Course Map interfaces | shell-owned filters/selections, callbacks | each section’s full workflow |
 | Course Map | `CourseMap.jsx` and `data/courseMapLayout.js` | rendering and fixed route geometry | course stop IDs, visited-state semantics | all nodes and complete solid/dotted segments |
@@ -383,15 +383,9 @@ Do not make transcript access dependent on media playback.
 
 ### Activities
 
-`LearningActivities.jsx` supports:
+The active vertical-slice activity renderer is `src/components/courseStops/ActivityStop.jsx`. It currently supports the Pause and Respond written-response workflow and delegates persistence through the workspace facade. Activity definitions remain in data rather than being hard-coded into persistence logic.
 
-- written response;
-- multiple choice;
-- compare-your-response.
-
-Activity definitions live in data, not component code. The component receives saved workspace records and callbacks.
-
-Current quiz behavior records attempts and provides explanatory feedback. Interpretive prompts should not be forced into binary grading.
+The earlier reusable `LearningActivities.jsx` component was removed after the final import audit proved it was unreachable from `src/main.jsx`. Future multiple-choice or compare-your-response renderers should be introduced only when a concrete lesson requires them. Interpretive prompts should not be forced into binary grading.
 
 ## 7. Accessibility and Privacy
 
@@ -530,6 +524,10 @@ IndexedDB adapter and additive schema normalizer. Database name, store, key, and
 
 Development-time validation of unique IDs and cross-file references. New data families should be added to this validator when they create shared identifiers.
 
+### `scripts/validate-architecture.mjs`
+
+Dependency-free repository validation invoked with `npm.cmd run validate:architecture`. It checks relative-import resolution, reachability from `src/main.jsx`, circular JavaScript dependencies, the six-layer stylesheet ledger, compatibility-sensitive storage identifiers, and the course data graph. Keep it aligned with deliberate architecture changes.
+
 ### `src/components/GlossaryStudy.jsx`
 
 Full-screen flashcard study experience, filters, keyboard controls, and card-flip state.
@@ -541,10 +539,6 @@ Encounter-time definition prompt.
 ### `src/components/KeyTerm.jsx`
 
 Inline lesson-term trigger.
-
-### `src/components/LearningActivities.jsx`
-
-Reusable activity renderers. The vertical-slice Pause and Respond stop uses the same two-argument save contract: `(activity, response)`.
 
 ### `src/components/ArtifactMedia.jsx`
 
@@ -591,7 +585,7 @@ The import ledger and ordered visual-system layers described in Section 8.
 8. Review external media providers individually before embedding.
 9. Perform usability testing with intended public learners and disabled users.
 10. Revisit desktop minimum viewport and browser support statement.
-11. Extend automated validation to captions, transcripts, rights, alt text, and future content completeness requirements.
+11. Extend automated content validation to captions, transcripts, rights, alt text, and future publication-readiness requirements.
 
 ## 12. Archived and Compatibility Paths
 
@@ -618,7 +612,7 @@ A future chat should begin with:
 ```text
 Source of truth: C:\Users\haley\OneDrive\Desktop\virtual-museum\
 Branch: main
-Checkpoint: bead569 — Remove obsolete stylesheet compatibility rules
+Checkpoint: 68b2fd4 — Complete architecture cleanup and documentation sync
 ```
 
 It should also be told:
