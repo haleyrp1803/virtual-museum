@@ -10,19 +10,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import CourseMap from './CourseMap.jsx'
-
-function contextLabel(note) {
-  return note.artifactTitle || note.moduleTitle || 'General observation'
-}
-
-const NOTEBOOK_SECTIONS = [
-  { id: 'notes', label: 'Notes', icon: '✎' },
-  { id: 'glossary', label: 'Glossary', icon: 'A–Z' },
-  { id: 'activities', label: 'Activities', icon: '✓' },
-  { id: 'bookmarks', label: 'Bookmarks', icon: '◆' },
-  { id: 'resources', label: 'Resources', icon: '▤' },
-  { id: 'course-map', label: 'Course Map', icon: '↝' },
-]
+import { findGlossaryEntry, getNoteContextLabel, NOTEBOOK_SECTIONS } from './notebookModel.js'
 
 
 export default function Notebook({
@@ -173,7 +161,7 @@ export default function Notebook({
     return [...groups.entries()]
   }, [glossaryTerms, glossaryModuleFilter])
 
-  const glossaryEntryFor = (termId) => glossaryEntries.find((item) => item.termId === termId)
+  const glossaryEntryFor = (termId) => findGlossaryEntry(glossaryEntries, termId)
   const selectedGlossaryTerm = glossaryTerms.find((term) => term.id === selectedGlossaryTermId && (glossaryModuleFilter === 'all' || term.moduleId === glossaryModuleFilter))
     || groupedGlossaryTerms[0]?.[1]?.[0]
     || null
@@ -249,7 +237,7 @@ export default function Notebook({
     <article className="notebook-entry" key={note.id}>
       <div className="notebook-entry-heading">
         <div>
-          <p className="note-source">{contextLabel(note)}</p>
+          <p className="note-source">{getNoteContextLabel(note)}</p>
           {note.moduleTitle && <p className="note-module">{note.moduleTitle}</p>}
         </div>
         {note.artifactId && <button className="text-button" type="button" onClick={() => navigateTo(note)}>Return to artifact</button>}
@@ -304,7 +292,7 @@ export default function Notebook({
               {filteredNotes.length === 0 ? <p className="empty-state">{notes.length ? 'No entries match these filters.' : 'Your observations will appear here.'}</p> : filteredNotes.map((note) => (
                 <button key={note.id} type="button" role="option" aria-selected={selectedNote?.id === note.id} className={selectedNote?.id === note.id ? 'journal-index-entry selected' : 'journal-index-entry'} onClick={() => setSelectedNoteId(note.id)}>
                   <span className="journal-entry-kicker">{note.moduleTitle || 'General observations'}</span>
-                  <strong>{contextLabel(note)}</strong>
+                  <strong>{getNoteContextLabel(note)}</strong>
                   <span>{note.text}</span>
                   {note.updatedAt !== note.createdAt && <small>Revised</small>}
                 </button>
@@ -316,7 +304,7 @@ export default function Notebook({
               <div className="note-editor"><h3>Edit note</h3><textarea value={editingText} onChange={(event) => setEditingText(event.target.value)} rows="10" /><div className="inline-actions"><button className="primary-button" type="button" onClick={saveEdit} disabled={!editingText.trim()}>Save changes</button><button type="button" onClick={() => setEditingId(null)}>Cancel</button></div></div>
             ) : (
               <article className="journal-detail-entry">
-                <p className="eyebrow">{selectedNote.moduleTitle || 'General observations'}</p><h3>{contextLabel(selectedNote)}</h3>
+                <p className="eyebrow">{selectedNote.moduleTitle || 'General observations'}</p><h3>{getNoteContextLabel(selectedNote)}</h3>
                 <p className="journal-full-text">{selectedNote.text}</p>
                 <dl className="journal-metadata"><div><dt>Created</dt><dd>{new Date(selectedNote.createdAt).toLocaleString()}</dd></div>{selectedNote.updatedAt !== selectedNote.createdAt && <div><dt>Revised</dt><dd>{new Date(selectedNote.updatedAt).toLocaleString()}</dd></div>}</dl>
                 <div className="inline-actions">{selectedNote.artifactId && <button type="button" onClick={() => navigateTo(selectedNote)}>Return to lesson</button>}<button type="button" onClick={() => { setEditingId(selectedNote.id); setEditingText(selectedNote.text) }}>Edit</button><button className="text-button danger-text" type="button" onClick={() => setDeleteCandidate(selectedNote.id)}>Delete</button></div>

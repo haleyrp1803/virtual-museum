@@ -2,8 +2,10 @@
  * Single React authority for the learner's private workspace.
  *
  * Coordinates consent, persistent or session-only loading/saving, workspace
- * mutations, progress records, and Markdown export. Browser database mechanics
- * live in `storage/workspaceDb.js`; UI components consume the API returned here.
+ * persistence lifecycle and exposes the stable UI-facing API. Pure workspace
+ * transformations live in `storage/workspaceActions.js`; Markdown construction
+ * lives in `storage/workspaceExport.js`; IndexedDB mechanics remain in
+ * `storage/workspaceDb.js`.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -15,6 +17,19 @@ import {
   supportsIndexedDb,
   writeWorkspace,
 } from '../storage/workspaceDb.js'
+import {
+  addNoteToWorkspace,
+  deleteWorkspaceNote,
+  markWorkspaceArtifactViewed,
+  saveWorkspaceActivityResponse,
+  saveWorkspaceGlossaryEntry,
+  saveWorkspaceQuizAttempt,
+  toggleWorkspaceBookmark,
+  toggleWorkspaceResource,
+  updateWorkspaceNote,
+  updateWorkspaceResourceStatus,
+} from '../storage/workspaceActions.js'
+import { downloadWorkspaceMarkdown } from '../storage/workspaceExport.js'
 
 const PERSISTENT_CONSENT_KEY = 'virtual-museum-storage-consent-v2'
 const SESSION_MODE_KEY = 'virtual-museum-session-mode-v1'
@@ -59,15 +74,6 @@ function createId(prefix) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
-function cleanContext(item = {}) {
-  return {
-    artifactId: item.artifactId ?? null,
-    artifactTitle: item.artifactTitle ?? null,
-    moduleId: item.moduleId ?? null,
-    moduleTitle: item.moduleTitle ?? null,
-  }
-}
-
 export function useLocalWorkspace() {
   const initialChoice = readInitialChoice()
   const [consentChoice, setConsentChoice] = useState(initialChoice)
@@ -77,6 +83,7 @@ export function useLocalWorkspace() {
   const hasLoadedRef = useRef(false)
   const saveSequenceRef = useRef(0)
 
+  // Persistent-mode lifecycle: load once, then save normalized state after changes.
   const loadWorkspace = useCallback(async () => {
     if (!supportsIndexedDb()) {
       setConsentChoice('session')
@@ -140,6 +147,7 @@ export function useLocalWorkspace() {
     }
   }, [consentChoice, workspace])
 
+  // Consent transitions preserve session work when a learner enables persistence.
   const acceptConsent = useCallback(async () => {
     if (!supportsIndexedDb()) {
       setConsentChoice('session')
@@ -189,13 +197,14 @@ export function useLocalWorkspace() {
 
   const retryStorage = useCallback(() => consentChoice === 'accepted' ? loadWorkspace() : acceptConsent(), [acceptConsent, consentChoice, loadWorkspace])
 
+  // Public mutation callbacks validate UI input, then delegate immutable updates.
   const addNote = useCallback((note) => {
     const cleanText = note.text.trim()
     if (!cleanText || consentChoice === 'undecided') return false
     const timestamp = new Date().toISOString()
-    setWorkspace((current) => ({
-      ...current,
-      notes: [...current.notes, { id: createId('note'), text: cleanText, ...cleanContext(note), createdAt: timestamp, updatedAt: timestamp }],
+    setWorkspace((current) => addNoteToWorkspace(current, { ...note, text: cleanText }, {
+      id: createId('note'),
+      timestamp,
     }))
     return true
   }, [consentChoice])
@@ -203,185 +212,74 @@ export function useLocalWorkspace() {
   const updateNote = useCallback((noteId, text) => {
     const cleanText = text.trim()
     if (!cleanText) return false
-    setWorkspace((current) => ({
-      ...current,
-      notes: current.notes.map((note) => note.id === noteId ? { ...note, text: cleanText, updatedAt: new Date().toISOString() } : note),
-    }))
+    setWorkspace((current) => updateWorkspaceNote(current, noteId, cleanText, new Date().toISOString()))
     return true
   }, [])
 
   const deleteNote = useCallback((noteId) => {
-    setWorkspace((current) => ({ ...current, notes: current.notes.filter((note) => note.id !== noteId) }))
+    setWorkspace((current) => deleteWorkspaceNote(current, noteId))
   }, [])
 
   const toggleBookmark = useCallback((context) => {
     if (!context?.artifactId) return false
-    setWorkspace((current) => {
-      const exists = current.bookmarks.some((bookmark) => bookmark.artifactId === context.artifactId)
-      return {
-        ...current,
-        bookmarks: exists
-          ? current.bookmarks.filter((bookmark) => bookmark.artifactId !== context.artifactId)
-          : [...current.bookmarks, { id: createId('bookmark'), ...cleanContext(context), createdAt: new Date().toISOString() }],
-      }
-    })
+    setWorkspace((current) => toggleWorkspaceBookmark(current, context, {
+      id: createId('bookmark'),
+      timestamp: new Date().toISOString(),
+    }))
     return true
   }, [])
 
 
   const markArtifactViewed = useCallback((moduleId, artifactId) => {
     if (!moduleId || !artifactId) return
-    setWorkspace((current) => {
-      const moduleProgress = current.progress[moduleId] ?? { artifactsViewed: [], activitiesAttempted: [] }
-      if (moduleProgress.artifactsViewed?.includes(artifactId)) return current
-      return {
-        ...current,
-        progress: {
-          ...current.progress,
-          [moduleId]: {
-            ...moduleProgress,
-            artifactsViewed: [...(moduleProgress.artifactsViewed ?? []), artifactId],
-            activitiesAttempted: moduleProgress.activitiesAttempted ?? [],
-          },
-        },
-      }
-    })
-  }, [])
-
-  const markActivityAttempted = useCallback((current, moduleId, activityId) => {
-    const moduleProgress = current.progress[moduleId] ?? { artifactsViewed: [], activitiesAttempted: [] }
-    if (moduleProgress.activitiesAttempted?.includes(activityId)) return current.progress
-    return {
-      ...current.progress,
-      [moduleId]: {
-        ...moduleProgress,
-        artifactsViewed: moduleProgress.artifactsViewed ?? [],
-        activitiesAttempted: [...(moduleProgress.activitiesAttempted ?? []), activityId],
-      },
-    }
+    setWorkspace((current) => markWorkspaceArtifactViewed(current, moduleId, artifactId))
   }, [])
 
   const saveActivityResponse = useCallback((activity, response) => {
     const cleanText = response?.text?.trim()
     if (!activity?.id || !activity?.moduleId || !cleanText) return false
-    const timestamp = new Date().toISOString()
-    setWorkspace((current) => {
-      const existing = current.responses.find((item) => item.activityId === activity.id)
-      const nextResponse = {
-        id: existing?.id ?? createId('response'),
-        activityId: activity.id,
-        activityTitle: activity.title,
-        activityType: activity.type,
-        moduleId: activity.moduleId,
-        moduleTitle: activity.moduleTitle ?? null,
-        prompt: activity.prompt,
-        text: cleanText,
-        createdAt: existing?.createdAt ?? timestamp,
-        updatedAt: timestamp,
-      }
-      return {
-        ...current,
-        responses: existing
-          ? current.responses.map((item) => item.activityId === activity.id ? nextResponse : item)
-          : [...current.responses, nextResponse],
-        progress: markActivityAttempted(current, activity.moduleId, activity.id),
-      }
-    })
+    setWorkspace((current) => saveWorkspaceActivityResponse(current, activity, { ...response, text: cleanText }, {
+      id: createId('response'),
+      timestamp: new Date().toISOString(),
+    }))
     return true
-  }, [markActivityAttempted])
+  }, [])
 
   const submitQuizAttempt = useCallback((activity, attempt) => {
     if (!activity?.id || !activity?.moduleId || !attempt?.selectedOptionId) return false
-    const timestamp = new Date().toISOString()
-    setWorkspace((current) => ({
-      ...current,
-      quizAttempts: [
-        ...current.quizAttempts.filter((item) => item.activityId !== activity.id),
-        {
-          id: createId('quiz'),
-          activityId: activity.id,
-          activityTitle: activity.title,
-          moduleId: activity.moduleId,
-          moduleTitle: activity.moduleTitle ?? null,
-          prompt: activity.prompt,
-          selectedOptionId: attempt.selectedOptionId,
-          correct: Boolean(attempt.correct),
-          feedback: attempt.feedback ?? '',
-          attemptedAt: timestamp,
-        },
-      ],
-      progress: markActivityAttempted(current, activity.moduleId, activity.id),
+    setWorkspace((current) => saveWorkspaceQuizAttempt(current, activity, attempt, {
+      id: createId('quiz'),
+      timestamp: new Date().toISOString(),
     }))
     return true
-  }, [markActivityAttempted])
+  }, [])
 
   const saveGlossaryEntry = useCallback((term, definition = '') => {
     if (!term?.id || consentChoice === 'undecided') return false
-    const timestamp = new Date().toISOString()
-    setWorkspace((current) => {
-      const existing = current.glossaryEntries.find((entry) => entry.termId === term.id)
-      const nextEntry = {
-        id: existing?.id ?? createId('glossary'),
-        termId: term.id,
-        term: term.term,
-        moduleId: term.moduleId,
-        moduleTitle: term.moduleTitle,
-        locationStopId: term.locationStopId,
-        locationLabel: term.locationLabel,
-        definition: definition.trim(),
-        createdAt: existing?.createdAt ?? timestamp,
-        updatedAt: timestamp,
-      }
-      return {
-        ...current,
-        glossaryEntries: existing
-          ? current.glossaryEntries.map((entry) => entry.termId === term.id ? nextEntry : entry)
-          : [...current.glossaryEntries, nextEntry],
-      }
-    })
+    setWorkspace((current) => saveWorkspaceGlossaryEntry(current, term, definition, {
+      id: createId('glossary'),
+      timestamp: new Date().toISOString(),
+    }))
     return true
   }, [consentChoice])
 
 
   const toggleResource = useCallback((resource) => {
     if (!resource?.id) return false
-    setWorkspace((current) => {
-      const existing = current.resources.find((item) => item.resourceId === resource.id)
-      return {
-        ...current,
-        resources: existing
-          ? current.resources.filter((item) => item.resourceId !== resource.id)
-          : [...current.resources, {
-              id: createId('resource'),
-              resourceId: resource.id,
-              title: resource.title,
-              creator: resource.creator,
-              type: resource.type,
-              access: resource.access,
-              note: resource.note,
-              moduleId: resource.moduleId || 'early-america',
-              moduleTitle: resource.moduleTitle || 'Early America',
-              url: resource.url || null,
-              status: 'saved',
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            }],
-      }
-    })
+    setWorkspace((current) => toggleWorkspaceResource(current, resource, {
+      id: createId('resource'),
+      timestamp: new Date().toISOString(),
+    }))
     return true
   }, [])
 
   const updateResourceStatus = useCallback((resourceId, status) => {
     if (!['saved', 'started', 'finished'].includes(status)) return false
-    setWorkspace((current) => ({
-      ...current,
-      resources: current.resources.map((item) => item.resourceId === resourceId
-        ? { ...item, status, updatedAt: new Date().toISOString() }
-        : item),
-    }))
+    setWorkspace((current) => updateWorkspaceResourceStatus(current, resourceId, status, new Date().toISOString()))
     return true
   }, [])
 
+  // Destructive storage operations stay here because they cross browser stores.
   const deleteAllData = useCallback(async () => {
     try {
       await clearWorkspaceDatabase()
@@ -401,99 +299,10 @@ export function useLocalWorkspace() {
     return true
   }, [])
 
+  // Export formatting is separate; this callback preserves the existing hook API.
   const exportMarkdown = useCallback(() => {
-    const lines = [
-      '# My Virtual Museum Field Notebook', '',
-      `Exported: ${new Date().toLocaleString()}`, '',
-      '> This file contains private notes exported from the Virtual Museum. The museum did not receive or store this work.', '',
-    ]
-
-    if (workspace.bookmarks.length) {
-      lines.push('## Bookmarked artifacts', '')
-      workspace.bookmarks.forEach((bookmark) => {
-        lines.push(`- **${bookmark.artifactTitle || bookmark.artifactId}**${bookmark.moduleTitle ? ` — ${bookmark.moduleTitle}` : ''}`)
-      })
-      lines.push('')
-    }
-
-    if (!workspace.notes.length) {
-      lines.push('## Notes', '', '_No notebook entries yet._', '')
-    } else {
-      const moduleGroups = new Map()
-      workspace.notes.forEach((note) => {
-        const key = note.moduleTitle || 'General observations'
-        if (!moduleGroups.has(key)) moduleGroups.set(key, [])
-        moduleGroups.get(key).push(note)
-      })
-      for (const [moduleTitle, notes] of moduleGroups) {
-        lines.push(`## ${moduleTitle}`, '')
-        notes.forEach((note) => {
-          lines.push(`### ${note.artifactTitle || 'General observation'}`, '')
-          if (note.artifactId) lines.push(`Artifact reference: \`${note.artifactId}\``, '')
-          lines.push(note.text, '')
-          const created = new Date(note.createdAt).toLocaleString()
-          const updated = new Date(note.updatedAt).toLocaleString()
-          lines.push(`_Created ${created}${note.updatedAt !== note.createdAt ? ` · Updated ${updated}` : ''}_`, '')
-        })
-      }
-    }
-
-    if (workspace.glossaryEntries.length) {
-      lines.push('## Glossary', '')
-      const glossaryGroups = new Map()
-      workspace.glossaryEntries.forEach((entry) => {
-        const key = entry.moduleTitle || 'Course glossary'
-        if (!glossaryGroups.has(key)) glossaryGroups.set(key, [])
-        glossaryGroups.get(key).push(entry)
-      })
-      for (const [moduleTitle, entries] of glossaryGroups) {
-        lines.push(`### ${moduleTitle}`, '')
-        entries.sort((a, b) => a.term.localeCompare(b.term)).forEach((entry) => {
-          lines.push(`- **${entry.term}**: ${entry.definition || '_Definition not yet added._'}`)
-        })
-        lines.push('')
-      }
-    }
-
-    if (workspace.resources.length) {
-      lines.push('## Saved resources', '')
-      workspace.resources.forEach((resource) => {
-        lines.push(`- **${resource.title}** — ${resource.creator || 'Creator not supplied'} (${resource.type || 'Resource'})`)
-        lines.push(`  - Module: ${resource.moduleTitle || 'Course'}`)
-        lines.push(`  - Status: ${resource.status || 'saved'}`)
-        if (resource.note) lines.push(`  - ${resource.note}`)
-      })
-      lines.push('')
-    }
-
-    if (workspace.responses.length || workspace.quizAttempts.length) {
-      lines.push('## Learning activities', '')
-      workspace.responses.forEach((response) => {
-        lines.push(`### ${response.activityTitle || 'Written response'}`, '')
-        if (response.prompt) lines.push(`**Prompt:** ${response.prompt}`, '')
-        lines.push(response.text, '')
-        lines.push(`_Saved ${new Date(response.updatedAt).toLocaleString()}_`, '')
-      })
-      workspace.quizAttempts.forEach((attempt) => {
-        lines.push(`### ${attempt.activityTitle || 'Knowledge check'}`, '')
-        if (attempt.prompt) lines.push(`**Prompt:** ${attempt.prompt}`, '')
-        lines.push(`Selected option: \`${attempt.selectedOptionId}\``, '')
-        lines.push(`Result: ${attempt.correct ? 'Supported by the prototype evidence' : 'Revisit the room'}`, '')
-        if (attempt.feedback) lines.push(attempt.feedback, '')
-        lines.push(`_Attempted ${new Date(attempt.attemptedAt).toLocaleString()}_`, '')
-      })
-    }
-
-    const blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `virtual-museum-field-notebook-${new Date().toISOString().slice(0, 10)}.md`
-    document.body.appendChild(link)
-    link.click()
-    link.remove()
-    URL.revokeObjectURL(url)
-  }, [workspace.bookmarks, workspace.glossaryEntries, workspace.notes, workspace.quizAttempts, workspace.responses, workspace.resources])
+    downloadWorkspaceMarkdown(workspace)
+  }, [workspace])
 
   const notebookEnabled = consentChoice === 'accepted' || consentChoice === 'session'
 
