@@ -1,3 +1,11 @@
+/**
+ * Accessible artifact media renderer.
+ *
+ * Selects the correct text, image, audio, or video presentation from an
+ * artifact record and keeps transcripts, captions, descriptions, and source
+ * notices available independently of media playback.
+ */
+
 import { useId, useState } from 'react'
 
 function Transcript({ transcript, label = 'Transcript' }) {

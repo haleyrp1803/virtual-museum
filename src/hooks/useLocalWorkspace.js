@@ -1,3 +1,11 @@
+/**
+ * Single React authority for the learner's private workspace.
+ *
+ * Coordinates consent, persistent or session-only loading/saving, workspace
+ * mutations, progress records, and Markdown export. Browser database mechanics
+ * live in `storage/workspaceDb.js`; UI components consume the API returned here.
+ */
+
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   clearWorkspaceDatabase,

@@ -1,3 +1,11 @@
+/**
+ * Prototype module, artifact, and activity catalog.
+ *
+ * These records provide the current vertical slice's historical-content shape
+ * and accessibility payloads. They remain placeholder teaching data until
+ * Georga supplies and approves real module content.
+ */
+
 export const modules = [
   {
     id: 'family-education',

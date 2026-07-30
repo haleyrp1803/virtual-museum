@@ -1,3 +1,11 @@
+/**
+ * First-use learner-storage choice dialog.
+ *
+ * Explains persistent versus session-only notebook use and reports the
+ * learner's choice to the workspace hook; it does not write browser storage
+ * directly.
+ */
+
 export default function ConsentDialog({ onAccept, onDecline, storageSupported = true }) {
   return (
     <div className="consent-backdrop" role="presentation">

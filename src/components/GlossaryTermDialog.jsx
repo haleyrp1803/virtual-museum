@@ -1,3 +1,10 @@
+/**
+ * Encounter-time glossary definition dialog.
+ *
+ * Lets a learner add a discovered term with or without a personal definition.
+ * Persistence remains the responsibility of the callback supplied by App.
+ */
+
 import { useEffect, useRef, useState } from 'react'
 
 export default function GlossaryTermDialog({ term, existingEntry, onSave, onClose }) {

@@ -1,3 +1,11 @@
+/**
+ * IndexedDB persistence adapter and workspace schema normalizer.
+ *
+ * Owns database open/read/write/delete mechanics and additive normalization of
+ * older saved work. React components and feature code should use the workspace
+ * hook rather than calling this adapter directly.
+ */
+
 const DB_NAME = 'virtual-museum-workspace'
 const DB_VERSION = 1
 const WORKSPACE_STORE = 'workspace'

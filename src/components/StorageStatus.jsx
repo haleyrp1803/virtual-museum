@@ -1,3 +1,11 @@
+/**
+ * Legacy standalone storage-status presentation.
+ *
+ * The active horizontal-course interface now places storage controls inside
+ * the Field Notebook. Confirm imports before modifying or removing this
+ * compatibility component.
+ */
+
 const STATUS_LABELS = {
   'awaiting-consent': 'Notebook setup required',
   loading: 'Opening private workspace',

@@ -1,3 +1,11 @@
+/**
+ * Learning activity renderer.
+ *
+ * Presents the supported written-response, multiple-choice, and comparison
+ * activity forms. Saved responses and quiz attempts are supplied by the
+ * workspace layer so this component does not access browser storage directly.
+ */
+
 import { useMemo, useState } from 'react'
 
 function WrittenResponse({ activity, savedResponse, onSave }) {

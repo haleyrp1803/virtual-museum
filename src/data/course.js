@@ -1,3 +1,12 @@
+/**
+ * Authoritative horizontal-course sequence and course-level catalogs.
+ *
+ * `courseStops` defines navigable order and stable stop IDs; timeline segments
+ * point into that sequence; artifact and Further Study catalogs are exposed to
+ * App and the Field Notebook. Cross-file references are checked by
+ * `validateCourseData.js` during development.
+ */
+
 import { sampleArtifacts } from './modules.js'
 
 export const courseStops = [

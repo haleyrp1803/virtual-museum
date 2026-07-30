@@ -1,4 +1,15 @@
+/**
+ * Field Notebook shell and section coordinator.
+ *
+ * Owns minimized/docked/full presentation behavior, focus containment, section
+ * navigation, settings, and the current master-detail section interfaces. The
+ * Course Map renderer and geometry are now separate first-step extractions;
+ * later bounded passes can split the remaining sections without changing this
+ * component's public prop contract.
+ */
+
 import { useEffect, useMemo, useRef, useState } from 'react'
+import CourseMap from './CourseMap.jsx'
 
 function contextLabel(note) {
   return note.artifactTitle || note.moduleTitle || 'General observation'
@@ -13,91 +24,6 @@ const NOTEBOOK_SECTIONS = [
   { id: 'course-map', label: 'Course Map', icon: '↝' },
 ]
 
-
-const COURSE_MAP_NODES = [
-  { id: 'course-introduction', label: 'Introduction', module: 'Course orientation', x: 22, y: 7 },
-  { id: 'early-america-introduction', label: 'Early America', module: 'Module 1', x: 68, y: 22 },
-  { id: 'early-america-text', label: 'Primary source', module: 'Early America', x: 33, y: 35, minor: true },
-  { id: 'early-america-image', label: 'Close looking', module: 'Early America', x: 68, y: 44, minor: true },
-  { id: 'early-america-media', label: 'Guided media', module: 'Early America', x: 31, y: 53, minor: true },
-  { id: 'early-america-activity', label: 'Private response', module: 'Early America', x: 69, y: 62, minor: true },
-  { id: 'early-america-synthesis', label: 'Synthesis', module: 'Early America', x: 35, y: 70, minor: true },
-  { id: 'early-america-resources', label: 'Further Study', module: 'Early America', x: 70, y: 78 },
-  { id: 'common-school-transition', label: 'Transition', module: 'Historical transition', x: 35, y: 87 },
-  { id: 'common-school-landing', label: 'Common School', module: 'Module 2', x: 69, y: 95 },
-]
-
-const COURSE_MAP_SEGMENTS = [
-  { from: 'course-introduction', to: 'early-america-introduction', d: 'M22 7 C82 11,82 20,68 22' },
-  { from: 'early-america-introduction', to: 'early-america-text', d: 'M68 22 C58 26,18 30,33 35' },
-  { from: 'early-america-text', to: 'early-america-image', d: 'M33 35 C49 37,82 39,68 44' },
-  { from: 'early-america-image', to: 'early-america-media', d: 'M68 44 C54 47,15 49,31 53' },
-  { from: 'early-america-media', to: 'early-america-activity', d: 'M31 53 C48 55,83 57,69 62' },
-  { from: 'early-america-activity', to: 'early-america-synthesis', d: 'M69 62 C54 64,20 66,35 70' },
-  { from: 'early-america-synthesis', to: 'early-america-resources', d: 'M35 70 C50 72,82 73,70 78' },
-  { from: 'early-america-resources', to: 'common-school-transition', d: 'M70 78 C55 80,18 82,35 87' },
-  { from: 'common-school-transition', to: 'common-school-landing', d: 'M35 87 C52 89,82 91,69 95' },
-]
-
-function CourseMap({ courseStops, currentStopId, progress, onNavigateToStop }) {
-  const currentIndex = Math.max(0, courseStops.findIndex((stop) => stop.id === currentStopId))
-  const stopIndex = new Map(courseStops.map((stop, index) => [stop.id, index]))
-  const earlyProgress = progress?.['early-america'] || { artifactsViewed: [], activitiesAttempted: [] }
-
-  const nodeState = (node) => {
-    const index = stopIndex.get(node.id)
-    if (node.id === currentStopId) return 'current'
-    if (index !== undefined && index < currentIndex) return 'visited'
-    return 'unvisited'
-  }
-
-  const segmentState = (segment) => {
-    const toIndex = stopIndex.get(segment.to)
-    return toIndex !== undefined && toIndex <= currentIndex ? 'visited' : 'unvisited'
-  }
-
-  return (
-    <div className="course-map-layout">
-      <div className="course-map-legend" aria-label="Course map states">
-        <span><i className="map-key current" /> Current</span>
-        <span><i className="map-key visited" /> Visited</span>
-        <span><i className="map-key unvisited" /> Not visited</span>
-      </div>
-      <div className="curved-course-map" aria-label="Curving chronological course map">
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-          {COURSE_MAP_SEGMENTS.map((segment) => (
-            <path
-              key={`${segment.from}-${segment.to}`}
-              className={`course-map-segment state-${segmentState(segment)}`}
-              d={segment.d}
-            />
-          ))}
-        </svg>
-        {COURSE_MAP_NODES.map((node) => {
-          const state = nodeState(node)
-          return (
-            <button
-              key={node.id}
-              type="button"
-              className={`course-map-node ${node.minor ? 'minor' : 'major'} state-${state}`}
-              style={{ left: `${node.x}%`, top: `${node.y}%` }}
-              aria-current={state === 'current' ? 'step' : undefined}
-              onClick={() => onNavigateToStop(node.id)}
-            >
-              <span className="course-map-node-mark" aria-hidden="true">{state === 'visited' ? '✓' : state === 'current' ? '●' : '○'}</span>
-              <span className="course-map-node-copy"><strong>{node.label}</strong><small>{node.module}</small></span>
-            </button>
-          )
-        })}
-      </div>
-      <section className="course-map-summary" aria-label="Current course progress summary">
-        <h4>Early America</h4>
-        <p>{earlyProgress.artifactsViewed?.length || 0} sources explored · {earlyProgress.activitiesAttempted?.length || 0} activities attempted</p>
-        <p>The map records where you have been without turning the course into a completion score.</p>
-      </section>
-    </div>
-  )
-}
 
 export default function Notebook({
   mode,

@@ -1,3 +1,11 @@
+/**
+ * Fixed course glossary catalog.
+ *
+ * Each term has a stable ID and a lesson-location backlink. Learner definitions
+ * are stored separately in the workspace so this file remains curricular data,
+ * not learner state.
+ */
+
 export const glossaryTerms = [
   {
     id: 'household-education',

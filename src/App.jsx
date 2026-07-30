@@ -1,3 +1,12 @@
+/**
+ * Top-level course application coordinator.
+ *
+ * Owns course position, navigation inputs, active lesson context, Field
+ * Notebook presentation mode, glossary dialogs, and the full-screen study
+ * view. Course content comes from `data/`; learner data and mutations come
+ * through `useLocalWorkspace`; feature rendering is delegated to components.
+ */
+
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ConsentDialog from './components/ConsentDialog.jsx'
 import ArtifactMedia from './components/ArtifactMedia.jsx'
@@ -67,6 +76,7 @@ export default function App() {
   const [activitySaved, setActivitySaved] = useState(false)
   const [selectedGlossaryTerm, setSelectedGlossaryTerm] = useState(null)
   const [notebookRequestedView, setNotebookRequestedView] = useState(null)
+  const [notebookNoteContext, setNotebookNoteContext] = useState(null)
   const [screenMode, setScreenMode] = useState('course')
   const [studyInitialModuleId, setStudyInitialModuleId] = useState('all')
   const courseRef = useRef(null)
@@ -79,7 +89,7 @@ export default function App() {
   const activeEra = activeStop?.eraId ?? 'introduction'
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
-  const noteContext = useMemo(() => {
+  const lessonNoteContext = useMemo(() => {
     const isCommonSchool = activeStop?.eraId === 'common-school' || activeStop?.eraId === 'transition'
     const moduleId = isCommonSchool ? 'common-school' : MODULE_ID
     const moduleTitle = isCommonSchool ? 'Common School' : MODULE_TITLE
@@ -90,6 +100,33 @@ export default function App() {
       artifactTitle: activeArtifact?.title ?? activeStop?.title ?? null,
     }
   }, [activeArtifact, activeStop])
+
+  // Artifact note buttons may need a more specific context than the active stop
+  // provides (for example, one item inside a paired-media stop). The override is
+  // cleared whenever course position changes so ordinary notebook use follows
+  // the current lesson again.
+  const noteContext = notebookNoteContext || lessonNoteContext
+
+  useEffect(() => {
+    setNotebookNoteContext(null)
+  }, [activeStop?.id])
+
+  const openNotebookForNotes = useCallback((artifact = null) => {
+    if (artifact) {
+      setNotebookNoteContext({
+        moduleId: artifact.moduleId || MODULE_ID,
+        moduleTitle: MODULE_TITLE,
+        artifactId: artifact.id,
+        artifactTitle: artifact.title,
+      })
+    }
+
+    // Force a fresh requested-view transition even when Notes was requested
+    // previously; Notebook responds to changes in this prop.
+    setNotebookRequestedView(null)
+    window.queueMicrotask(() => setNotebookRequestedView('notes'))
+    setNotebookMode('side')
+  }, [])
 
   const scrollToStop = useCallback((index, behavior = reducedMotion ? 'auto' : 'smooth') => {
     const bounded = Math.max(0, Math.min(courseStops.length - 1, index))
@@ -216,10 +253,10 @@ export default function App() {
 
                 {stop.type === 'artifact' && artifact && <div className="source-stop-layout">
                   <div className="source-stage" onMouseEnter={() => markArtifact(artifact)}><ArtifactMedia artifact={artifact} /></div>
-                  <aside className="source-guidance"><p className="eyebrow">Professor guidance</p><h2>{artifact.title}</h2><p>{artifact.description}</p>{artifact.id === 'family-text-01' ? <p>This <KeyTerm term={getGlossaryTerm('primary-source')} onSelect={selectGlossaryTerm} /> invites <KeyTerm term={getGlossaryTerm('close-reading')} onSelect={selectGlossaryTerm} /> before Georga directs attention to its historical significance.</p> : <p>This placeholder indicates where Georga can direct attention without replacing the student’s own encounter with the source.</p>}<div className="source-actions"><button type="button" onClick={() => { markArtifact(artifact); setNotebookMode('side') }}>Annotate in notebook</button><button type="button" aria-pressed={isBookmarked(artifact.id)} onClick={() => workspace.toggleBookmark({ moduleId: MODULE_ID, moduleTitle: MODULE_TITLE, artifactId: artifact.id, artifactTitle: artifact.title })}>{isBookmarked(artifact.id) ? 'Bookmarked' : 'Bookmark source'}</button></div></aside>
+                  <aside className="source-guidance"><p className="eyebrow">Professor guidance</p><h2>{artifact.title}</h2><p>{artifact.description}</p>{artifact.id === 'family-text-01' ? <p>This <KeyTerm term={getGlossaryTerm('primary-source')} onSelect={selectGlossaryTerm} /> invites <KeyTerm term={getGlossaryTerm('close-reading')} onSelect={selectGlossaryTerm} /> before Georga directs attention to its historical significance.</p> : <p>This placeholder indicates where Georga can direct attention without replacing the student’s own encounter with the source.</p>}<div className="source-actions"><button type="button" onClick={() => { markArtifact(artifact); openNotebookForNotes(artifact) }}>Annotate in notebook</button><button type="button" aria-pressed={isBookmarked(artifact.id)} onClick={() => workspace.toggleBookmark({ moduleId: MODULE_ID, moduleTitle: MODULE_TITLE, artifactId: artifact.id, artifactTitle: artifact.title })}>{isBookmarked(artifact.id) ? 'Bookmarked' : 'Bookmark source'}</button></div></aside>
                 </div>}
 
-                {stop.type === 'media-pair' && <div className="media-pair">{pairedArtifacts.map((item) => <article key={item.id} className="media-pair-card" onMouseEnter={() => markArtifact(item)}><ArtifactMedia artifact={item} /><h2>{item.title}</h2><p>{item.description}</p>{item.id === 'family-audio-01' && <p>The final lesson can identify this source as an <KeyTerm term={getGlossaryTerm('oral-history')} onSelect={selectGlossaryTerm} /> and ask students to define the form in their own words.</p>}<div className="source-actions"><button type="button" onClick={() => { markArtifact(item); setNotebookMode('side') }}>Take notes</button><button type="button" aria-pressed={isBookmarked(item.id)} onClick={() => workspace.toggleBookmark({ moduleId: MODULE_ID, moduleTitle: MODULE_TITLE, artifactId: item.id, artifactTitle: item.title })}>{isBookmarked(item.id) ? 'Bookmarked' : 'Bookmark'}</button></div></article>)}</div>}
+                {stop.type === 'media-pair' && <div className="media-pair">{pairedArtifacts.map((item) => <article key={item.id} className="media-pair-card" onMouseEnter={() => markArtifact(item)}><ArtifactMedia artifact={item} /><h2>{item.title}</h2><p>{item.description}</p>{item.id === 'family-audio-01' && <p>The final lesson can identify this source as an <KeyTerm term={getGlossaryTerm('oral-history')} onSelect={selectGlossaryTerm} /> and ask students to define the form in their own words.</p>}<div className="source-actions"><button type="button" onClick={() => { markArtifact(item); openNotebookForNotes(item) }}>Take notes</button><button type="button" aria-pressed={isBookmarked(item.id)} onClick={() => workspace.toggleBookmark({ moduleId: MODULE_ID, moduleTitle: MODULE_TITLE, artifactId: item.id, artifactTitle: item.title })}>{isBookmarked(item.id) ? 'Bookmarked' : 'Bookmark'}</button></div></article>)}</div>}
 
                 {stop.type === 'activity' && <div className="activity-prototype"><label htmlFor="prototype-response">What changed in your interpretation after moving among several source formats?</label><textarea id="prototype-response" rows="8" value={activityDraft} onChange={(event) => { setActivityDraft(event.target.value); setActivitySaved(false) }} placeholder="Your response remains private in this browser or current session, according to the storage choice you made." /><div><button className="primary-button" type="button" disabled={!activityDraft.trim()} onClick={savePrototypeActivity}>Save response</button>{activitySaved && <span role="status">Saved to your private notebook.</span>}</div></div>}
 

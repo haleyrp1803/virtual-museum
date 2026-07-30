@@ -1,3 +1,10 @@
+/**
+ * Full-screen glossary flashcard study view.
+ *
+ * Filters learner-added glossary entries, manages card order and flip state,
+ * and provides keyboard-accessible private review without scoring or grades.
+ */
+
 import { useEffect, useMemo, useState } from 'react'
 
 export default function GlossaryStudy({ terms, entries, initialModuleId = 'all', onExit }) {
