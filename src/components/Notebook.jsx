@@ -3,18 +3,20 @@
  *
  * Owns minimized/docked/full presentation behavior, focus containment, section
  * navigation, settings, and the current master-detail section interfaces.
- * Section renderers are being extracted in bounded stages. Activities,
- * Bookmarks, Resources, and Course Map now live in dedicated files; Notes and
- * Glossary remain here until the next extraction pass. The shell still owns
- * presentation mode, focus containment, shared selection state, and dispatch.
+ * All six section renderers now live in dedicated files. This shell retains
+ * presentation mode, focus containment, section navigation, shared selection
+ * and filter state, settings, and dispatch so section changes do not reset the
+ * learner's place or an in-progress edit.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ActivitiesSection from './notebookSections/ActivitiesSection.jsx'
 import BookmarksSection from './notebookSections/BookmarksSection.jsx'
 import CourseMapSection from './notebookSections/CourseMapSection.jsx'
+import GlossarySection from './notebookSections/GlossarySection.jsx'
+import NotesSection from './notebookSections/NotesSection.jsx'
 import ResourcesSection from './notebookSections/ResourcesSection.jsx'
-import { findGlossaryEntry, getNoteContextLabel, NOTEBOOK_SECTIONS } from './notebookModel.js'
+import { findGlossaryEntry, NOTEBOOK_SECTIONS } from './notebookModel.js'
 
 
 export default function Notebook({
@@ -237,158 +239,62 @@ export default function Notebook({
     )
   }
 
-  const renderNote = (note) => (
-    <article className="notebook-entry" key={note.id}>
-      <div className="notebook-entry-heading">
-        <div>
-          <p className="note-source">{getNoteContextLabel(note)}</p>
-          {note.moduleTitle && <p className="note-module">{note.moduleTitle}</p>}
-        </div>
-        {note.artifactId && <button className="text-button" type="button" onClick={() => navigateTo(note)}>Return to artifact</button>}
-      </div>
-      {editingId === note.id ? (
-        <div className="note-editor">
-          <label className="sr-only" htmlFor={`edit-${note.id}`}>Edit note</label>
-          <textarea id={`edit-${note.id}`} value={editingText} onChange={(event) => setEditingText(event.target.value)} rows="5" />
-          <div className="inline-actions">
-            <button className="primary-button" type="button" onClick={saveEdit} disabled={!editingText.trim()}>Save changes</button>
-            <button type="button" onClick={() => setEditingId(null)}>Cancel</button>
-          </div>
-        </div>
-      ) : (
-        <>
-          <p className="note-text">{note.text}</p>
-          <p className="note-date">{new Date(note.updatedAt).toLocaleString()}</p>
-          <div className="inline-actions">
-            <button type="button" onClick={() => { setEditingId(note.id); setEditingText(note.text) }}>Edit</button>
-            <button className="text-button danger-text" type="button" onClick={() => setDeleteCandidate(note.id)}>Delete</button>
-          </div>
-          {deleteCandidate === note.id && (
-            <div className="entry-delete-confirmation" role="group" aria-label="Confirm note deletion">
-              <span>Delete this note?</span>
-              <button className="danger-button" type="button" onClick={() => { onDeleteNote(note.id); setDeleteCandidate(null) }}>Delete</button>
-              <button type="button" onClick={() => setDeleteCandidate(null)}>Cancel</button>
-            </div>
-          )}
-        </>
-      )}
-    </article>
-  )
-
   const renderSection = () => {
     if (activeView === 'notes') {
-      const captureContext = noteTarget || context
       return (
-        <div className="fieldbook-section-body journal-master-detail notes-journal">
-          <section className="journal-index-panel" aria-label="Note index">
-            <div className="notebook-composer fieldbook-quick-capture">
-              <div className="section-heading-row"><h3>Quick capture</h3>{noteTarget && <button className="text-button" type="button" onClick={() => setNoteTarget(null)}>Use current lesson</button>}</div>
-              <label htmlFor="notebook-draft">{captureContext?.artifactTitle ? `Note about “${captureContext.artifactTitle}”` : 'General observation'}</label>
-              <textarea id="notebook-draft" value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Record what you notice, question, or want to remember." rows="3" />
-              <button className="primary-button" type="button" onClick={saveDraft} disabled={!draft.trim() || storageStatus === 'loading'}>Save note</button>
-            </div>
-            <div className="journal-filter-grid">
-              <label>Search<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search notes" /></label>
-              <label>Module<select value={noteModuleFilter} onChange={(event) => setNoteModuleFilter(event.target.value)}><option value="all">All modules</option>{noteModules.map((module) => <option key={module}>{module}</option>)}</select></label>
-              <label>Order<select value={noteSort} onChange={(event) => setNoteSort(event.target.value)}><option value="recent">Most recent</option><option value="earliest">Earliest</option></select></label>
-            </div>
-            <div className="journal-entry-list" role="listbox" aria-label="Notebook entries">
-              {filteredNotes.length === 0 ? <p className="empty-state">{notes.length ? 'No entries match these filters.' : 'Your observations will appear here.'}</p> : filteredNotes.map((note) => (
-                <button key={note.id} type="button" role="option" aria-selected={selectedNote?.id === note.id} className={selectedNote?.id === note.id ? 'journal-index-entry selected' : 'journal-index-entry'} onClick={() => setSelectedNoteId(note.id)}>
-                  <span className="journal-entry-kicker">{note.moduleTitle || 'General observations'}</span>
-                  <strong>{getNoteContextLabel(note)}</strong>
-                  <span>{note.text}</span>
-                  {note.updatedAt !== note.createdAt && <small>Revised</small>}
-                </button>
-              ))}
-            </div>
-          </section>
-          <section className="journal-detail-panel" aria-label="Selected note">
-            {!selectedNote ? <p className="empty-state">Select a note to review it.</p> : editingId === selectedNote.id ? (
-              <div className="note-editor"><h3>Edit note</h3><textarea value={editingText} onChange={(event) => setEditingText(event.target.value)} rows="10" /><div className="inline-actions"><button className="primary-button" type="button" onClick={saveEdit} disabled={!editingText.trim()}>Save changes</button><button type="button" onClick={() => setEditingId(null)}>Cancel</button></div></div>
-            ) : (
-              <article className="journal-detail-entry">
-                <p className="eyebrow">{selectedNote.moduleTitle || 'General observations'}</p><h3>{getNoteContextLabel(selectedNote)}</h3>
-                <p className="journal-full-text">{selectedNote.text}</p>
-                <dl className="journal-metadata"><div><dt>Created</dt><dd>{new Date(selectedNote.createdAt).toLocaleString()}</dd></div>{selectedNote.updatedAt !== selectedNote.createdAt && <div><dt>Revised</dt><dd>{new Date(selectedNote.updatedAt).toLocaleString()}</dd></div>}</dl>
-                <div className="inline-actions">{selectedNote.artifactId && <button type="button" onClick={() => navigateTo(selectedNote)}>Return to lesson</button>}<button type="button" onClick={() => { setEditingId(selectedNote.id); setEditingText(selectedNote.text) }}>Edit</button><button className="text-button danger-text" type="button" onClick={() => setDeleteCandidate(selectedNote.id)}>Delete</button></div>
-                {deleteCandidate === selectedNote.id && <div className="entry-delete-confirmation"><span>Delete this note?</span><button className="danger-button" type="button" onClick={() => { onDeleteNote(selectedNote.id); setDeleteCandidate(null); setSelectedNoteId(null) }}>Delete</button><button type="button" onClick={() => setDeleteCandidate(null)}>Cancel</button></div>}
-              </article>
-            )}
-          </section>
-        </div>
+        <NotesSection
+          context={context}
+          noteTarget={noteTarget}
+          draft={draft}
+          storageStatus={storageStatus}
+          notes={notes}
+          noteModules={noteModules}
+          filteredNotes={filteredNotes}
+          selectedNote={selectedNote}
+          query={query}
+          noteModuleFilter={noteModuleFilter}
+          noteSort={noteSort}
+          editingId={editingId}
+          editingText={editingText}
+          deleteCandidate={deleteCandidate}
+          onDraftChange={setDraft}
+          onSaveDraft={saveDraft}
+          onClearNoteTarget={() => setNoteTarget(null)}
+          onQueryChange={setQuery}
+          onModuleFilterChange={setNoteModuleFilter}
+          onSortChange={setNoteSort}
+          onSelectNote={setSelectedNoteId}
+          onEditingTextChange={setEditingText}
+          onSaveEdit={saveEdit}
+          onCancelEdit={() => setEditingId(null)}
+          onBeginEdit={(note) => { setEditingId(note.id); setEditingText(note.text) }}
+          onRequestDelete={setDeleteCandidate}
+          onConfirmDelete={(noteId) => { onDeleteNote(noteId); setDeleteCandidate(null); setSelectedNoteId(null) }}
+          onCancelDelete={() => setDeleteCandidate(null)}
+          onNavigateToNote={navigateTo}
+        />
       )
     }
 
     if (activeView === 'glossary') {
       return (
-        <div className="fieldbook-section-body journal-master-detail glossary-journal">
-          <section className="journal-index-panel glossary-index-panel" aria-label="Glossary term index">
-            <div className="glossary-index-header">
-              <div>
-                <h3>Course glossary</h3>
-                <p>Build your own definitions as you encounter key terms.</p>
-              </div>
-              <button type="button" onClick={() => onStartGlossaryStudy({ moduleId: context?.moduleId })} disabled={glossaryEntries.length === 0}>Study terms</button>
-            </div>
-            <label className="journal-group-control">Show module
-              <select value={glossaryModuleFilter} onChange={(event) => { setGlossaryModuleFilter(event.target.value); setSelectedGlossaryTermId(null) }}>
-                <option value="all">All modules</option>
-                {glossaryModules.map(([moduleId, moduleTitle]) => <option key={moduleId} value={moduleId}>{moduleTitle}</option>)}
-              </select>
-            </label>
-            <div className="glossary-state-key" aria-label="Glossary state key">
-              <span><b aria-hidden="true">○</b> Not encountered</span>
-              <span><b aria-hidden="true">◐</b> Added</span>
-              <span><b aria-hidden="true">●</b> Defined</span>
-            </div>
-            <div className="glossary-index-list">
-              {groupedGlossaryTerms.map(([moduleTitle, terms]) => (
-                <section className="glossary-index-module" key={moduleTitle}>
-                  <h4>{moduleTitle}</h4>
-                  {terms.map((term) => {
-                    const state = glossaryState(term)
-                    const selected = selectedGlossaryTerm?.id === term.id
-                    return (
-                      <button key={term.id} type="button" className={`glossary-index-entry glossary-state-${state.id} ${selected ? 'selected' : ''}`} aria-current={selected ? 'true' : undefined} title={state.id === 'undiscovered' ? `Not yet added. Find this term in ${term.locationLabel}.` : `${state.label}: ${term.term}`} onClick={() => openGlossaryTerm(term)}>
-                        <span className="glossary-state-symbol" aria-hidden="true">{state.symbol}</span>
-                        <span><strong>{term.term}</strong><small>{state.label}</small></span>
-                      </button>
-                    )
-                  })}
-                </section>
-              ))}
-            </div>
-          </section>
-
-          <section className="journal-detail-panel glossary-detail-panel" aria-live="polite">
-            {!selectedGlossaryTerm ? <p className="empty-state">Select a glossary term to review it.</p> : (
-              <article className="journal-detail-entry">
-                <p className="eyebrow">{selectedGlossaryTerm.moduleTitle}</p>
-                <h3>{selectedGlossaryTerm.term}</h3>
-                {!selectedGlossaryEntry ? (
-                  <div className="glossary-undiscovered-detail">
-                    <p className="journal-state-label state-undiscovered">Not yet added</p>
-                    <p>You will encounter this term in:</p>
-                    <p className="glossary-lesson-location"><strong>{selectedGlossaryTerm.locationLabel}</strong></p>
-                    <button className="primary-button" type="button" onClick={() => goToGlossaryLocation(selectedGlossaryTerm)}>Go to lesson location</button>
-                  </div>
-                ) : (
-                  <div className="glossary-added-detail">
-                    <p className={`journal-state-label ${selectedGlossaryEntry.definition?.trim() ? 'state-defined' : 'state-added'}`}>{selectedGlossaryEntry.definition?.trim() ? 'Defined' : 'Added without definition'}</p>
-                    <label htmlFor={`glossary-edit-${selectedGlossaryTerm.id}`}>Your definition</label>
-                    <textarea id={`glossary-edit-${selectedGlossaryTerm.id}`} rows="7" value={glossaryEdit} onChange={(event) => setGlossaryEdit(event.target.value)} placeholder="Write the definition in your own words, or leave it blank for now." />
-                    <div className="inline-actions">
-                      <button className="primary-button" type="button" onClick={() => onSaveGlossaryEntry(selectedGlossaryTerm, glossaryEdit)}>Save definition</button>
-                      <button type="button" onClick={() => goToGlossaryLocation(selectedGlossaryTerm)}>Return to lesson</button>
-                    </div>
-                    {!selectedGlossaryEntry.definition?.trim() && <p className="fieldbook-pass-note">This term is in your glossary, but you have not written a definition yet.</p>}
-                  </div>
-                )}
-              </article>
-            )}
-          </section>
-        </div>
+        <GlossarySection
+          context={context}
+          glossaryEntries={glossaryEntries}
+          glossaryModules={glossaryModules}
+          groupedGlossaryTerms={groupedGlossaryTerms}
+          glossaryModuleFilter={glossaryModuleFilter}
+          selectedGlossaryTerm={selectedGlossaryTerm}
+          selectedGlossaryEntry={selectedGlossaryEntry}
+          glossaryEdit={glossaryEdit}
+          getGlossaryState={glossaryState}
+          onStartGlossaryStudy={onStartGlossaryStudy}
+          onModuleFilterChange={(moduleId) => { setGlossaryModuleFilter(moduleId); setSelectedGlossaryTermId(null) }}
+          onOpenTerm={openGlossaryTerm}
+          onGlossaryEditChange={setGlossaryEdit}
+          onSaveGlossaryEntry={onSaveGlossaryEntry}
+          onGoToLocation={goToGlossaryLocation}
+        />
       )
     }
 
