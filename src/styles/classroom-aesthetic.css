@@ -1,10 +1,13 @@
 /**
- * Old-classroom/library visual system and accepted desktop notebook docking.
+ * Old-classroom/library material and typography layer.
  *
- * This layer establishes the material palette, typography, paper/wood cues,
- * and the final Pass 5.4 docking correction inherited by the horizontal
- * course. It must remain after foundation.css and before course-specific
- * overrides.
+ * This file establishes the paper, wood, brass, burgundy, and historic
+ * classroom vocabulary shared by the current horizontal course. It must remain
+ * after `foundation.css` and before the course-specific layout layers.
+ *
+ * Pass 6B removed the obsolete docking block that targeted the superseded
+ * `.app-shell` root. Current `.course-app` docking belongs to the later
+ * horizontal-course and Field Notebook stylesheets.
  */
 
 /* --------------------------------------------------------------------------
@@ -149,8 +152,6 @@ select {
   font-family: Georgia, "Times New Roman", serif;
 }
 
-.hero h1 {
-}
 
 .eyebrow {
   color: var(--dusty-rose);
@@ -425,51 +426,3 @@ select {
     background-image: none;
   }
 }
-
-
-/* Pass 5.4: true desktop notebook docking.
-   The notebook occupies a dedicated right-hand grid column rather than
-   entering the normal document flow beneath the museum content. */
-@media (min-width: 901px) {
-  .app-shell.notebook-mode-side {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(360px, 430px);
-    grid-template-rows: auto auto minmax(0, 1fr);
-    min-height: 100vh;
-  }
-
-  .app-shell.notebook-mode-side .site-header,
-  .app-shell.notebook-mode-side .storage-status {
-    grid-column: 1 / -1;
-  }
-
-  .app-shell.notebook-mode-side .site-header {
-    grid-row: 1;
-  }
-
-  .app-shell.notebook-mode-side .storage-status {
-    grid-row: 2;
-  }
-
-  .app-shell.notebook-mode-side main {
-    grid-column: 1;
-    grid-row: 3;
-    min-width: 0;
-    margin-right: 0;
-  }
-
-  .app-shell.notebook-mode-side .notebook-side {
-    position: sticky;
-    grid-column: 2;
-    grid-row: 3;
-    top: 74px;
-    right: auto;
-    bottom: auto;
-    width: 100%;
-    height: calc(100vh - 74px);
-    max-height: calc(100vh - 74px);
-    align-self: start;
-    overflow-y: auto;
-  }
-}
-
