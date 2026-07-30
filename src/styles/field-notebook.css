@@ -1,0 +1,779 @@
+/**
+ * Current Field Notebook visual system and accessibility integration.
+ *
+ * Owns the game-inspired fieldbook shell, master-detail section layouts,
+ * glossary study refinements, Resources, Course Map, compact states, and final
+ * accessibility overrides. It imports last because it is the authoritative
+ * notebook presentation layer.
+ */
+
+/* Notebook Redesign Pass 1: fieldbook shell and stable navigation. */
+.fieldbook-launcher {
+  border-radius: 0.5rem 0.5rem 0.15rem 0.15rem;
+  background: linear-gradient(90deg, #173e31 0 12%, #285844 12% 100%);
+  border: 1px solid #d0ae63;
+  box-shadow: 0 8px 20px rgba(28, 20, 10, 0.24);
+  letter-spacing: 0.02em;
+}
+
+.fieldbook-cover-icon { color: #d9ba72; font-size: 1.25rem; }
+.notebook.fieldbook-side,
+.notebook.fieldbook-full { background: #e9dfc5; }
+
+.fieldbook-shell { height: 100%; display: flex; flex-direction: column; min-height: 0; background: #e9dfc5; }
+.fieldbook-header {
+  position: relative;
+  flex: 0 0 auto;
+  color: #f8efda;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.035), transparent 24%, rgba(0,0,0,0.08)),
+    #254b3a;
+  border-bottom: 3px double #b78f45;
+  padding: 0.9rem 1rem;
+}
+.fieldbook-header h2 { color: #fff8e7; font-size: 1.55rem; }
+.fieldbook-header .eyebrow { color: #e3c995; }
+.fieldbook-title-lockup { display: flex; align-items: center; gap: 0.7rem; }
+.fieldbook-header .notebook-header-actions button { background: #f1e8d2; border-color: #c5aa70; }
+
+.fieldbook-workspace { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: 112px minmax(0, 1fr); }
+.fieldbook-tab-rail {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.7rem 0 0.7rem 0.45rem;
+  background: #5c3d26;
+  border-right: 4px solid #2e2117;
+  box-shadow: inset -7px 0 12px rgba(0,0,0,0.2);
+}
+.fieldbook-tab-rail button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "icon count" "label label";
+  gap: 0.18rem;
+  margin: 0 0 0.42rem;
+  padding: 0.58rem 0.45rem 0.58rem 0.58rem;
+  border: 1px solid #a47a46;
+  border-right: 0;
+  border-radius: 0.45rem 0 0 0.45rem;
+  background: #d9c7a0;
+  color: #3e281b;
+  text-align: left;
+  box-shadow: inset 0 -2px rgba(93,60,32,0.12);
+}
+.fieldbook-tab-rail button:hover { background: #efe2c4; }
+.fieldbook-tab-rail button.fieldbook-tab-active {
+  position: relative;
+  z-index: 2;
+  width: calc(100% + 5px);
+  background: #f5ecd7;
+  color: #5f1830;
+  border-color: #c29b56;
+  box-shadow: -3px 3px 0 rgba(47,29,16,0.18);
+}
+.fieldbook-tab-icon { grid-area: icon; font-size: 0.92rem; font-weight: 800; }
+.fieldbook-tab-label { grid-area: label; font-size: 0.73rem; font-weight: 800; line-height: 1.1; }
+.fieldbook-tab-count { grid-area: count; font-size: 0.65rem; color: #6e5b45; }
+
+.fieldbook-page {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background:
+    repeating-linear-gradient(0deg, rgba(83,64,38,0.025) 0 1px, transparent 1px 5px),
+    #f5ecd7;
+  box-shadow: inset 18px 0 24px rgba(68,45,25,0.08);
+}
+.fieldbook-context-card {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.75rem 0.9rem 0;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #c8ae78;
+  border-left: 5px solid #7c243c;
+  background: rgba(255,250,235,0.78);
+}
+.fieldbook-context-card strong,
+.fieldbook-context-card span { display: block; }
+.fieldbook-context-card span { margin-top: 0.16rem; color: #665a47; font-size: 0.8rem; }
+.fieldbook-context-card button { flex: 0 0 auto; }
+
+.fieldbook-page-heading {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0.95rem 0.55rem;
+  border-bottom: 1px solid #d7c7a6;
+}
+.fieldbook-page-heading h3 { margin: 0; color: #5f1830; font-family: Georgia, serif; font-size: 1.45rem; }
+.fieldbook-settings-button { font-size: 0.82rem; }
+.fieldbook-settings {
+  flex: 0 0 auto;
+  margin: 0.6rem 0.9rem 0;
+  padding: 0.75rem;
+  border: 1px solid #bca575;
+  background: #eee3ca;
+}
+.fieldbook-settings p { margin: 0.2rem 0 0.6rem; color: #5f5748; font-size: 0.82rem; }
+.fieldbook-page-content { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+.fieldbook-section-body { padding: 0.9rem; }
+.fieldbook-section-body .notebook-composer,
+.fieldbook-section-body .notebook-tools,
+.fieldbook-section-body .notebook-notes,
+.fieldbook-section-body.notebook-glossary,
+.fieldbook-section-body.notebook-activities,
+.fieldbook-section-body.notebook-bookmarks { padding-left: 0; padding-right: 0; }
+.fieldbook-quick-capture { padding-top: 0; }
+
+.fieldbook-placeholder-section { max-width: 700px; }
+.fieldbook-placeholder-section h3 { font-family: Georgia, serif; color: #5f1830; }
+.fieldbook-pass-note { padding: 0.7rem; border-left: 4px solid #b78f45; background: #ece1c6; color: #625843; }
+.fieldbook-map-preview { position: relative; display: grid; gap: 0.55rem; max-width: 360px; padding: 0.5rem 0 0.5rem 1.4rem; }
+.fieldbook-map-preview::before { content: ''; position: absolute; inset: 0.8rem auto 0.8rem 0.45rem; width: 3px; background: #7c243c; border-radius: 99px; }
+.fieldbook-map-preview span { position: relative; padding-left: 0.35rem; }
+.fieldbook-map-preview span::before { content: ''; position: absolute; left: -1.17rem; top: 0.35rem; width: 0.62rem; height: 0.62rem; border: 2px solid #7c243c; border-radius: 50%; background: #f5ecd7; }
+
+.fieldbook-full { width: min(1180px, 96vw); height: min(900px, 95vh); border: 5px solid #4a2f1d; border-radius: 12px; overflow: hidden; }
+.fieldbook-full .fieldbook-workspace { grid-template-columns: 165px minmax(0, 1fr); }
+.fieldbook-full .fieldbook-tab-rail { padding-left: 0.7rem; }
+.fieldbook-full .fieldbook-tab-label { font-size: 0.88rem; }
+.fieldbook-full .fieldbook-page-content { padding-inline: clamp(0.4rem, 2vw, 1.6rem); }
+.fieldbook-full .fieldbook-section-body { max-width: 900px; margin-inline: auto; }
+
+/* Preserve course-aware docking bounds while the new shell fills the panel. */
+.course-app.notebook-mode-side .notebook-panel.fieldbook-side {
+  top: var(--course-header-height, 76px);
+  bottom: var(--course-navigation-height, 104px);
+  height: auto;
+  overflow: hidden;
+}
+
+@media (max-width: 1100px) {
+  .fieldbook-workspace { grid-template-columns: 94px minmax(0, 1fr); }
+  .fieldbook-tab-label { font-size: 0.66rem; }
+  .fieldbook-context-card { align-items: flex-start; flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fieldbook-tab-rail button { transition: background-color 140ms ease, width 140ms ease, transform 140ms ease; }
+  .fieldbook-tab-rail button:hover { transform: translateX(-2px); }
+}
+
+@media (forced-colors: active) {
+  .fieldbook-header,
+  .fieldbook-tab-rail,
+  .fieldbook-page { background: Canvas; color: CanvasText; }
+  .fieldbook-tab-rail button.fieldbook-tab-active { outline: 3px solid Highlight; }
+}
+
+/* Notebook Redesign Pass 2: master-detail learner records. */
+.journal-master-detail { display: grid; grid-template-columns: minmax(250px, 38%) minmax(0, 1fr); gap: 1rem; min-height: 100%; }
+.journal-index-panel { min-width: 0; padding-right: 0.9rem; border-right: 1px solid #c9b991; }
+.journal-detail-panel { min-width: 0; padding: 0.35rem 0.5rem 1rem; }
+.journal-filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; margin: 0.8rem 0; }
+.journal-filter-grid label:first-child { grid-column: 1 / -1; }
+.journal-filter-grid label, .journal-group-control { display: grid; gap: 0.25rem; color: #5d4937; font-size: 0.76rem; font-weight: 800; }
+.journal-filter-grid input, .journal-filter-grid select, .journal-group-control select { width: 100%; min-width: 0; padding: 0.52rem; border: 1px solid #aa956d; background: #fffaf0; color: #30271e; }
+.journal-entry-list { display: grid; gap: 0.45rem; max-height: 48vh; overflow-y: auto; padding-right: 0.25rem; }
+.journal-index-entry { display: grid; gap: 0.18rem; width: 100%; padding: 0.68rem; border: 1px solid #c6b58d; border-radius: 4px; background: #f5ecd7; color: #31271e; text-align: left; }
+.journal-index-entry:hover { background: #eee0c2; }
+.journal-index-entry.selected { border-color: #6e1f36; box-shadow: inset 4px 0 #6e1f36; background: #fff8e8; }
+.journal-index-entry strong { font-family: Georgia, serif; color: #5f1830; }
+.journal-index-entry > span:not(.journal-state-label):not(.journal-media-icon) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #675a49; font-size: 0.78rem; }
+.journal-entry-kicker { color: #765f42 !important; font-size: 0.66rem !important; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.journal-index-entry small { color: #765f42; font-style: italic; }
+.journal-detail-entry h3 { margin-top: 0.2rem; color: #5f1830; font-family: Georgia, serif; font-size: 1.5rem; }
+.journal-detail-entry h4 { color: #5f1830; }
+.journal-full-text { white-space: pre-wrap; line-height: 1.65; font-size: 1rem; }
+.journal-metadata { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1.2rem 0; padding-top: 0.8rem; border-top: 1px solid #d0c19d; }
+.journal-metadata div { display: grid; gap: 0.1rem; }
+.journal-metadata dt { color: #755d40; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; }
+.journal-metadata dd { margin: 0; }
+.journal-prompt { padding: 0.85rem; border-left: 4px solid #a9823a; background: #eee2c7; }
+.journal-prompt p { margin-bottom: 0; }
+.journal-status-filters { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.8rem; }
+.journal-status-filters button.selected { background: #5f1830; color: #fff8e7; border-color: #5f1830; }
+.journal-state-label { width: max-content; padding: 0.16rem 0.38rem; border-radius: 2px; font-size: 0.66rem; font-weight: 900; text-transform: uppercase; }
+.state-completed { color: #174d37; }
+.journal-state-label.state-completed { background: #d9eadf; }
+.state-revisit { color: #7a3e08; }
+.journal-state-label.state-revisit { background: #f3dfbd; }
+.grouped-bookmark-list > section > h3 { margin: 0.8rem 0 0.35rem; color: #5f1830; font-family: Georgia, serif; font-size: 0.95rem; }
+.journal-media-icon { color: #9b7633; }
+.fieldbook-side .journal-master-detail { grid-template-columns: 1fr; }
+.fieldbook-side .journal-index-panel { padding-right: 0; border-right: 0; }
+.fieldbook-side .journal-detail-panel { padding-top: 0.8rem; border-top: 2px solid #c6b58d; }
+.fieldbook-side .journal-entry-list { max-height: 26vh; }
+@media (max-width: 1050px) { .journal-master-detail { grid-template-columns: 1fr; } .journal-index-panel { border-right: 0; padding-right: 0; } .journal-detail-panel { border-top: 2px solid #c6b58d; padding-top: 1rem; } }
+@media (forced-colors: active) { .journal-index-entry.selected { outline: 3px solid Highlight; box-shadow: none; } }
+
+/* Notebook Redesign Pass 3: glossary master-detail and fieldbook study mode. */
+.glossary-journal { min-height: 100%; }
+.glossary-index-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.glossary-index-header h3 { margin: 0; color: #5f1830; font-family: Georgia, serif; }
+.glossary-index-header p { margin: 0.25rem 0 0; color: #665a47; font-size: 0.82rem; line-height: 1.4; }
+.glossary-index-header > button { flex: 0 0 auto; }
+.glossary-state-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  margin: 0.7rem 0;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid #d0c09b;
+  background: #eee2c8;
+  color: #625641;
+  font-size: 0.7rem;
+}
+.glossary-state-key span { display: inline-flex; align-items: center; gap: 0.25rem; }
+.glossary-state-key b { color: #6b1f38; font-size: 0.95rem; }
+.glossary-index-list { display: grid; gap: 0.85rem; max-height: 48vh; overflow-y: auto; padding-right: 0.3rem; }
+.glossary-index-module h4 {
+  margin: 0 0 0.35rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #cbb98d;
+  color: #5f1830;
+  font-family: Georgia, serif;
+  font-size: 0.92rem;
+  letter-spacing: 0.03em;
+}
+.glossary-index-entry {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.28rem;
+  padding: 0.5rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: #34291f;
+  text-align: left;
+}
+.glossary-index-entry:hover { border-color: #c7b485; background: #eee1c4; }
+.glossary-index-entry.selected { border-color: #6e1f36; box-shadow: inset 4px 0 #6e1f36; background: #fff8e8; }
+.glossary-index-entry > span:last-child { min-width: 0; display: grid; gap: 0.08rem; }
+.glossary-index-entry strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: Georgia, serif; color: #5f1830; }
+.glossary-index-entry small { color: #6c604f; font-size: 0.68rem; }
+.glossary-state-symbol { color: #6e1f36; font-size: 1rem; font-weight: 900; text-align: center; }
+.glossary-state-undiscovered { opacity: 0.55; }
+.glossary-state-undiscovered:hover,
+.glossary-state-undiscovered.selected { opacity: 1; }
+.glossary-state-undiscovered strong { color: #5b5750; }
+.glossary-detail-panel label { display: block; margin: 0.85rem 0 0.35rem; color: #4d3d2e; font-weight: 850; }
+.glossary-detail-panel textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 0.8rem;
+  border: 1px solid #aa956d;
+  background: #fffaf0;
+  color: #30271e;
+  line-height: 1.55;
+}
+.glossary-undiscovered-detail,
+.glossary-added-detail { max-width: 650px; }
+.glossary-lesson-location { padding: 0.8rem; border-left: 4px solid #a9823a; background: #eee2c7; }
+.journal-state-label.state-undiscovered { background: #e2ded5; color: #5c574e; }
+.journal-state-label.state-added { background: #ead9bd; color: #6f431a; }
+.journal-state-label.state-defined { background: #d9eadf; color: #174d37; }
+.fieldbook-side .glossary-journal { grid-template-columns: 1fr; }
+.fieldbook-side .glossary-index-panel { padding-right: 0; border-right: 0; }
+.fieldbook-side .glossary-detail-panel { padding-top: 0.8rem; border-top: 2px solid #c6b58d; }
+.fieldbook-side .glossary-index-list { max-height: 24vh; }
+
+.fieldbook-study-screen {
+  min-height: 100vh;
+  color: #30271e;
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(255,255,255,0.12), transparent 35%),
+    repeating-linear-gradient(0deg, rgba(83,64,38,0.025) 0 1px, transparent 1px 5px),
+    #e9dfc5;
+}
+.fieldbook-study-header {
+  color: #f8efda;
+  background: linear-gradient(90deg, rgba(255,255,255,0.035), transparent 24%, rgba(0,0,0,0.08)), #254b3a;
+  border-bottom: 4px double #b78f45;
+}
+.fieldbook-study-header h1 { color: #fff8e7; }
+.fieldbook-study-header .eyebrow { color: #e3c995; }
+.fieldbook-study-header button { background: #f1e8d2; border-color: #c5aa70; }
+.study-filter-bar {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.8rem 1rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid #c7b588;
+  background: #f2e8d1;
+}
+.study-filter-bar label { display: grid; gap: 0.25rem; color: #5d4937; font-size: 0.76rem; font-weight: 850; }
+.study-filter-bar select { min-width: 180px; padding: 0.5rem; border: 1px solid #aa956d; background: #fffaf0; color: #30271e; }
+.study-filter-bar p { margin: 0 0 0.55rem; color: #665a47; font-size: 0.82rem; }
+.fieldbook-study-stage { padding-top: clamp(1rem, 3vh, 2.4rem); }
+.fieldbook-flashcard { border: 0; background: transparent; box-shadow: none; }
+.fieldbook-flashcard .flashcard-face {
+  border: 2px solid #a7874b;
+  border-radius: 8px;
+  background:
+    repeating-linear-gradient(0deg, rgba(91,69,36,0.035) 0 1px, transparent 1px 6px),
+    #fff7e5;
+  box-shadow: 0 12px 28px rgba(48,35,20,0.18), inset 12px 0 18px rgba(78,49,24,0.05);
+}
+.fieldbook-flashcard .flashcard-back { background: repeating-linear-gradient(0deg, rgba(91,69,36,0.035) 0 1px, transparent 1px 6px), #f5ecd7; }
+.flashcard-page-label { color: #7a5f2d; font-size: 0.76rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; }
+.study-keyboard-help { color: #665a47; font-size: 0.78rem; }
+.fieldbook-study-empty { border-color: #b99a5d; background: #f5ecd7; }
+
+@media (max-width: 1050px) {
+  .glossary-journal { grid-template-columns: 1fr; }
+  .glossary-index-panel { border-right: 0; padding-right: 0; }
+  .glossary-detail-panel { border-top: 2px solid #c6b58d; padding-top: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fieldbook-flashcard .flashcard-inner { transition: none; }
+}
+
+@media (forced-colors: active) {
+  .glossary-index-entry.selected { outline: 3px solid Highlight; box-shadow: none; }
+  .glossary-state-undiscovered { opacity: 1; }
+}
+
+/* Notebook Redesign Pass 4: Resources and curved Course Map */
+.resource-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: auto;
+}
+
+.resources-journal .journal-index-panel,
+.resources-journal .journal-detail-panel {
+  min-height: 0;
+}
+
+.resource-detail {
+  max-width: 52rem;
+}
+
+.resource-status-control {
+  display: grid;
+  gap: 0.4rem;
+  max-width: 18rem;
+  margin-top: 1.2rem;
+  color: var(--ink, #2f2922);
+  font-weight: 700;
+}
+
+.resource-status-control select {
+  width: 100%;
+}
+
+.journal-state-label.state-saved,
+.journal-state-label.state-started,
+.journal-state-label.state-finished,
+.journal-state-label.state-unsaved {
+  width: fit-content;
+}
+
+.journal-state-label.state-saved { background: #e8dec4; color: #563324; }
+.journal-state-label.state-started { background: #d8e2d2; color: #254c37; }
+.journal-state-label.state-finished { background: #c9d9ca; color: #173c29; }
+.journal-state-label.state-unsaved { background: #ece9e0; color: #69645b; }
+
+.course-map-section {
+  overflow: auto;
+  padding-right: 0.5rem;
+}
+
+.course-map-layout {
+  display: grid;
+  grid-template-columns: minmax(24rem, 1fr) minmax(13rem, 0.34fr);
+  gap: 1.5rem;
+  align-items: start;
+  min-height: 0;
+}
+
+.course-map-legend {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.86rem;
+}
+
+.course-map-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.map-key {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 999px;
+  border: 2px solid #6e6252;
+  display: inline-block;
+  background: #ede6d5;
+}
+
+.map-key.current { background: #7d2334; border-color: #7d2334; box-shadow: 0 0 0 3px rgba(125, 35, 52, 0.18); }
+.map-key.visited { background: #315944; border-color: #315944; }
+.map-key.unvisited { background: #e8e2d4; border-style: dashed; }
+
+.curved-course-map {
+  position: relative;
+  min-height: 52rem;
+  border: 1px solid rgba(80, 60, 40, 0.25);
+  border-radius: 1.2rem;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(250, 246, 234, 0.92), rgba(244, 236, 217, 0.94)),
+    repeating-linear-gradient(0deg, rgba(77, 58, 38, 0.035) 0 1px, transparent 1px 5px);
+}
+
+.curved-course-map svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.course-map-segment {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.course-map-segment.state-unvisited {
+  stroke: rgba(91, 75, 54, 0.38);
+  stroke-width: 4;
+  stroke-dasharray: 5 6;
+}
+
+.course-map-segment.state-visited {
+  stroke: #315944;
+  stroke-width: 5;
+}
+
+
+.course-map-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.55rem;
+  max-width: 14rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid rgba(70, 53, 34, 0.4);
+  border-radius: 0.85rem;
+  text-align: left;
+  background: #f5eedf;
+  color: #30271f;
+  box-shadow: 0 2px 0 rgba(71, 49, 26, 0.14);
+}
+
+.course-map-node:hover,
+.course-map-node:focus-visible {
+  z-index: 4;
+  border-color: #7d2334;
+}
+
+.course-map-node.minor {
+  max-width: 11.5rem;
+  padding: 0.38rem 0.52rem;
+  font-size: 0.86rem;
+}
+
+.course-map-node-mark {
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.course-map-node-copy {
+  display: grid;
+  min-width: 0;
+}
+
+.course-map-node-copy strong,
+.course-map-node-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.course-map-node-copy small { color: inherit; opacity: 0.75; }
+.course-map-node.state-current { background: #7d2334; color: #fff7e6; border-color: #551522; }
+.course-map-node.state-visited { background: #e2eadf; color: #173c29; border-color: #315944; }
+.course-map-node.state-unvisited { color: #6a655b; border-style: dashed; background: rgba(241, 237, 228, 0.92); }
+
+.course-map-summary {
+  position: sticky;
+  top: 0;
+  padding: 1rem;
+  border-left: 4px solid #7d2334;
+  background: #f2ead8;
+}
+
+.course-map-summary h4 { margin-top: 0; }
+
+.fieldbook-side .course-map-layout {
+  grid-template-columns: 1fr;
+}
+
+.fieldbook-side .course-map-summary {
+  position: static;
+}
+
+.fieldbook-side .curved-course-map {
+  min-height: 44rem;
+}
+
+.fieldbook-side .course-map-node {
+  max-width: 9.5rem;
+  font-size: 0.78rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+}
+
+
+/* Notebook Redesign Pass 5: visual integration and accessibility audit. */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.fieldbook-header .notebook-header-actions button {
+  color: #3f2a1d;
+  min-height: 42px;
+  min-width: 86px;
+  font-weight: 800;
+}
+
+.fieldbook-workspace {
+  position: relative;
+}
+
+.fieldbook-workspace::before {
+  content: '';
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--fieldbook-rail-width, 112px) - 5px);
+  width: 10px;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(62, 37, 23, 0.2), transparent 38%, rgba(255,255,255,0.32) 62%, transparent),
+    repeating-linear-gradient(0deg, #7b562f 0 5px, #b38c55 5px 8px, #4c321f 8px 10px);
+  box-shadow: 2px 0 5px rgba(49, 28, 16, 0.2);
+}
+
+.fieldbook-tab-rail {
+  --fieldbook-rail-width: 112px;
+  padding-top: 0.65rem;
+  border-right: 0;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.13), transparent 42%),
+    #6b4528;
+}
+
+.fieldbook-tab-rail button {
+  min-height: 54px;
+  margin: 0 0 0.42rem 0.42rem;
+  width: calc(100% - 0.42rem);
+  border: 1px solid #9c7a47;
+  border-right: 0;
+  border-radius: 8px 0 0 8px;
+  background: #d9c59a;
+  color: #3d2c20;
+  box-shadow: inset 0 1px rgba(255,255,255,0.35);
+}
+
+.fieldbook-tab-rail button.fieldbook-tab-active {
+  width: calc(100% + 5px);
+  background: #f5ecd7;
+  color: #651c33;
+  border-color: #b6955d;
+  box-shadow: 0 2px 4px rgba(54, 33, 18, 0.2), inset 4px 0 #7c243c;
+}
+
+.fieldbook-tab-rail button:focus-visible {
+  position: relative;
+  z-index: 6;
+}
+
+.fieldbook-page {
+  background:
+    repeating-linear-gradient(0deg, rgba(94, 69, 35, 0.035) 0 1px, transparent 1px 7px),
+    radial-gradient(circle at 12% 10%, rgba(255,255,255,0.55), transparent 32%),
+    #f5ecd7;
+}
+
+.fieldbook-context-card,
+.fieldbook-settings,
+.journal-index-panel,
+.journal-detail-panel,
+.curved-course-map,
+.course-map-summary {
+  border-color: #c7ad78;
+}
+
+.fieldbook-context-card {
+  background: rgba(255, 250, 237, 0.86);
+  box-shadow: inset 4px 0 #7c243c;
+}
+
+.fieldbook-page-heading {
+  border-bottom: 1px solid #c8b58a;
+  background: linear-gradient(90deg, rgba(245,236,215,0.96), rgba(236,222,190,0.74));
+}
+
+.fieldbook-page-content {
+  scrollbar-color: #8b6842 #e6d8b8;
+  scrollbar-width: thin;
+}
+
+.fieldbook-page-content::-webkit-scrollbar,
+.journal-entry-list::-webkit-scrollbar,
+.glossary-index-list::-webkit-scrollbar {
+  width: 11px;
+}
+
+.fieldbook-page-content::-webkit-scrollbar-thumb,
+.journal-entry-list::-webkit-scrollbar-thumb,
+.glossary-index-list::-webkit-scrollbar-thumb {
+  background: #8b6842;
+  border: 3px solid #e9ddc1;
+  border-radius: 999px;
+}
+
+.journal-index-entry,
+.glossary-index-entry {
+  min-height: 48px;
+}
+
+.journal-index-entry.selected,
+.glossary-index-entry.selected {
+  box-shadow: inset 4px 0 #7c243c;
+}
+
+.empty-state {
+  padding: 1rem;
+  border: 1px dashed #aa956d;
+  background: rgba(255, 251, 241, 0.58);
+  color: #5f5544;
+}
+
+.fieldbook-settings.storage-error,
+.fieldbook-settings.storage-unavailable {
+  border-left: 5px solid #7c243c;
+}
+
+button:disabled,
+select:disabled,
+textarea:disabled,
+input:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 3px solid #b78f45;
+  outline-offset: 3px;
+}
+
+.fieldbook-full {
+  box-shadow: 0 18px 48px rgba(24, 13, 7, 0.48);
+}
+
+.fieldbook-full .fieldbook-workspace {
+  --fieldbook-rail-width: 165px;
+}
+
+.fieldbook-full .fieldbook-workspace::before {
+  left: 160px;
+}
+
+.course-map-node {
+  min-height: 42px;
+}
+
+.course-map-node.state-current::after {
+  content: 'Current';
+  position: absolute;
+  right: 0.35rem;
+  top: -0.78rem;
+  padding: 0.08rem 0.32rem;
+  border-radius: 99px;
+  background: #fff7e6;
+  color: #651c33;
+  border: 1px solid #7c243c;
+  font-size: 0.52rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+@media (max-height: 740px) {
+  .fieldbook-header { padding-block: 0.45rem; }
+  .fieldbook-context-card { padding-block: 0.48rem; }
+  .fieldbook-page-heading { padding-block: 0.38rem; }
+  .fieldbook-tab-rail button { min-height: 46px; }
+}
+
+@media (prefers-contrast: more) {
+  .fieldbook-page,
+  .fieldbook-context-card,
+  .journal-index-panel,
+  .journal-detail-panel { background: #fffaf0; }
+  .fieldbook-tab-rail button { border-width: 2px; }
+  .fieldbook-tab-rail button.fieldbook-tab-active,
+  .journal-index-entry.selected,
+  .glossary-index-entry.selected { outline: 3px solid #651c33; outline-offset: -3px; }
+  .course-map-segment.state-unvisited { stroke: #4e4a42; }
+}
+
+@media (forced-colors: active) {
+  .fieldbook-workspace::before { background: CanvasText; }
+  .fieldbook-tab-rail button.fieldbook-tab-active,
+  .journal-index-entry.selected,
+  .glossary-index-entry.selected { border: 3px solid Highlight; }
+  .course-map-node.state-current::after { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+}

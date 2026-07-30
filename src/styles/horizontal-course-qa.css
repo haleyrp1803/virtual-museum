@@ -1,0 +1,267 @@
+/**
+ * Horizontal-course QA and integrated-navigation corrections.
+ *
+ * These source-ordered overrides keep stops inside the viewport, reserve space
+ * for the bottom timeline, relocate storage controls into the notebook, and
+ * protect the notebook launcher/navigation relationship. Do not reorder this
+ * file ahead of horizontal-course.css.
+ */
+
+/* --------------------------------------------------------------------------
+   HORIZONTAL COURSE QA PASS 1
+   Keeps navigation visible, fits each stop within the course viewport, and
+   relocates notebook storage choices into the notebook itself.
+   -------------------------------------------------------------------------- */
+
+/* The timeline now occupies the space immediately beneath the header. */
+.course-app > .storage-status { display: none; }
+
+/* Burgundy is the readable text accent on paper; dusty rose is reserved for
+   dark historical surfaces. */
+.eyebrow { color: var(--burgundy); }
+.stop-era-introduction .eyebrow,
+.stop-era-transition .eyebrow,
+.stop-era-common-school .eyebrow { color: var(--dusty-rose); }
+
+/* Keep the notebook launcher clear of the fixed Previous/Next navigation. */
+.course-app .notebook-launcher {
+  right: 1.25rem;
+  bottom: 92px;
+}
+.note-count { display: none !important; }
+
+/* Storage information and controls now live inside the notebook. */
+.notebook-storage-line {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.45rem 0.65rem;
+  align-items: center;
+}
+.notebook-storage-actions {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.25rem;
+}
+.notebook-storage-actions button {
+  padding: 0.38rem 0.58rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--burgundy);
+  background: rgba(255,255,255,0.48);
+  font-size: 0.78rem;
+}
+
+/* Every timeline stop occupies the fixed course viewport. Long optional
+   material scrolls inside its own panel rather than changing the page axis. */
+.course-stop { overflow: hidden; }
+.stop-inner {
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1rem, 1.8vw, 1.65rem) clamp(2rem, 5vw, 5rem) 1.25rem;
+  overflow: hidden;
+}
+.stop-heading {
+  flex: 0 0 auto;
+  max-width: 980px;
+  margin-bottom: clamp(0.65rem, 1.4vh, 1rem);
+}
+.stop-heading h1 {
+  margin: 0.15rem 0 0.4rem;
+  font-size: clamp(2.15rem, 3.5vw, 4.15rem);
+  line-height: 0.98;
+}
+.stop-summary {
+  margin: 0;
+  max-width: 850px;
+  font-size: clamp(0.94rem, 1.2vw, 1.08rem);
+  line-height: 1.42;
+}
+.date-marker {
+  margin-bottom: 0.25rem;
+  padding: 0.24rem 0.58rem;
+  font-size: 0.7rem;
+}
+
+.intro-layout,
+.era-threshold,
+.source-stop-layout,
+.synthesis-layout,
+.next-era-landing,
+.media-pair,
+.resource-grid,
+.activity-prototype,
+.transition-experience {
+  min-height: 0;
+  margin-top: 0;
+}
+
+.intro-layout,
+.era-threshold,
+.source-stop-layout,
+.synthesis-layout,
+.next-era-landing {
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+.intro-layout { align-items: stretch; }
+.placeholder-video,
+.navigation-tutorial,
+.source-stage,
+.source-guidance,
+.synthesis-card,
+.next-era-landing > div,
+.media-pair-card,
+.resource-card,
+.activity-prototype { min-height: 0; }
+.placeholder-video-screen { min-height: 0; height: clamp(190px, 30vh, 285px); }
+.placeholder-video details { max-height: 8rem; overflow: auto; }
+.navigation-tutorial { overflow: auto; padding: 1.15rem; }
+.navigation-tutorial h3 { font-size: 1.2rem; }
+.navigation-tutorial ul { gap: 0.45rem; }
+
+.era-number { font-size: clamp(6rem, 12vw, 11rem); }
+.era-threshold > div:last-child,
+.source-guidance,
+.synthesis-card,
+.next-era-landing > div:last-child { padding: clamp(1.1rem, 2vw, 1.6rem); overflow: auto; }
+
+.source-stage { padding: 1rem; border-width: 8px; overflow: auto; }
+.source-guidance h2 { margin: 0.35rem 0 0.65rem; font-size: 1.65rem; }
+.artifact-media { margin: 0.6rem 0; }
+.artifact-image-media img { max-height: 42vh; }
+.artifact-av-media video { max-height: 34vh; }
+.transcript-panel { max-height: 16vh; overflow: auto; }
+
+.media-pair {
+  flex: 1 1 auto;
+  align-items: stretch;
+  overflow: hidden;
+}
+.media-pair-card { padding: 1rem; overflow: auto; }
+.media-pair-card h2 { margin: 0.5rem 0; font-size: 1.35rem; }
+
+.activity-prototype {
+  flex: 1 1 auto;
+  width: min(900px, 100%);
+  padding: 1.35rem;
+  overflow: hidden;
+}
+.activity-prototype label { margin-bottom: 0.5rem; font-size: 1.1rem; }
+.activity-prototype textarea {
+  height: clamp(170px, 28vh, 280px);
+  min-height: 0;
+  resize: none;
+  line-height: 1.45;
+}
+
+.resource-grid {
+  flex: 1 1 auto;
+  overflow: hidden;
+  align-items: stretch;
+}
+.resource-card { padding: 1rem; overflow: auto; }
+.resource-card h3 { font-size: 1.12rem; }
+.resource-card p { margin: 0.35rem 0; line-height: 1.35; }
+
+.transition-experience {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+.transition-domestic,
+.transition-institutional { padding: 1.3rem; }
+.transition-experience > p { line-height: 1.45; }
+.slate-placeholder { min-height: 0; height: min(42vh, 320px); }
+
+/* Ensure the footer's Next control remains fully visible and independently
+   clickable when the notebook launcher is minimized. */
+.course-navigation { grid-template-columns: 180px minmax(0, 1fr) 180px; }
+.course-navigation > button { min-width: 130px; }
+.course-navigation > button:last-child { position: relative; z-index: 2; }
+
+@media (max-height: 820px) {
+  .stop-inner { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+  .stop-heading h1 { font-size: clamp(1.9rem, 3vw, 3.3rem); }
+  .stop-summary { font-size: 0.94rem; }
+  .placeholder-video-screen { height: clamp(160px, 25vh, 225px); }
+  .artifact-image-media img { max-height: 34vh; }
+  .artifact-av-media video { max-height: 28vh; }
+  .activity-prototype textarea { height: clamp(140px, 23vh, 220px); }
+}
+
+/* --------------------------------------------------------------------------
+   HORIZONTAL COURSE QA PASS 2
+   Integrates the historical timeline into the bottom Previous/Next bar.
+   -------------------------------------------------------------------------- */
+
+/* With the standalone top timeline removed, course content begins directly
+   below the fixed course header. */
+.horizontal-course {
+  inset: 72px 0 96px 0;
+}
+
+.course-navigation {
+  min-height: 96px;
+  grid-template-columns: 170px minmax(0, 1fr) 170px;
+  gap: 1.1rem;
+  padding: 0.55rem 1.25rem 0.45rem;
+}
+
+.bottom-timeline {
+  position: relative;
+  align-self: stretch;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(78px, 1fr));
+  align-items: center;
+  min-width: 0;
+  padding: 0.1rem 0.25rem 0;
+}
+
+.bottom-timeline .timeline-track {
+  left: 4.5%;
+  right: 4.5%;
+  top: 29px;
+}
+
+.bottom-timeline > button {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 2.15rem 0.2rem 0.15rem;
+  border: 0;
+  background: transparent;
+  color: #655646;
+  font-size: 0.7rem;
+  line-height: 1.05;
+  text-align: center;
+}
+
+.bottom-timeline > button:disabled { opacity: 0.34; }
+.bottom-timeline > button.visited .timeline-dot { background: var(--burgundy); }
+.bottom-timeline > button.current { color: var(--green-dark); font-weight: 900; }
+.bottom-timeline > button.current .timeline-dot {
+  width: 19px;
+  height: 19px;
+  top: 0.72rem;
+  background: var(--gold);
+  box-shadow: 0 0 0 3px rgba(182,145,72,0.22);
+}
+.bottom-timeline .timeline-dot { top: 0.9rem; }
+
+/* The notebook launcher remains clear of the taller integrated navigation. */
+.course-app .notebook-launcher { bottom: 110px; }
+
+.course-app.notebook-mode-side .horizontal-course,
+.course-app.notebook-mode-side .course-navigation,
+.course-app.notebook-mode-side .course-header { right: min(440px, 36vw); }
+
+@media (max-width: 1100px) {
+  .bottom-timeline { grid-template-columns: repeat(8, 108px); overflow-x: auto; }
+}
+
