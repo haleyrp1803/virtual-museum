@@ -2,14 +2,18 @@
  * Field Notebook shell and section coordinator.
  *
  * Owns minimized/docked/full presentation behavior, focus containment, section
- * navigation, settings, and the current master-detail section interfaces. The
- * Course Map renderer and geometry are now separate first-step extractions;
- * later bounded passes can split the remaining sections without changing this
- * component's public prop contract.
+ * navigation, settings, and the current master-detail section interfaces.
+ * Section renderers are being extracted in bounded stages. Activities,
+ * Bookmarks, Resources, and Course Map now live in dedicated files; Notes and
+ * Glossary remain here until the next extraction pass. The shell still owns
+ * presentation mode, focus containment, shared selection state, and dispatch.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import CourseMap from './CourseMap.jsx'
+import ActivitiesSection from './notebookSections/ActivitiesSection.jsx'
+import BookmarksSection from './notebookSections/BookmarksSection.jsx'
+import CourseMapSection from './notebookSections/CourseMapSection.jsx'
+import ResourcesSection from './notebookSections/ResourcesSection.jsx'
 import { findGlossaryEntry, getNoteContextLabel, NOTEBOOK_SECTIONS } from './notebookModel.js'
 
 
@@ -390,65 +394,54 @@ export default function Notebook({
 
     if (activeView === 'activities') {
       return (
-        <div className="fieldbook-section-body journal-master-detail activities-journal">
-          <section className="journal-index-panel">
-            <div className="journal-status-filters" aria-label="Filter activities"><button className={activityFilter === 'all' ? 'selected' : ''} type="button" onClick={() => setActivityFilter('all')}>All</button><button className={activityFilter === 'revisit' ? 'selected' : ''} type="button" onClick={() => setActivityFilter('revisit')}>To revisit</button><button className={activityFilter === 'completed' ? 'selected' : ''} type="button" onClick={() => setActivityFilter('completed')}>Completed</button></div>
-            <div className="journal-entry-list" role="listbox" aria-label="Activity records">
-              {filteredActivities.length === 0 ? <p className="empty-state">No activities in this category.</p> : filteredActivities.map((item) => <button key={item.key} type="button" role="option" aria-selected={selectedActivity?.key === item.key} className={selectedActivity?.key === item.key ? 'journal-index-entry selected' : 'journal-index-entry'} onClick={() => setSelectedActivityKey(item.key)}><span className={`journal-state-label state-${item.status}`}>{item.status === 'revisit' ? 'To revisit' : 'Completed'}</span><strong>{item.activityTitle || 'Learning activity'}</strong><span>{item.moduleTitle || 'Course activity'}</span></button>)}
-            </div>
-          </section>
-          <section className="journal-detail-panel">
-            {!selectedActivity ? <p className="empty-state">Completed activities and items to revisit will appear here.</p> : <article className="journal-detail-entry"><p className="eyebrow">{selectedActivity.moduleTitle || 'Course activity'}</p><h3>{selectedActivity.activityTitle}</h3>{selectedActivity.prompt && <div className="journal-prompt"><strong>Prompt</strong><p>{selectedActivity.prompt}</p></div>}{selectedActivity.recordType === 'response' ? <><h4>Your response</h4><p className="journal-full-text">{selectedActivity.text}</p><p className="note-date">Saved {new Date(selectedActivity.updatedAt).toLocaleString()}</p></> : <><p className={`journal-result state-${selectedActivity.status}`}><strong>{selectedActivity.correct ? 'Completed' : 'To revisit'}</strong></p><p className="journal-full-text">{selectedActivity.feedback}</p><p className="note-date">Attempted {new Date(selectedActivity.attemptedAt).toLocaleString()}</p></>}</article>}
-          </section>
-        </div>
+        <ActivitiesSection
+          activityFilter={activityFilter}
+          filteredActivities={filteredActivities}
+          selectedActivity={selectedActivity}
+          onFilterChange={setActivityFilter}
+          onSelectActivity={setSelectedActivityKey}
+        />
       )
     }
 
     if (activeView === 'bookmarks') {
       return (
-        <div className="fieldbook-section-body journal-master-detail bookmarks-journal">
-          <section className="journal-index-panel">
-            <label className="journal-group-control">Group saved evidence<select value={bookmarkGroup} onChange={(event) => setBookmarkGroup(event.target.value)}><option value="module">By module</option><option value="type">By media type</option></select></label>
-            <div className="journal-entry-list grouped-bookmark-list">
-              {bookmarks.length === 0 ? <p className="empty-state">Bookmarked sources will appear here.</p> : groupedBookmarks.map(([group, items]) => <section key={group}><h3>{group}</h3>{items.map((bookmark) => <button key={bookmark.id} type="button" className={selectedBookmark?.id === bookmark.id ? 'journal-index-entry selected' : 'journal-index-entry'} onClick={() => setSelectedBookmarkId(bookmark.id)}><span className="journal-media-icon" aria-hidden="true">◆</span><strong>{bookmark.artifactTitle || bookmark.artifactId}</strong><span>{bookmark.moduleTitle || 'Saved source'}</span></button>)}</section>)}
-            </div>
-          </section>
-          <section className="journal-detail-panel">
-            {!selectedBookmark ? <p className="empty-state">Select a saved source to review it.</p> : <article className="journal-detail-entry"><p className="eyebrow">Saved evidence</p><h3>{selectedBookmark.artifactTitle || selectedBookmark.artifactId}</h3><p>{selectedBookmark.moduleTitle || 'Course source'}</p><p className="note-date">Saved {new Date(selectedBookmark.createdAt).toLocaleString()}</p><div className="inline-actions"><button className="primary-button" type="button" onClick={() => navigateTo(selectedBookmark)}>Open source</button><button type="button" onClick={() => { setNoteTarget(selectedBookmark); setActiveView('notes') }}>Add note</button><button className="text-button danger-text" type="button" onClick={() => { onToggleBookmark(selectedBookmark); setSelectedBookmarkId(null) }}>Remove bookmark</button></div></article>}
-          </section>
-        </div>
+        <BookmarksSection
+          bookmarks={bookmarks}
+          bookmarkGroup={bookmarkGroup}
+          groupedBookmarks={groupedBookmarks}
+          selectedBookmark={selectedBookmark}
+          onGroupChange={setBookmarkGroup}
+          onSelectBookmark={setSelectedBookmarkId}
+          onOpenBookmark={navigateTo}
+          onAddNote={(bookmark) => { setNoteTarget(bookmark); setActiveView('notes') }}
+          onRemoveBookmark={(bookmark) => { onToggleBookmark(bookmark); setSelectedBookmarkId(null) }}
+        />
       )
     }
 
     if (activeView === 'resources') {
-      const modules = [...new Set(resourceCatalog.map((item) => item.moduleTitle || 'Course'))]
-      const filteredCatalog = resourceModuleFilter === 'all' ? resourceCatalog : resourceCatalog.filter((item) => (item.moduleTitle || 'Course') === resourceModuleFilter)
-      const selectedResource = resourceCatalog.find((item) => item.id === selectedResourceId) || filteredCatalog[0] || null
-      const savedEntry = selectedResource ? resources.find((item) => item.resourceId === selectedResource.id) : null
       return (
-        <div className="fieldbook-section-body journal-master-detail resources-journal">
-          <section className="journal-index-panel">
-            <label className="journal-group-control">Module<select value={resourceModuleFilter} onChange={(event) => setResourceModuleFilter(event.target.value)}><option value="all">All modules</option>{modules.map((module) => <option key={module} value={module}>{module}</option>)}</select></label>
-            <div className="journal-entry-list" role="listbox" aria-label="Further-study resources">
-              {filteredCatalog.map((resource) => {
-                const saved = resources.find((item) => item.resourceId === resource.id)
-                return <button key={resource.id} type="button" role="option" aria-selected={selectedResource?.id === resource.id} className={selectedResource?.id === resource.id ? 'journal-index-entry selected' : 'journal-index-entry'} onClick={() => setSelectedResourceId(resource.id)}><span className={`journal-state-label ${saved ? `state-${saved.status}` : 'state-unsaved'}`}>{saved ? saved.status[0].toUpperCase() + saved.status.slice(1) : 'Not saved'}</span><strong>{resource.title}</strong><span>{resource.type} · {resource.creator}</span></button>
-              })}
-            </div>
-          </section>
-          <section className="journal-detail-panel">
-            {!selectedResource ? <p className="empty-state">Further-study resources will appear here.</p> : <article className="journal-detail-entry resource-detail"><p className="eyebrow">{selectedResource.moduleTitle || 'Course resource'} · {selectedResource.type}</p><h3>{selectedResource.title}</h3><p><strong>{selectedResource.creator}</strong></p><p>{selectedResource.note}</p><p><strong>Access:</strong> {selectedResource.access}</p><div className="inline-actions"><button className="primary-button" type="button" aria-pressed={Boolean(savedEntry)} onClick={() => onToggleResource(selectedResource)}>{savedEntry ? 'Remove from fieldbook' : 'Save to fieldbook'}</button><button type="button" onClick={() => window.alert('Prototype only: the final resource will open externally after a clear disclosure.')}>Open external resource</button></div>{savedEntry && <label className="resource-status-control">Your reading status<select value={savedEntry.status} onChange={(event) => onUpdateResourceStatus(selectedResource.id, event.target.value)}><option value="saved">Saved</option><option value="started">Started</option><option value="finished">Finished</option></select></label>}</article>}
-          </section>
-        </div>
+        <ResourcesSection
+          resources={resources}
+          resourceCatalog={resourceCatalog}
+          resourceModuleFilter={resourceModuleFilter}
+          selectedResourceId={selectedResourceId}
+          onModuleFilterChange={setResourceModuleFilter}
+          onSelectResource={setSelectedResourceId}
+          onToggleResource={onToggleResource}
+          onUpdateResourceStatus={onUpdateResourceStatus}
+        />
       )
     }
 
     return (
-      <div className="fieldbook-section-body course-map-section">
-        <p className="eyebrow">Course orientation</p>
-        <h3>Your route through the course</h3>
-        <CourseMap courseStops={courseStops} currentStopId={currentStopId} progress={progress} onNavigateToStop={(stopId) => { onNavigateToStop(stopId); onModeChange('side') }} />
-      </div>
+      <CourseMapSection
+        courseStops={courseStops}
+        currentStopId={currentStopId}
+        progress={progress}
+        onNavigateToStop={(stopId) => { onNavigateToStop(stopId); onModeChange('side') }}
+      />
     )
   }
 

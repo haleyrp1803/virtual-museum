@@ -176,16 +176,20 @@ export default function App() {
   const savePrototypeActivity = () => {
     const text = activityDraft.trim()
     if (!text) return
-    workspace.saveActivityResponse({
+
+    // The workspace API keeps activity metadata separate from the learner's
+    // response payload. This mirrors LearningActivities.jsx and lets the
+    // workspace layer store one stable record per activity ID.
+    const saved = workspace.saveActivityResponse({
       id: 'early-america-prototype-response',
       moduleId: MODULE_ID,
       moduleTitle: MODULE_TITLE,
-      activityTitle: 'Pause and Respond',
+      title: 'Pause and Respond',
       prompt: 'What changed in your interpretation after moving among several source formats?',
-      text,
       type: 'written-response',
-    })
-    setActivitySaved(true)
+    }, { text })
+
+    setActivitySaved(saved)
   }
 
   const openArtifactFromNotebook = ({ artifactId }) => {
