@@ -10,6 +10,7 @@ export const EMPTY_WORKSPACE = Object.freeze({
   progress: {},
   responses: [],
   quizAttempts: [],
+  glossaryEntries: [],
   preferences: {},
 })
 
@@ -21,6 +22,7 @@ function cloneEmptyWorkspace() {
     progress: {},
     responses: [],
     quizAttempts: [],
+    glossaryEntries: [],
     preferences: {},
   }
 }
@@ -35,6 +37,7 @@ export function normalizeWorkspace(value) {
     progress: candidate.progress && typeof candidate.progress === 'object' ? candidate.progress : {},
     responses: Array.isArray(candidate.responses) ? candidate.responses : [],
     quizAttempts: Array.isArray(candidate.quizAttempts) ? candidate.quizAttempts : [],
+    glossaryEntries: Array.isArray(candidate.glossaryEntries) ? candidate.glossaryEntries : [],
     preferences: candidate.preferences && typeof candidate.preferences === 'object' ? candidate.preferences : {},
   }
 }

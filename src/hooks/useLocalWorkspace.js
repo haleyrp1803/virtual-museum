@@ -307,6 +307,33 @@ export function useLocalWorkspace() {
     return true
   }, [markActivityAttempted])
 
+  const saveGlossaryEntry = useCallback((term, definition = '') => {
+    if (!term?.id || consentChoice === 'undecided') return false
+    const timestamp = new Date().toISOString()
+    setWorkspace((current) => {
+      const existing = current.glossaryEntries.find((entry) => entry.termId === term.id)
+      const nextEntry = {
+        id: existing?.id ?? createId('glossary'),
+        termId: term.id,
+        term: term.term,
+        moduleId: term.moduleId,
+        moduleTitle: term.moduleTitle,
+        locationStopId: term.locationStopId,
+        locationLabel: term.locationLabel,
+        definition: definition.trim(),
+        createdAt: existing?.createdAt ?? timestamp,
+        updatedAt: timestamp,
+      }
+      return {
+        ...current,
+        glossaryEntries: existing
+          ? current.glossaryEntries.map((entry) => entry.termId === term.id ? nextEntry : entry)
+          : [...current.glossaryEntries, nextEntry],
+      }
+    })
+    return true
+  }, [consentChoice])
+
   const deleteAllData = useCallback(async () => {
     try {
       await clearWorkspaceDatabase()
@@ -363,6 +390,23 @@ export function useLocalWorkspace() {
       }
     }
 
+    if (workspace.glossaryEntries.length) {
+      lines.push('## Glossary', '')
+      const glossaryGroups = new Map()
+      workspace.glossaryEntries.forEach((entry) => {
+        const key = entry.moduleTitle || 'Course glossary'
+        if (!glossaryGroups.has(key)) glossaryGroups.set(key, [])
+        glossaryGroups.get(key).push(entry)
+      })
+      for (const [moduleTitle, entries] of glossaryGroups) {
+        lines.push(`### ${moduleTitle}`, '')
+        entries.sort((a, b) => a.term.localeCompare(b.term)).forEach((entry) => {
+          lines.push(`- **${entry.term}**: ${entry.definition || '_Definition not yet added._'}`)
+        })
+        lines.push('')
+      }
+    }
+
     if (workspace.responses.length || workspace.quizAttempts.length) {
       lines.push('## Learning activities', '')
       workspace.responses.forEach((response) => {
@@ -390,7 +434,7 @@ export function useLocalWorkspace() {
     link.click()
     link.remove()
     URL.revokeObjectURL(url)
-  }, [workspace.bookmarks, workspace.notes, workspace.quizAttempts, workspace.responses])
+  }, [workspace.bookmarks, workspace.glossaryEntries, workspace.notes, workspace.quizAttempts, workspace.responses])
 
   const notebookEnabled = consentChoice === 'accepted' || consentChoice === 'session'
 
@@ -412,7 +456,8 @@ export function useLocalWorkspace() {
     markArtifactViewed,
     saveActivityResponse,
     submitQuizAttempt,
+    saveGlossaryEntry,
     deleteAllData,
     exportMarkdown,
-  }), [acceptConsent, addNote, consentChoice, deleteAllData, deleteNote, exportMarkdown, notebookEnabled, reconsiderConsent, retryStorage, storageMessage, storageStatus, submitQuizAttempt, toggleBookmark, updateNote, useSessionNotebook, workspace, markArtifactViewed, saveActivityResponse])
+  }), [acceptConsent, addNote, consentChoice, deleteAllData, deleteNote, exportMarkdown, notebookEnabled, reconsiderConsent, retryStorage, storageMessage, storageStatus, submitQuizAttempt, saveGlossaryEntry, toggleBookmark, updateNote, useSessionNotebook, workspace, markArtifactViewed, saveActivityResponse])
 }

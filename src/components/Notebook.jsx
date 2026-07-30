@@ -12,6 +12,8 @@ export default function Notebook({
   bookmarks,
   responses,
   quizAttempts,
+  glossaryTerms,
+  glossaryEntries,
   storageStatus,
   storageMessage,
   onAddNote,
@@ -21,6 +23,12 @@ export default function Notebook({
   onNavigateToArtifact,
   onExport,
   onDeleteAll,
+  onReconsiderStorage,
+  onRetryStorage,
+  onNavigateToStop,
+  onSaveGlossaryEntry,
+  onStartGlossaryStudy,
+  requestedView,
 }) {
   const [draft, setDraft] = useState('')
   const [editingId, setEditingId] = useState(null)
@@ -29,11 +37,17 @@ export default function Notebook({
   const [confirmDeleteAll, setConfirmDeleteAll] = useState(false)
   const [query, setQuery] = useState('')
   const [activeView, setActiveView] = useState('notes')
+  const [expandedTermId, setExpandedTermId] = useState(null)
+  const [glossaryEdit, setGlossaryEdit] = useState('')
   const fullScreenRef = useRef(null)
 
   useEffect(() => {
     if (mode === 'full') fullScreenRef.current?.focus()
   }, [mode])
+
+  useEffect(() => {
+    if (requestedView) setActiveView(requestedView)
+  }, [requestedView])
 
   const currentArtifactBookmarked = Boolean(context?.artifactId && bookmarks.some((bookmark) => bookmark.artifactId === context.artifactId))
   const filteredNotes = useMemo(() => {
@@ -51,6 +65,31 @@ export default function Notebook({
     })
     return [...groups.entries()]
   }, [filteredNotes])
+
+  const groupedGlossaryTerms = useMemo(() => {
+    const groups = new Map()
+    ;[...glossaryTerms].sort((a, b) => a.term.localeCompare(b.term)).forEach((term) => {
+      if (!groups.has(term.moduleTitle)) groups.set(term.moduleTitle, [])
+      groups.get(term.moduleTitle).push(term)
+    })
+    return [...groups.entries()]
+  }, [glossaryTerms])
+
+  const openGlossaryTerm = (term) => {
+    const entry = glossaryEntries.find((item) => item.termId === term.id)
+    if (!entry) {
+      onNavigateToStop(term.locationStopId)
+      onModeChange('side')
+      return
+    }
+    const nextId = expandedTermId === term.id ? null : term.id
+    setExpandedTermId(nextId)
+    setGlossaryEdit(nextId ? entry.definition : '')
+  }
+
+  const saveGlossaryDefinition = (term) => {
+    onSaveGlossaryEntry(term, glossaryEdit)
+  }
 
   const saveDraft = () => {
     const saved = onAddNote({ text: draft, ...context })
@@ -85,9 +124,8 @@ export default function Notebook({
 
   if (mode === 'minimized') {
     return (
-      <button className="notebook-launcher" type="button" onClick={() => onModeChange('side')} aria-label={`Open field notebook. ${notes.length} notes, ${responses.length + quizAttempts.length} activity records, and ${bookmarks.length} bookmarks.`}>
+      <button className="notebook-launcher" type="button" onClick={() => onModeChange('side')} aria-label="Open field notebook">
         <span aria-hidden="true">▤</span><span>Notebook</span>
-        {(notes.length + responses.length + quizAttempts.length + bookmarks.length) > 0 && <span className="note-count">{notes.length + responses.length + quizAttempts.length + bookmarks.length}</span>}
       </button>
     )
   }
@@ -141,10 +179,18 @@ export default function Notebook({
         </div>
       </header>
 
-      <div className={`notebook-storage-line storage-${storageStatus}`} aria-live="polite"><span aria-hidden="true">●</span><span>{storageMessage}</span></div>
+      <div className={`notebook-storage-line storage-${storageStatus}`} aria-live="polite">
+        <span aria-hidden="true">●</span>
+        <span>{storageMessage}</span>
+        <div className="notebook-storage-actions">
+          {(storageStatus === 'error' || storageStatus === 'unavailable') && <button type="button" onClick={onRetryStorage}>Retry</button>}
+          <button type="button" onClick={onReconsiderStorage}>Notebook storage choices</button>
+        </div>
+      </div>
 
-      <div className="notebook-tabs notebook-tabs-three" role="tablist" aria-label="Notebook sections">
+      <div className="notebook-tabs notebook-tabs-four" role="tablist" aria-label="Notebook sections">
         <button type="button" role="tab" aria-selected={activeView === 'notes'} onClick={() => setActiveView('notes')}>Notes <span>{notes.length}</span></button>
+        <button type="button" role="tab" aria-selected={activeView === 'glossary'} onClick={() => setActiveView('glossary')}>Glossary <span>{glossaryEntries.length}/{glossaryTerms.length}</span></button>
         <button type="button" role="tab" aria-selected={activeView === 'activities'} onClick={() => setActiveView('activities')}>Activities <span>{responses.length + quizAttempts.length}</span></button>
         <button type="button" role="tab" aria-selected={activeView === 'bookmarks'} onClick={() => setActiveView('bookmarks')}>Bookmarks <span>{bookmarks.length}</span></button>
       </div>
@@ -175,6 +221,52 @@ export default function Notebook({
             ))}
           </div>
         </>
+      )}
+
+      {activeView === 'glossary' && (
+        <div className="notebook-glossary">
+          <div className="glossary-heading-row">
+            <div>
+              <h3>Course glossary</h3>
+              <p>Terms begin faded. Select underlined terms in the lesson to add them and write definitions in your own words.</p>
+            </div>
+            <button type="button" onClick={onStartGlossaryStudy} disabled={glossaryEntries.length === 0}>Study as flashcards</button>
+          </div>
+          {groupedGlossaryTerms.map(([moduleTitle, terms]) => (
+            <section className="glossary-module" key={moduleTitle}>
+              <h4>{moduleTitle}</h4>
+              <ul className="glossary-list">
+                {terms.map((term) => {
+                  const entry = glossaryEntries.find((item) => item.termId === term.id)
+                  const expanded = expandedTermId === term.id
+                  const unavailableMessage = `Not yet added. Find this term in ${term.locationLabel}.`
+                  return (
+                    <li key={term.id} className={entry ? 'glossary-term-added' : 'glossary-term-unadded'}>
+                      <button
+                        type="button"
+                        title={entry ? `Show your definition of ${term.term}` : unavailableMessage}
+                        aria-label={entry ? `${term.term}. Added to glossary. Select to show your definition.` : `${term.term}. ${unavailableMessage}`}
+                        onClick={() => openGlossaryTerm(term)}
+                      >
+                        {term.term}
+                      </button>
+                      {!entry && <span className="glossary-location">{term.locationLabel}</span>}
+                      {entry && expanded && (
+                        <div className="glossary-definition-panel">
+                          <p><strong>Your definition</strong></p>
+                          <p>{entry.definition || 'No definition added yet.'}</p>
+                          <label htmlFor={`glossary-edit-${term.id}`}>Edit your definition</label>
+                          <textarea id={`glossary-edit-${term.id}`} rows="4" value={glossaryEdit} onChange={(event) => setGlossaryEdit(event.target.value)} />
+                          <button type="button" onClick={() => saveGlossaryDefinition(term)}>Save definition</button>
+                        </div>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            </section>
+          ))}
+        </div>
       )}
 
       {activeView === 'activities' && (
@@ -238,6 +330,6 @@ export default function Notebook({
     </>
   )
 
-  if (mode === 'full') return <div className="notebook-full-backdrop"><section className="notebook notebook-full" role="dialog" aria-modal="true" aria-label="Full-screen field notebook" tabIndex="-1" ref={fullScreenRef}>{content}</section></div>
-  return <aside className="notebook notebook-side" aria-label="Field notebook side panel">{content}</aside>
+  if (mode === 'full') return <div className="notebook-full-backdrop"><section className="notebook notebook-panel notebook-full" role="dialog" aria-modal="true" aria-label="Full-screen field notebook" tabIndex="-1" ref={fullScreenRef}>{content}</section></div>
+  return <aside className="notebook notebook-panel notebook-side" aria-label="Field notebook side panel">{content}</aside>
 }

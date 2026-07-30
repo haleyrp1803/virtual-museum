@@ -2,10 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ConsentDialog from './components/ConsentDialog.jsx'
 import ArtifactMedia from './components/ArtifactMedia.jsx'
 import Notebook from './components/Notebook.jsx'
-import StorageStatus from './components/StorageStatus.jsx'
+import KeyTerm from './components/KeyTerm.jsx'
+import GlossaryTermDialog from './components/GlossaryTermDialog.jsx'
+import GlossaryStudy from './components/GlossaryStudy.jsx'
 import { supportsIndexedDb } from './storage/workspaceDb.js'
 import { useLocalWorkspace } from './hooks/useLocalWorkspace.js'
 import { courseArtifacts, courseStops, placeholderResources, timelineSegments } from './data/course.js'
+import { getGlossaryTerm, glossaryTerms } from './data/glossary.js'
 
 const MODULE_ID = 'early-america'
 const MODULE_TITLE = 'Early America'
@@ -59,6 +62,9 @@ export default function App() {
   const [notebookMode, setNotebookMode] = useState('minimized')
   const [activityDraft, setActivityDraft] = useState('')
   const [activitySaved, setActivitySaved] = useState(false)
+  const [selectedGlossaryTerm, setSelectedGlossaryTerm] = useState(null)
+  const [notebookRequestedView, setNotebookRequestedView] = useState(null)
+  const [screenMode, setScreenMode] = useState('course')
   const courseRef = useRef(null)
   const stopRefs = useRef([])
   const wheelLockRef = useRef(false)
@@ -145,6 +151,26 @@ export default function App() {
   const markArtifact = (artifact) => workspace.markArtifactViewed(MODULE_ID, artifact.id)
   const isBookmarked = (artifactId) => workspace.workspace.bookmarks.some((bookmark) => bookmark.artifactId === artifactId)
 
+  const selectGlossaryTerm = (term) => {
+    setSelectedGlossaryTerm(term)
+  }
+
+  const saveGlossaryTerm = (term, definition) => {
+    workspace.saveGlossaryEntry(term, definition)
+    setNotebookRequestedView(null)
+    window.queueMicrotask(() => setNotebookRequestedView('glossary'))
+    setNotebookMode('side')
+  }
+
+  const navigateToGlossaryLocation = (stopId) => {
+    setScreenMode('course')
+    navigateToStopId(stopId)
+  }
+
+  if (screenMode === 'study') {
+    return <GlossaryStudy terms={glossaryTerms} entries={workspace.workspace.glossaryEntries} onExit={() => setScreenMode('course')} />
+  }
+
   return (
     <div className={`course-app notebook-mode-${notebookMode} era-${activeEra}`}>
       <a className="skip-link" href="#course-canvas">Skip to course content</a>
@@ -158,17 +184,8 @@ export default function App() {
         </div>
       </header>
 
-      <StorageStatus status={workspace.storageStatus} message={workspace.storageMessage} onRetry={workspace.retryStorage} onReconsider={workspace.reconsiderConsent} />
 
-      <nav className="course-timeline" aria-label="Course timeline">
-        <div className="timeline-track" aria-hidden="true"><span style={{ width: `${(activeStopIndex / (courseStops.length - 1)) * 100}%` }} /></div>
-        {timelineSegments.map((segment) => {
-          const targetIndex = segment.stopId ? courseStops.findIndex((stop) => stop.id === segment.stopId) : -1
-          const current = !segment.disabled && targetIndex <= activeStopIndex && (timelineSegments.findIndex((item) => item.id === segment.id) === timelineSegments.findIndex((item) => item.id === activeEra) || courseStops[activeStopIndex]?.eraId === segment.id)
-          const visited = targetIndex >= 0 && targetIndex <= activeStopIndex
-          return <button key={segment.id} type="button" disabled={segment.disabled} className={`${current ? 'current' : ''} ${visited ? 'visited' : ''}`} onClick={() => segment.stopId && navigateToStopId(segment.stopId)}><span className="timeline-dot" aria-hidden="true" /><span>{segment.label}</span></button>
-        })}
-      </nav>
+
 
       <main id="course-canvas" ref={courseRef} className="horizontal-course" onWheel={handleWheel} tabIndex="-1" aria-label="Horizontal course sequence">
         {courseStops.map((stop, index) => {
@@ -186,37 +203,57 @@ export default function App() {
 
                 {stop.type === 'introduction' && <div className="intro-layout"><PlaceholderVideo /><NavigationTutorial /><button className="primary-button begin-course" type="button" onClick={() => scrollToStop(1)}>Begin course →</button></div>}
 
-                {stop.type === 'era-intro' && <div className="era-threshold"><div className="era-number">01</div><div><h2>Historical cluster</h2><p>Within this era, source stops, activities, and Georga’s guidance share one visual language so they feel spatially and thematically connected.</p><button className="primary-button" type="button" onClick={() => scrollToStop(index + 1)}>Enter Early America →</button></div></div>}
+                {stop.type === 'era-intro' && <div className="era-threshold"><div className="era-number">01</div><div><h2>Historical cluster</h2><p>Within this era, sources and activities explore <KeyTerm term={getGlossaryTerm('household-education')} onSelect={selectGlossaryTerm} /> while Georga’s guidance keeps the historical cluster spatially and thematically connected.</p><button className="primary-button" type="button" onClick={() => scrollToStop(index + 1)}>Enter Early America →</button></div></div>}
 
                 {stop.type === 'artifact' && artifact && <div className="source-stop-layout">
                   <div className="source-stage" onMouseEnter={() => markArtifact(artifact)}><ArtifactMedia artifact={artifact} /></div>
-                  <aside className="source-guidance"><p className="eyebrow">Professor guidance</p><h2>{artifact.title}</h2><p>{artifact.description}</p><p>This placeholder indicates where Georga can direct attention without replacing the student’s own encounter with the source.</p><div className="source-actions"><button type="button" onClick={() => { markArtifact(artifact); setNotebookMode('side') }}>Annotate in notebook</button><button type="button" aria-pressed={isBookmarked(artifact.id)} onClick={() => workspace.toggleBookmark({ moduleId: MODULE_ID, moduleTitle: MODULE_TITLE, artifactId: artifact.id, artifactTitle: artifact.title })}>{isBookmarked(artifact.id) ? 'Bookmarked' : 'Bookmark source'}</button></div></aside>
+                  <aside className="source-guidance"><p className="eyebrow">Professor guidance</p><h2>{artifact.title}</h2><p>{artifact.description}</p>{artifact.id === 'family-text-01' ? <p>This <KeyTerm term={getGlossaryTerm('primary-source')} onSelect={selectGlossaryTerm} /> invites <KeyTerm term={getGlossaryTerm('close-reading')} onSelect={selectGlossaryTerm} /> before Georga directs attention to its historical significance.</p> : <p>This placeholder indicates where Georga can direct attention without replacing the student’s own encounter with the source.</p>}<div className="source-actions"><button type="button" onClick={() => { markArtifact(artifact); setNotebookMode('side') }}>Annotate in notebook</button><button type="button" aria-pressed={isBookmarked(artifact.id)} onClick={() => workspace.toggleBookmark({ moduleId: MODULE_ID, moduleTitle: MODULE_TITLE, artifactId: artifact.id, artifactTitle: artifact.title })}>{isBookmarked(artifact.id) ? 'Bookmarked' : 'Bookmark source'}</button></div></aside>
                 </div>}
 
-                {stop.type === 'media-pair' && <div className="media-pair">{pairedArtifacts.map((item) => <article key={item.id} className="media-pair-card" onMouseEnter={() => markArtifact(item)}><ArtifactMedia artifact={item} /><h2>{item.title}</h2><p>{item.description}</p><div className="source-actions"><button type="button" onClick={() => { markArtifact(item); setNotebookMode('side') }}>Take notes</button><button type="button" aria-pressed={isBookmarked(item.id)} onClick={() => workspace.toggleBookmark({ moduleId: MODULE_ID, moduleTitle: MODULE_TITLE, artifactId: item.id, artifactTitle: item.title })}>{isBookmarked(item.id) ? 'Bookmarked' : 'Bookmark'}</button></div></article>)}</div>}
+                {stop.type === 'media-pair' && <div className="media-pair">{pairedArtifacts.map((item) => <article key={item.id} className="media-pair-card" onMouseEnter={() => markArtifact(item)}><ArtifactMedia artifact={item} /><h2>{item.title}</h2><p>{item.description}</p>{item.id === 'family-audio-01' && <p>The final lesson can identify this source as an <KeyTerm term={getGlossaryTerm('oral-history')} onSelect={selectGlossaryTerm} /> and ask students to define the form in their own words.</p>}<div className="source-actions"><button type="button" onClick={() => { markArtifact(item); setNotebookMode('side') }}>Take notes</button><button type="button" aria-pressed={isBookmarked(item.id)} onClick={() => workspace.toggleBookmark({ moduleId: MODULE_ID, moduleTitle: MODULE_TITLE, artifactId: item.id, artifactTitle: item.title })}>{isBookmarked(item.id) ? 'Bookmarked' : 'Bookmark'}</button></div></article>)}</div>}
 
                 {stop.type === 'activity' && <div className="activity-prototype"><label htmlFor="prototype-response">What changed in your interpretation after moving among several source formats?</label><textarea id="prototype-response" rows="8" value={activityDraft} onChange={(event) => { setActivityDraft(event.target.value); setActivitySaved(false) }} placeholder="Your response remains private in this browser or current session, according to the storage choice you made." /><div><button className="primary-button" type="button" disabled={!activityDraft.trim()} onClick={savePrototypeActivity}>Save response</button>{activitySaved && <span role="status">Saved to your private notebook.</span>}</div></div>}
 
-                {stop.type === 'synthesis' && <div className="synthesis-layout"><PlaceholderVideo label="Georga’s Module 1 synthesis" /><div className="synthesis-card"><h2>Review before leaving the module</h2><p>Students can return to previous stops, open their notebook, or continue into optional further study. Completion remains descriptive rather than graded.</p><button type="button" onClick={() => setNotebookMode('full')}>Review notebook</button></div></div>}
+                {stop.type === 'synthesis' && <div className="synthesis-layout"><PlaceholderVideo label="Georga’s Module 1 synthesis" /><div className="synthesis-card"><h2>Review before leaving the module</h2><p>Students can use <KeyTerm term={getGlossaryTerm('historical-context')} onSelect={selectGlossaryTerm} /> to reconnect earlier sources, open their notebook, or continue into optional further study.</p><button type="button" onClick={() => setNotebookMode('full')}>Review notebook</button></div></div>}
 
                 {stop.type === 'resources' && <div className="resource-grid">{placeholderResources.map((resource) => <ResourceCard key={resource.id} resource={resource} />)}</div>}
 
-                {stop.type === 'transition' && <div className="transition-experience"><div className="transition-domestic"><span>handwritten</span><span>household</span><span>local</span></div><div className="transition-arrow" aria-hidden="true">→</div><div className="transition-institutional"><span>printed</span><span>standardized</span><span>public</span></div><p>The visual grammar becomes more regular as the course approaches the common-school era. Final transitions may use sound, typography, archival materials, and restrained animation.</p></div>}
+                {stop.type === 'transition' && <div className="transition-experience"><div className="transition-domestic"><span>handwritten</span><span>household</span><span>local</span></div><div className="transition-arrow" aria-hidden="true">→</div><div className="transition-institutional"><span>printed</span><span><KeyTerm term={getGlossaryTerm('standardization')} onSelect={selectGlossaryTerm} /></span><span>public</span></div><p>The visual grammar becomes more regular as the course approaches the common-school era. Final transitions may use sound, typography, archival materials, and restrained animation.</p></div>}
 
-                {stop.type === 'next-era' && <div className="next-era-landing"><div className="slate-placeholder"><span>Module 2</span><strong>Common School</strong></div><div><h2>A new visual system</h2><p>Regular grids, printed forms, slate tones, and institutional scale make the change of era perceptible before the next lesson begins.</p><button type="button" onClick={() => scrollToStop(0)}>Return to course introduction</button></div></div>}
+                {stop.type === 'next-era' && <div className="next-era-landing"><div className="slate-placeholder"><span>Module 2</span><strong>Common School</strong></div><div><h2>A new visual system</h2><p>The <KeyTerm term={getGlossaryTerm('common-school')} onSelect={selectGlossaryTerm} /> movement and expanding <KeyTerm term={getGlossaryTerm('public-schooling')} onSelect={selectGlossaryTerm} /> introduce a more regular, institutional visual system.</p><button type="button" onClick={() => scrollToStop(0)}>Return to course introduction</button></div></div>}
               </div>
             </section>
           )
         })}
       </main>
 
-      <div className="course-navigation" aria-label="Course movement controls">
+      <nav className="course-navigation" aria-label="Course timeline and movement controls">
         <button type="button" onClick={() => scrollToStop(activeStopIndex - 1)} disabled={activeStopIndex === 0}>← Previous</button>
-        <div aria-live="polite"><strong>{activeStopIndex + 1} of {courseStops.length}</strong><span>{activeStop.title}</span></div>
+        <div className="bottom-timeline">
+          <div className="timeline-track" aria-hidden="true"><span style={{ width: `${(activeStopIndex / (courseStops.length - 1)) * 100}%` }} /></div>
+          {timelineSegments.map((segment) => {
+            const targetIndex = segment.stopId ? courseStops.findIndex((stop) => stop.id === segment.stopId) : -1
+            const current = !segment.disabled && courseStops[activeStopIndex]?.eraId === segment.id
+            const visited = targetIndex >= 0 && targetIndex <= activeStopIndex
+            return (
+              <button
+                key={segment.id}
+                type="button"
+                disabled={segment.disabled}
+                className={`${current ? 'current' : ''} ${visited ? 'visited' : ''}`}
+                onClick={() => segment.stopId && navigateToStopId(segment.stopId)}
+              >
+                <span className="timeline-dot" aria-hidden="true" />
+                <span>{segment.label}</span>
+              </button>
+            )
+          })}
+        </div>
         <button className="primary-button" type="button" onClick={() => scrollToStop(activeStopIndex + 1)} disabled={activeStopIndex === courseStops.length - 1}>Next →</button>
-      </div>
+      </nav>
 
-      {workspace.notebookEnabled && <Notebook mode={notebookMode} onModeChange={setNotebookMode} context={noteContext} notes={workspace.workspace.notes} bookmarks={workspace.workspace.bookmarks} responses={workspace.workspace.responses} quizAttempts={workspace.workspace.quizAttempts} storageStatus={workspace.storageStatus} storageMessage={workspace.storageMessage} onAddNote={workspace.addNote} onUpdateNote={workspace.updateNote} onDeleteNote={workspace.deleteNote} onToggleBookmark={workspace.toggleBookmark} onNavigateToArtifact={openArtifactFromNotebook} onExport={workspace.exportMarkdown} onDeleteAll={workspace.deleteAllData} />}
+      {workspace.notebookEnabled && <Notebook mode={notebookMode} onModeChange={setNotebookMode} requestedView={notebookRequestedView} context={noteContext} notes={workspace.workspace.notes} bookmarks={workspace.workspace.bookmarks} responses={workspace.workspace.responses} quizAttempts={workspace.workspace.quizAttempts} glossaryTerms={glossaryTerms} glossaryEntries={workspace.workspace.glossaryEntries} storageStatus={workspace.storageStatus} storageMessage={workspace.storageMessage} onAddNote={workspace.addNote} onUpdateNote={workspace.updateNote} onDeleteNote={workspace.deleteNote} onToggleBookmark={workspace.toggleBookmark} onNavigateToArtifact={openArtifactFromNotebook} onNavigateToStop={navigateToGlossaryLocation} onSaveGlossaryEntry={workspace.saveGlossaryEntry} onStartGlossaryStudy={() => setScreenMode('study')} onExport={workspace.exportMarkdown} onDeleteAll={workspace.deleteAllData} onReconsiderStorage={workspace.reconsiderConsent} onRetryStorage={workspace.retryStorage} />}
+      {selectedGlossaryTerm && <GlossaryTermDialog term={selectedGlossaryTerm} existingEntry={workspace.workspace.glossaryEntries.find((entry) => entry.termId === selectedGlossaryTerm.id)} onSave={saveGlossaryTerm} onClose={() => setSelectedGlossaryTerm(null)} />}
     </div>
   )
 }
