@@ -8,6 +8,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
+import ThemePreview from './components/ThemePreview.jsx'
 import './styles/global.css'
 import { assertValidCourseData } from './data/validateCourseData.js'
 
@@ -15,8 +16,10 @@ import { assertValidCourseData } from './data/validateCourseData.js'
 // remains unchanged, while broken navigation/data references fail loudly.
 if (import.meta.env.DEV) assertValidCourseData()
 
+const showThemePreview = new URLSearchParams(window.location.search).has('theme-preview')
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    {showThemePreview ? <ThemePreview /> : <App />}
   </StrictMode>,
 )

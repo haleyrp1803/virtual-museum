@@ -17,6 +17,7 @@ import SynthesisStop from './courseStops/SynthesisStop.jsx'
 import ResourcesStop from './courseStops/ResourcesStop.jsx'
 import TransitionStop from './courseStops/TransitionStop.jsx'
 import NextEraStop from './courseStops/NextEraStop.jsx'
+import { getEraTheme } from '../data/eraThemes.js'
 
 export default function CourseStop({
   stop,
@@ -39,6 +40,7 @@ export default function CourseStop({
   isResourceSaved,
   onToggleResource,
 }) {
+  const eraTheme = getEraTheme(stop.eraId)
   let content = null
 
   switch (stop.type) {
@@ -79,6 +81,10 @@ export default function CourseStop({
       data-stop-index={index}
       ref={sectionRef}
       className={`course-stop stop-${stop.type} stop-era-${stop.eraId}`}
+      data-era-theme={eraTheme?.id ?? stop.eraId}
+      data-heading-variant={eraTheme?.variants.heading}
+      data-surface-variant={eraTheme?.variants.surface}
+      data-frame-variant={eraTheme?.variants.frame}
       aria-labelledby={`${stop.id}-title`}
     >
       <div className="stop-inner">

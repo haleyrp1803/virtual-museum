@@ -12,6 +12,7 @@ import { courseArtifacts, courseStops, placeholderResources, timelineSegments } 
 import { glossaryTerms } from './glossary.js'
 import { sampleActivities } from './modules.js'
 import { COURSE_MAP_NODES, COURSE_MAP_SEGMENTS } from './courseMapLayout.js'
+import { ERA_THEMES } from './eraThemes.js'
 
 function collectDuplicateIds(items, label, issues) {
   const seen = new Set()
@@ -33,6 +34,7 @@ function requireReference(ids, value, description, issues) {
 export function validateCourseData() {
   const issues = []
   const stopIds = collectDuplicateIds(courseStops, 'courseStops', issues)
+  const eraThemeIds = collectDuplicateIds(ERA_THEMES, 'ERA_THEMES', issues)
   const artifactIds = collectDuplicateIds(courseArtifacts, 'courseArtifacts', issues)
   collectDuplicateIds(glossaryTerms, 'glossaryTerms', issues)
   collectDuplicateIds(placeholderResources, 'placeholderResources', issues)
@@ -40,6 +42,7 @@ export function validateCourseData() {
   const mapNodeIds = collectDuplicateIds(COURSE_MAP_NODES, 'COURSE_MAP_NODES', issues)
 
   for (const stop of courseStops) {
+    requireReference(eraThemeIds, stop.eraId, `Course stop "${stop.id}" eraId`, issues)
     requireReference(artifactIds, stop.artifactId, `Course stop "${stop.id}"`, issues)
     for (const artifactId of stop.artifactIds ?? []) {
       requireReference(artifactIds, artifactId, `Course stop "${stop.id}"`, issues)
