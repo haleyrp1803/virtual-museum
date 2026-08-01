@@ -1,0 +1,486 @@
+# Era Theme Design Specification
+
+## Status and role
+
+Current implementation checkpoint at the start of this design-system sequence:
+
+```text
+1f1e7cd — Add era theme foundation and preview
+Branch: main
+```
+
+The local working tree also includes the accepted Adobe typography and period-preview checkpoints that follow `1f1e7cd` and have not yet been committed. This document is the authoritative design-direction record for reusable historical design packs: typography, color roles, texture, layout character, transitions, asset provenance, and deferred continuity work.
+
+Pedagogical reasons for historical transitions remain in `core_documentation/LESSON_DESIGN_AND_TEACHING_GUIDE.md`. Current technical architecture remains in `core_documentation/MAINTAINERS_GUIDE.md`. Full core-document synchronization is reserved for Pass 8 of the theme implementation sequence.
+
+## Approved period taxonomy
+
+The reusable design packs are:
+
+1. Course-neutral / Introduction
+2. 18th century / Colonial era
+3. Pre–Civil War 19th century / Victorian era
+4. Post–Civil War 19th century / Jim Crow era
+5. Early 20th century / World Wars era
+6. 1960s–1970s / Civil Rights era
+7. 1980–present / Modern schooling era
+8. Course-neutral / Conclusion
+
+Historical transitions are separate curated packs. They are not calculated by averaging the palettes of adjacent eras.
+
+## Design principle
+
+Each historical pack should communicate interpretation through a coordinated system of:
+
+- semantic color roles;
+- typography;
+- material and background texture;
+- border and frame character;
+- spatial order and density;
+- document treatment;
+- media framing;
+- motion and transition rhythm.
+
+Visual differences must carry pedagogical meaning rather than operate as decorative theme changes. The same component vocabulary should remain recognizable across the course, while each period changes how that vocabulary looks and feels.
+
+## Course-neutral framing
+
+The Introduction and Conclusion sit outside a specific historical era.
+
+| Role | Approved direction | Hex |
+|---|---|---:|
+| Page | Neutral parchment | `#E8E1D3` |
+| Surface | Light paper | `#F4EFE6` |
+| Text | Dark brown-black | `#292621` |
+| Primary accent | Academic green | `#365B4B` |
+| Secondary accent | Burgundy | `#713B48` |
+| Border | Muted bronze | `#88765F` |
+
+The Conclusion should echo the Introduction while facing the learner toward the present rather than implying historical finality. It may carry restrained traces of earlier periods through a divider or controlled accent sequence, but it should not become a collage.
+
+# Historical design packs
+
+## 18th century / Colonial era
+
+### Interpretive direction
+
+The atmosphere is domestic, coastal, mercantile, and Atlantic-facing:
+
+- parchment and aged paper;
+- dark wood;
+- ocean travel and coastal trade;
+- American Revolution;
+- iron-gall ink;
+- maritime charts;
+- household education;
+- young wives schooling children at home while husbands participate in smuggling and seafaring economies.
+
+The pack should feel active and ocean-facing, not simply generically old.
+
+### Semantic palette
+
+| Role | Approved color | Hex |
+|---|---|---:|
+| Page parchment | Warm aged paper | `#E8D9B8` |
+| Raised surface | Light parchment | `#F4E9CF` |
+| Deep surface | Weathered oak | `#5A3B2A` |
+| Primary text | Iron-gall ink | `#262A2D` |
+| Muted text | Faded brown-grey | `#6F665B` |
+| Primary accent | Deep ocean navy | `#173B55` |
+| Light accent | Coastal blue | `#91B6C5` |
+| Accent hover | Storm blue | `#285A73` |
+| Border | Tarnished brass-brown | `#8B7354` |
+| Focus | Clear sea blue | `#3D7EA0` |
+
+### Texture and layout
+
+- parchment fibers;
+- faint chart lines;
+- subtle water staining;
+- dark wood in framing and navigation;
+- restrained brass details;
+- intimate scale and looser domestic arrangement;
+- no nautical iconography unless historically or pedagogically justified.
+
+### Typography
+
+| Role | Typeface | Designer / foundry | Source |
+|---|---|---|---|
+| Expressive display | Antiquarian Scribe Regular | Richard Kegler / Three Islands Press | https://fonts.adobe.com/fonts/antiquarian-scribe |
+| Supporting headings and labels | ATF Garamond Subhead Medium | Mark van Bronkhorst / American Type Founders Collection | https://fonts.adobe.com/fonts/atf-garamond-subhead |
+| Sustained body text | Adobe Caslon Pro Regular; italic and bold where needed | Carol Twombly / Adobe Originals | https://fonts.adobe.com/fonts/adobe-caslon |
+
+Antiquarian Scribe is reserved for short prominent text. ATF Garamond Subhead provides controlled hierarchy. Adobe Caslon carries paragraphs and extended reading.
+
+## Pre–Civil War 19th century / Victorian era
+
+### Interpretive direction
+
+The pack stages tension between:
+
+- the industrial North and agricultural South;
+- machinery, rail, metal, and bureaucracy;
+- cotton, linen, soil, and leaves;
+- expanding common-school systems;
+- increasing institutional regularity.
+
+It should feel more structured than the Colonial pack without yet becoming stark or bureaucratically severe.
+
+### Semantic palette
+
+| Role | Approved color | Hex |
+|---|---|---:|
+| Page | Unbleached cotton | `#E7DDC7` |
+| Raised surface | Pale linen | `#F1E9D9` |
+| Deep surface | Oxidized iron | `#474A46` |
+| Primary text | Charcoal | `#292B29` |
+| Muted text | Weathered taupe | `#756F63` |
+| Primary accent | Rust | `#98533B` |
+| Secondary accent | Cotton-leaf green | `#5E704C` |
+| Metal accent | Aged steel | `#777E7B` |
+| Border | Dark iron | `#5A5C56` |
+| Focus | Clear leaf green | `#718C59` |
+
+### Texture and layout
+
+- woven cotton or linen;
+- oxidized iron;
+- engraved rules and printer’s ornaments;
+- faint mechanical grids;
+- occasional botanical cotton-leaf forms;
+- controlled asymmetry between industrial and agricultural materials;
+- stronger grids and institutional scale than the Colonial era.
+
+### Typography
+
+| Role | Typeface | Designer / foundry | Source |
+|---|---|---|---|
+| Primary display | HWT Slab Columbian | Hamilton Wood Type Collection | https://fonts.adobe.com/fonts/hwt-slab |
+| Alternate display candidate | HWT Slab Antique | Hamilton Wood Type Collection | https://fonts.adobe.com/fonts/hwt-slab |
+| Condensed labels | HWT Gothic Round | Hamilton Wood Type Collection | https://fonts.adobe.com/fonts/hwt-gothic-round |
+| Sustained body and secondary headings | Clarendon Text Regular, Italic, and Bold | Patrick Griffin / Canada Type | https://fonts.adobe.com/fonts/clarendon-text |
+| Selective artifact accent | Coronette | Chank Diesel / Chank Co | https://fonts.adobe.com/fonts/coronette |
+
+The pack follows controlled variety found in nineteenth-century printer’s specimens: emphatic wood-type display faces, condensed institutional labels, and a quieter slab-serif body. Coronette is not a governing era face and is reserved for historically appropriate ephemera.
+
+## Post–Civil War 19th century / Jim Crow era
+
+### Interpretive direction
+
+The aesthetic makes division and imposed hierarchy legible without turning racial oppression into decorative spectacle.
+
+The system may use:
+
+- hard partitions;
+- sharp black-and-white contrast;
+- restricted greyscale;
+- parallel but unequal columns;
+- separated frames;
+- interrupted rules;
+- deliberate misalignment;
+- occasional muted warning color used sparingly.
+
+The historical argument must remain explicit. Styling should not depend on learners intuiting that monochrome signifies segregation.
+
+### Semantic palette
+
+| Role | Approved color | Hex |
+|---|---|---:|
+| Page | Cold off-white | `#EEEDE8` |
+| Raised surface | Paper white | `#F8F7F3` |
+| Deep surface | Near black | `#1E1F1F` |
+| Primary text | Black charcoal | `#202121` |
+| Muted text | Mid grey | `#676A69` |
+| Primary accent | Graphite | `#3D4142` |
+| Secondary accent | Pale grey | `#B7BAB8` |
+| Restricted warning accent | Dark oxblood | `#672F32` |
+| Border | Black | `#242525` |
+| Focus | Medium cool blue | `#356D8C` |
+
+### Texture and layout
+
+- newsprint;
+- carbon copy;
+- institutional forms;
+- courthouse and school-board paperwork;
+- stark dividing lines;
+- repeated blocks;
+- black-and-white photography;
+- minimal decorative texture.
+
+Avoid prison-stripe imagery, decorative replicas of segregated doors or signs, stylized distress that trivializes violence, and broad dramatic red washes. Oxblood is restricted to content notices, emphasis, or specific historical stakes.
+
+### Typography
+
+Typography remains provisional. Century Gothic and Grad may be tested as candidates, but this pack requires a dedicated later design decision rather than inheriting a generic late-nineteenth/early-twentieth system.
+
+## Early 20th century / World Wars era
+
+### Interpretive direction
+
+The visual language combines:
+
+- victory gardens;
+- wartime classrooms;
+- home-front labor;
+- Rosie the Riveter;
+- ration books;
+- public-information posters;
+- faded red, blue, and cream;
+- practical optimism under strain.
+
+It should balance mobilization and domestic labor rather than becoming generically patriotic.
+
+### Semantic palette
+
+| Role | Approved color | Hex |
+|---|---|---:|
+| Page | Aged cream | `#EEE1C8` |
+| Raised surface | Poster paper | `#F5EAD4` |
+| Deep surface | Navy slate | `#344D5D` |
+| Primary text | Deep blue-grey | `#29343A` |
+| Muted text | Dusty taupe | `#756F66` |
+| Primary accent | Faded federal blue | `#547A91` |
+| Secondary accent | Rosie red | `#A94E4B` |
+| Garden accent | Victory green | `#657552` |
+| Border | Dusty navy | `#4A616D` |
+| Focus | Strong blue | `#376E91` |
+
+### Texture and layout
+
+- screen-printed poster grain;
+- seed packets;
+- ration-card paper;
+- faded fabric;
+- stamped labels;
+- painted metal;
+- modest geometric structure.
+
+### Typography
+
+Typography remains provisional. Century Gothic and Grad may be tested for institutional, textbook, and poster roles, but the period may require a distinct display family.
+
+## 1960s–1970s / Civil Rights era
+
+### Interpretive direction
+
+The visual tone should be bold, public, energetic, hopeful, and vibrant without implying inevitable progress. It may draw from:
+
+- posters;
+- community print;
+- protest graphics;
+- television;
+- youth culture;
+- movement organizing.
+
+### Semantic palette
+
+| Role | Approved color | Hex |
+|---|---|---:|
+| Page | Warm off-white | `#F1E5C9` |
+| Raised surface | Pale cream | `#F8EFD9` |
+| Deep surface | Deep indigo | `#263C68` |
+| Primary text | Ink navy | `#202A3A` |
+| Muted text | Warm grey | `#6E685F` |
+| Primary accent | Vivid orange | `#D86A32` |
+| Secondary accent | Bright teal | `#2B8C88` |
+| Supporting accent | Mustard yellow | `#D6A62F` |
+| Additional accent | Movement magenta | `#A94769` |
+| Border | Deep indigo | `#334A72` |
+| Focus | Strong cyan-blue | `#167DA3` |
+
+### Texture and layout
+
+- poster ink;
+- screen print;
+- restrained offset-registration variation;
+- bold geometric blocks;
+- photographic halftone;
+- community-flyer layering;
+- energetic but controlled composition.
+
+### Typography
+
+| Role | Typeface | Source |
+|---|---|---|
+| Display and secondary | Goodland Variable | https://fonts.adobe.com/fonts/goodland-variable |
+| Sustained body | News Gothic | https://fonts.adobe.com/fonts/news-gothic |
+
+Goodland supplies period personality and variation. News Gothic provides a disciplined reading and interface face.
+
+## 1980–present / Modern schooling era
+
+### Interpretive direction
+
+The visual language should evoke:
+
+- modern universities;
+- computer labs;
+- overhead transparencies;
+- early educational software;
+- geometric institutional branding;
+- 1980s and 1990s print design;
+- laminated surfaces;
+- fluorescent accents used carefully;
+- gradual movement toward contemporary digital systems.
+
+It should not look like a current generic software dashboard.
+
+### Semantic palette
+
+| Role | Approved color | Hex |
+|---|---|---:|
+| Page | Warm institutional grey | `#E7E5DF` |
+| Raised surface | Pale computer beige | `#F2F0E8` |
+| Deep surface | Dark campus teal | `#244B50` |
+| Primary text | Dark graphite | `#262B2D` |
+| Muted text | Cool grey | `#687074` |
+| Primary accent | Deep teal | `#287B7A` |
+| Secondary accent | University purple | `#64527D` |
+| Bright accent | Electric coral | `#D96862` |
+| Supporting accent | Muted aqua | `#73AAA6` |
+| Border | Blue-grey | `#60747B` |
+| Focus | Bright cyan | `#2587A2` |
+
+### Texture and layout
+
+- speckled institutional paper;
+- laminate;
+- photocopy grain;
+- CRT glow used very lightly;
+- geometric grids;
+- campus wayfinding;
+- 1980s–1990s textbook and brochure layouts;
+- restrained Memphis-style forms only where historically appropriate.
+
+### Typography
+
+| Role | Typeface | Source |
+|---|---|---|
+| Display and labels | Centrifuge | https://fonts.adobe.com/fonts/centrifuge |
+| Secondary and body | Aktiv Grotesk | https://fonts.adobe.com/fonts/aktiv-grotesk |
+
+Centrifuge is especially appropriate for higher education, laboratories, research, STEM, and institutional labels. Aktiv Grotesk carries sustained reading and technical information.
+
+# Transition architecture
+
+Transitions are teaching and design structures, not decorative gradients. Each transition must define what persists, fades, enters, and changes in visual order.
+
+## Colonial → Victorian
+
+- parchment remains;
+- navy recedes;
+- rust and cotton green emerge;
+- wood becomes iron and textile;
+- layout becomes more gridded;
+- handwriting gives way to print.
+
+## Victorian → Jim Crow
+
+- Clarendon and institutional print persist;
+- warmth drains from the palette;
+- green and rust recede;
+- black, white, and grey dominate;
+- page divisions become harder and more explicit.
+
+## Jim Crow → World Wars
+
+- greyscale persists initially;
+- faded blue and red enter gradually;
+- bureaucratic forms turn into civic posters;
+- the page becomes more mobilized and public-facing.
+
+## World Wars → Civil Rights
+
+- faded patriotic colors become brighter and less controlled;
+- poster language persists;
+- teal, orange, mustard, and magenta emerge;
+- layouts become bolder and more participatory.
+
+## Civil Rights → Modern schooling
+
+- strong color remains;
+- poster texture gives way to geometric systems;
+- teal carries forward;
+- the palette cools;
+- analog print gradually shifts toward institutional digital design.
+
+# Adobe Fonts delivery and licensing
+
+The site currently loads one Adobe Fonts Web Project:
+
+```html
+<link rel="stylesheet" href="https://use.typekit.net/caf5rgw.css">
+```
+
+Adobe serves the webfont files. No downloaded `.otf`, `.ttf`, `.woff`, or `.woff2` files may be committed to this repository under the current subscription-based delivery arrangement.
+
+Font credits must record:
+
+- family and styles used;
+- designer;
+- foundry;
+- Adobe Fonts source page;
+- delivery method;
+- applicable license;
+- fallback stack;
+- date verified;
+- replacement plan if Adobe hosting becomes unavailable.
+
+## Deferred pre-completion work — final backup-font plan
+
+Before final publication or the end of development:
+
+1. choose a deliberate backup or open-source substitute for every Adobe family used in the final course;
+2. test each complete theme pack with Adobe Fonts blocked;
+3. confirm that headings do not overflow and every stop retains viewport containment;
+4. record the final fallback family, license, source, and reason for selection;
+5. decide whether long-term font delivery will remain attached to a durable Adobe account or move to separately licensed, self-hosted, or open-source fonts.
+
+This is required before development ends but intentionally low priority during most development because the current Brown Adobe subscription is expected to remain available for several more years.
+
+Adobe-hosted fonts create third-party requests to Adobe’s font network. Public privacy language and publication-readiness review must identify this provider accurately. The course must remain readable if the request fails.
+
+# Approved implementation sequence
+
+## Pass 1 — Historical taxonomy and design-direction documentation
+
+- Rename design packs and preview labels.
+- Update current course-era mappings.
+- Preserve live colors and behavior.
+- Add this complete approved design-direction record.
+
+## Pass 2 — Semantic color-token system
+
+- Add all six historical palettes and the course-neutral palette.
+- Define semantic roles rather than page-specific colors.
+- Use flat colors, borders, gradients, and generated textures only.
+
+## Pass 3 — Live Colonial and Victorian packs
+
+- Apply Colonial to the current Early America material.
+- Apply Victorian to the current Common School landing.
+- Preserve navigation, notebook behavior, and viewport containment.
+
+## Pass 4 — Future era preview packs
+
+- Add preview-only implementations for Jim Crow, World Wars, Civil Rights, and Modern schooling.
+
+## Pass 5 — Transition packs
+
+- Add all five historical transition systems.
+- Specify persistence, fading, emergence, and structural change.
+- Do not use flat palette averaging.
+
+## Pass 6 — Design-system QA
+
+- Audit contrast, font-role clarity, heading overflow, density, spacing, hierarchy, texture interference, reduced motion, forced colors, and preview/live consistency.
+
+## Pass 7 — Historical texture and background assets
+
+- Select or create actual textures only after palettes stabilize.
+- Verify rights, provenance, file size, legibility, and credits.
+
+## Pass 8 — Full core-documentation refresh
+
+Synchronize the root README, all four core documents, and this design specification. Update the synchronized checkpoint, architecture ownership, active backlog, Adobe disclosure, deferred fallback task, accepted design packs, and transition architecture.

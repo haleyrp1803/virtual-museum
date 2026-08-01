@@ -81,10 +81,10 @@ export default function CourseStop({
       data-stop-index={index}
       ref={sectionRef}
       className={`course-stop stop-${stop.type} stop-era-${stop.eraId}`}
-      data-era-theme={eraTheme?.id ?? stop.eraId}
-      data-heading-variant={eraTheme?.variants.heading}
-      data-surface-variant={eraTheme?.variants.surface}
-      data-frame-variant={eraTheme?.variants.frame}
+      data-era-theme={eraTheme?.designPackId ?? stop.eraId}
+      data-heading-variant={eraTheme?.designPack?.variants.heading}
+      data-surface-variant={eraTheme?.designPack?.variants.surface}
+      data-frame-variant={eraTheme?.designPack?.variants.frame}
       aria-labelledby={`${stop.id}-title`}
     >
       <div className="stop-inner">

@@ -18,6 +18,7 @@ import { useLocalWorkspace } from './hooks/useLocalWorkspace.js'
 import { useCourseNavigation } from './hooks/useCourseNavigation.js'
 import { courseArtifacts, courseStops, placeholderResources, timelineSegments } from './data/course.js'
 import { glossaryTerms } from './data/glossary.js'
+import { SHOW_DESIGN_PREVIEW_LINK } from './config/developmentFeatures.js'
 
 const MODULE_ID = 'early-america'
 const MODULE_TITLE = 'Early America'
@@ -141,6 +142,9 @@ export default function App() {
       <header className="course-header">
         <div className="course-brand"><span>History of Education</span><small>A horizontally progressing course prototype</small></div>
         <div className="header-actions">
+          {import.meta.env.DEV && SHOW_DESIGN_PREVIEW_LINK && (
+            <a className="development-preview-link" href="?theme-preview">Design Preview</a>
+          )}
           <button type="button" onClick={() => scrollToStop(0)}>Course beginning</button>
           <button type="button" onClick={() => workspace.notebookEnabled ? setNotebookMode('full') : workspace.reconsiderConsent()}>My Notebook</button>
         </div>

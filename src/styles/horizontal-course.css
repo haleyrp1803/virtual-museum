@@ -41,7 +41,10 @@
 .course-brand span { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.025em; }
 .course-brand small { margin-top: 0.15rem; color: #dfcdb2; }
 .header-actions { display: flex; gap: 0.6rem; }
-.course-header button { color: var(--paper); border-color: rgba(255,255,255,0.28); background: rgba(255,255,255,0.06); }
+.course-header button,
+.development-preview-link { color: var(--paper); border-color: rgba(255,255,255,0.28); background: rgba(255,255,255,0.06); }
+.development-preview-link { display: inline-flex; align-items: center; padding: 0.58rem 0.82rem; border: 1px dashed rgba(255,255,255,0.42); border-radius: 999px; text-decoration: none; font-size: 0.84rem; font-weight: 800; }
+.development-preview-link:hover { background: rgba(255,255,255,0.13); }
 
 
 .course-timeline {
@@ -83,8 +86,14 @@
   /* Shared semantic era-token contract. Each registered theme overrides these
      values below; components consume roles rather than literal period colors. */
   --era-font-display: Georgia, 'Times New Roman', serif;
+  --era-font-secondary: Georgia, 'Times New Roman', serif;
   --era-font-body: Georgia, 'Times New Roman', serif;
+  --era-font-label: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --era-font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --era-display-weight: 700;
+  --era-secondary-weight: 700;
+  --era-body-weight: 400;
+  --era-label-weight: 800;
   --era-text: var(--ink);
   --era-muted: var(--muted);
   --era-accent: var(--burgundy);
@@ -113,6 +122,7 @@
   background-image: var(--era-background-image);
   background-size: var(--era-background-size);
   font-family: var(--era-font-body);
+  font-weight: var(--era-body-weight);
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
@@ -122,17 +132,23 @@
 .stop-heading h2 {
   margin: 0.25rem 0 0.85rem;
   font-family: var(--era-font-display);
+  font-weight: var(--era-display-weight);
   font-size: clamp(2.6rem, 5vw, 5.8rem);
   line-height: 0.98;
   letter-spacing: var(--era-heading-letter-spacing);
   text-transform: var(--era-heading-transform);
 }
 .stop-summary { max-width: 780px; color: var(--era-text); font-size: 1.15rem; line-height: 1.65; }
-.date-marker { display: inline-block; margin: 0 0 0.5rem; padding: 0.35rem 0.7rem; border: 1px solid currentColor; border-radius: 999px; font-family: var(--era-font-ui); font-size: 0.78rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.date-marker { display: inline-block; margin: 0 0 0.5rem; padding: 0.35rem 0.7rem; border: 1px solid currentColor; border-radius: 999px; font-family: var(--era-font-label); font-size: 0.78rem; font-weight: var(--era-label-weight); letter-spacing: 0.06em; text-transform: uppercase; }
+.course-stop .eyebrow,
+.course-stop .resource-type { font-family: var(--era-font-label); font-weight: var(--era-label-weight); }
+.course-stop h3,
+.course-stop .theme-preview-subhead { font-family: var(--era-font-secondary); font-weight: var(--era-secondary-weight); }
 
 /* Era themes: executable design templates. JavaScript owns IDs, purpose, and
    named variants; CSS owns all actual presentation values. */
-.course-stop[data-era-theme='introduction'] {
+.course-stop[data-era-theme='course-neutral-introduction'],
+.course-stop[data-era-theme='course-neutral-conclusion'] {
   --era-text: var(--paper);
   --era-muted: #dfcdb2;
   --era-accent: var(--dusty-rose);
@@ -143,7 +159,14 @@
   --era-background-image: linear-gradient(120deg, rgba(32,58,48,0.98), rgba(18,39,32,0.98));
   --era-heading-letter-spacing: 0.01em;
 }
-.course-stop[data-era-theme='early-america'] {
+.course-stop[data-era-theme='colonial-era'] {
+  --era-font-display: 'antiquarian-scribe', 'Snell Roundhand', cursive;
+  --era-font-secondary: 'garamond-atf-subhead', 'Adobe Garamond Pro', Garamond, serif;
+  --era-font-body: 'adobe-caslon-pro', 'Book Antiqua', Georgia, serif;
+  --era-font-label: 'garamond-atf-subhead', Garamond, Georgia, serif;
+  --era-display-weight: 400;
+  --era-secondary-weight: 500;
+  --era-heading-letter-spacing: 0.005em;
   --era-text: var(--ink);
   --era-muted: var(--muted);
   --era-accent: var(--burgundy);
@@ -154,19 +177,14 @@
   --era-background-image: radial-gradient(circle at 20% 15%, rgba(255,255,255,0.25) 0 1px, transparent 1.5px), radial-gradient(circle at 75% 42%, rgba(74,48,29,0.13) 0 1px, transparent 1.5px), linear-gradient(96deg, rgba(255,255,255,0.08), transparent 18%, rgba(74,48,29,0.05) 48%, transparent 72%);
   --era-background-size: 17px 17px, 23px 23px, 100% 100%;
 }
-.course-stop[data-era-theme='resources'] {
-  --era-text: var(--ink);
-  --era-muted: var(--muted);
-  --era-accent: var(--burgundy);
-  --era-surface: rgba(250,246,236,0.96);
-  --era-surface-text: var(--ink);
-  --era-border: var(--line);
-  --era-page: #e9e0ce;
-  --era-background-image: linear-gradient(rgba(95,72,45,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(95,72,45,0.035) 1px, transparent 1px);
-  --era-background-size: 34px 34px;
-  --era-heading-letter-spacing: 0.01em;
-}
-.course-stop[data-era-theme='transition'] {
+.course-stop[data-era-theme='colonial-to-victorian'] {
+  --era-font-display: 'garamond-atf-subhead', 'Adobe Garamond Pro', Garamond, serif;
+  --era-font-secondary: 'clarendon-text-pro', Rockwell, 'Roboto Slab', serif;
+  --era-font-body: 'adobe-caslon-pro', 'Book Antiqua', Georgia, serif;
+  --era-font-label: 'hwt-gothic-round', 'Arial Narrow', sans-serif;
+  --era-display-weight: 500;
+  --era-secondary-weight: 700;
+  --era-label-weight: 900;
   --era-text: var(--paper);
   --era-muted: #e4d4bd;
   --era-accent: var(--dusty-rose);
@@ -176,7 +194,14 @@
   --era-page: #5c4433;
   --era-background-image: linear-gradient(90deg, #6e4d32 0%, #5c4433 36%, #3b4b45 72%, #263c35 100%);
 }
-.course-stop[data-era-theme='common-school'] {
+.course-stop[data-era-theme='victorian-era'] {
+  --era-font-display: 'hwt-slab-columbian', 'Roboto Slab', Rockwell, serif;
+  --era-font-secondary: 'clarendon-text-pro', Rockwell, 'Roboto Slab', serif;
+  --era-font-body: 'clarendon-text-pro', Rockwell, 'Roboto Slab', serif;
+  --era-font-label: 'hwt-gothic-round', 'Arial Narrow', sans-serif;
+  --era-display-weight: 400;
+  --era-secondary-weight: 700;
+  --era-label-weight: 900;
   --era-text: #f3eddd;
   --era-muted: #d6cdbd;
   --era-accent: var(--dusty-rose);
@@ -191,6 +216,69 @@
 
 .intro-layout { display: grid; grid-template-columns: minmax(480px, 1.3fr) minmax(330px, 0.7fr); gap: 2rem; align-items: start; margin-top: 2rem; }
 .placeholder-video { border: 1px solid rgba(255,255,255,0.26); border-radius: 18px; overflow: hidden; background: rgba(255,255,255,0.08); }
+
+/* Period packs reserved for future modules. Their current visual treatment is
+   intentionally typography-led and provisional; colors, textures, and framing
+   will be designed in later bounded passes. */
+.course-stop[data-era-theme='jim-crow-era'],
+.course-stop[data-era-theme='world-wars-era'] {
+  --era-font-display: 'century-gothic', Futura, 'Trebuchet MS', sans-serif;
+  --era-font-secondary: 'grad', 'Century Schoolbook', Georgia, serif;
+  --era-font-body: 'grad', 'Century Schoolbook', Georgia, serif;
+  --era-font-label: 'century-gothic', Futura, 'Trebuchet MS', sans-serif;
+  --era-display-weight: 700;
+  --era-secondary-weight: 600;
+  --era-heading-letter-spacing: 0.015em;
+  --era-text: #262a2b;
+  --era-muted: #5e6567;
+  --era-accent: #5f1830;
+  --era-surface: rgba(248,246,239,0.94);
+  --era-surface-text: #262a2b;
+  --era-border: #8c8f8d;
+  --era-page: #d9d7cf;
+  --era-background-image: linear-gradient(rgba(54,58,57,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(54,58,57,0.035) 1px, transparent 1px);
+  --era-background-size: 28px 28px;
+  --era-frame-radius: 4px;
+}
+.course-stop[data-era-theme='civil-rights-era'] {
+  --era-font-display: 'goodland-variable', 'Cooper Black', Georgia, serif;
+  --era-font-secondary: 'goodland-variable', 'Cooper Black', Georgia, serif;
+  --era-font-body: 'news-gothic-std', 'Franklin Gothic Medium', Arial, sans-serif;
+  --era-font-label: 'news-gothic-std', 'Franklin Gothic Medium', Arial, sans-serif;
+  --era-display-weight: 650;
+  --era-secondary-weight: 600;
+  --era-heading-letter-spacing: 0.01em;
+  --era-text: #28251f;
+  --era-muted: #686054;
+  --era-accent: #874229;
+  --era-surface: rgba(248,239,213,0.94);
+  --era-surface-text: #28251f;
+  --era-border: #8d765c;
+  --era-page: #c9b875;
+  --era-background-image: radial-gradient(circle at 16% 22%, rgba(255,255,255,0.18) 0 2px, transparent 2.5px), linear-gradient(135deg, rgba(129,66,42,0.08), transparent 55%);
+  --era-background-size: 26px 26px, 100% 100%;
+  --era-frame-radius: 10px;
+}
+.course-stop[data-era-theme='modern-schooling-era'] {
+  --era-font-display: 'centrifuge', Impact, sans-serif;
+  --era-font-secondary: 'aktiv-grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --era-font-body: 'aktiv-grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --era-font-label: 'centrifuge', Impact, sans-serif;
+  --era-display-weight: 400;
+  --era-secondary-weight: 600;
+  --era-heading-letter-spacing: 0.04em;
+  --era-heading-transform: uppercase;
+  --era-text: #20272c;
+  --era-muted: #5a666d;
+  --era-accent: #31585a;
+  --era-surface: rgba(248,250,249,0.95);
+  --era-surface-text: #20272c;
+  --era-border: #819096;
+  --era-page: #d8dfe0;
+  --era-background-image: linear-gradient(120deg, rgba(49,88,90,0.07), transparent 52%), linear-gradient(rgba(255,255,255,0.35), rgba(255,255,255,0.08));
+  --era-frame-radius: 2px;
+}
+
 .placeholder-video-screen { min-height: 310px; display: grid; place-items: center; align-content: center; gap: 0.7rem; padding: 2rem; color: inherit; text-align: center; background: radial-gradient(circle at center, rgba(255,255,255,0.12), transparent 55%), rgba(0,0,0,0.16); }
 .placeholder-video-screen .play-symbol { display: grid; place-items: center; width: 76px; height: 76px; border: 2px solid currentColor; border-radius: 50%; font-size: 1.7rem; }
 .placeholder-video-screen strong { font-size: 1.35rem; }
@@ -234,8 +322,8 @@ kbd { padding: 0.12rem 0.35rem; border: 1px solid currentColor; border-radius: 4
 
 .transition-experience { display: grid; grid-template-columns: 1fr auto 1fr; gap: 2rem; align-items: center; min-height: 350px; margin-top: 2rem; }
 .transition-domestic, .transition-institutional { display: grid; gap: 0.7rem; padding: 2rem; border: 1px solid rgba(255,255,255,0.25); border-radius: 18px; }
-.transition-domestic { transform: rotate(-1deg); background: rgba(245,236,216,0.14); font-family: Georgia, serif; }
-.transition-institutional { background: rgba(15,31,26,0.38); text-transform: uppercase; letter-spacing: 0.09em; }
+.transition-domestic { transform: rotate(-1deg); background: rgba(245,236,216,0.14); font-family: 'adobe-caslon-pro', 'Book Antiqua', Georgia, serif; }
+.transition-institutional { background: rgba(15,31,26,0.38); font-family: 'hwt-gothic-round', 'Arial Narrow', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 0.09em; }
 .transition-domestic span, .transition-institutional span { padding: 0.7rem 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.25); }
 .transition-arrow { font-size: 4rem; color: var(--gold); }
 .transition-experience > p { grid-column: 1 / -1; max-width: 800px; margin: 0 auto; text-align: center; line-height: 1.7; }
@@ -281,13 +369,16 @@ kbd { padding: 0.12rem 0.35rem; border: 1px solid currentColor; border-radius: 4
 .theme-preview-toolbar { display: flex; justify-content: space-between; gap: 2rem; padding: 1.5rem 2rem; border-bottom: 1px solid var(--line); background: var(--paper); }
 .theme-preview-toolbar h1 { margin: 0.2rem 0; }
 .theme-preview-toolbar p { margin: 0.2rem 0; }
+.theme-preview-toolbar-actions { display: flex; align-items: end; gap: 0.8rem; }
 .theme-preview-toolbar label { display: grid; gap: 0.4rem; align-content: center; min-width: 260px; font-weight: 800; }
+.theme-preview-return { display: inline-flex; align-items: center; min-height: 42px; padding: 0.55rem 0.8rem; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: white; text-decoration: none; font-weight: 800; }
 .theme-preview-toolbar select { padding: 0.7rem; border: 1px solid var(--line); border-radius: 8px; font: inherit; background: white; }
 .theme-preview-stage { width: 100%; min-width: 0; height: auto; min-height: 620px; overflow: visible; }
 .theme-preview-stage .stop-inner { min-height: 620px; height: auto; padding-bottom: 2rem; overflow: visible; }
 .theme-preview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
 .theme-preview-card { padding: 1.4rem; border: var(--era-frame-border-width) var(--era-frame-border-style) var(--era-border); border-radius: var(--era-frame-radius); color: var(--era-surface-text); background: var(--era-surface); box-shadow: var(--paper-shadow); }
-.theme-preview-card h3 { font-family: var(--era-font-display); }
+.theme-preview-card h3 { font-family: var(--era-font-secondary); font-weight: var(--era-secondary-weight); }
+.theme-preview-subhead { margin: -0.2rem 0 0.9rem; color: var(--era-muted); font-size: 1.05rem; }
 .theme-preview-card button { margin-right: 0.35rem; }
 .theme-preview-card label { display: block; margin-bottom: 0.45rem; font-weight: 800; }
 .theme-preview-card textarea { box-sizing: border-box; width: 100%; min-height: 120px; padding: 0.75rem; border: 1px solid var(--era-border); border-radius: 8px; font: inherit; }

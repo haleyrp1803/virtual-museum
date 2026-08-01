@@ -16,9 +16,10 @@
 /* Burgundy is the readable text accent on paper; dusty rose is reserved for
    dark historical surfaces. */
 .eyebrow { color: var(--burgundy); }
-.course-stop[data-era-theme='introduction'] .eyebrow,
-.course-stop[data-era-theme='transition'] .eyebrow,
-.course-stop[data-era-theme='common-school'] .eyebrow { color: var(--era-accent); }
+.course-stop[data-era-theme='course-neutral-introduction'] .eyebrow,
+.course-stop[data-era-theme='course-neutral-conclusion'] .eyebrow,
+.course-stop[data-era-theme='colonial-to-victorian'] .eyebrow,
+.course-stop[data-era-theme='victorian-era'] .eyebrow { color: var(--era-accent); }
 
 /* Keep the notebook launcher clear of the fixed Previous/Next navigation. */
 .course-app .notebook-launcher {

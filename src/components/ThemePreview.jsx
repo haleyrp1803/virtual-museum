@@ -1,33 +1,36 @@
 /**
- * Internal visual test fixture for the era-theme system.
+ * Internal visual test fixture for reusable historical design packs.
  *
- * Open the local application with `?theme-preview` to compare every registered
- * era against identical representative content. This surface is deliberately
- * outside the learner course and persistence lifecycle; it exists to make
- * token and variant changes reviewable before they enter historical stops.
+ * Open the local application with `?theme-preview` or use the temporary
+ * development header control. Period-based packs stay independent of current
+ * placeholder lesson/module names so later course content can adopt them by
+ * assigning a `designPackId`.
  */
 
 import { useState } from 'react'
-import { ERA_THEMES } from '../data/eraThemes.js'
+import { DESIGN_PACKS } from '../data/eraThemes.js'
 
 export default function ThemePreview() {
-  const [selectedId, setSelectedId] = useState(ERA_THEMES[0].id)
-  const theme = ERA_THEMES.find((item) => item.id === selectedId) ?? ERA_THEMES[0]
+  const [selectedId, setSelectedId] = useState(DESIGN_PACKS[0].id)
+  const theme = DESIGN_PACKS.find((item) => item.id === selectedId) ?? DESIGN_PACKS[0]
 
   return (
     <main className="theme-preview-shell">
       <header className="theme-preview-toolbar">
         <div>
           <p className="eyebrow">Internal design fixture</p>
-          <h1>Era Theme Preview</h1>
-          <p>Compare identical interface elements while changing only the registered era theme.</p>
+          <h1>Historical Design Pack Preview</h1>
+          <p>Compare reusable period templates against identical interface content.</p>
         </div>
-        <label>
-          Preview theme
-          <select value={selectedId} onChange={(event) => setSelectedId(event.target.value)}>
-            {ERA_THEMES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-          </select>
-        </label>
+        <div className="theme-preview-toolbar-actions">
+          <label>
+            Time period
+            <select value={selectedId} onChange={(event) => setSelectedId(event.target.value)}>
+              {DESIGN_PACKS.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+            </select>
+          </label>
+          <a className="theme-preview-return" href={window.location.pathname}>Return to course</a>
+        </div>
       </header>
 
       <section
@@ -41,15 +44,16 @@ export default function ThemePreview() {
         <div className="stop-inner">
           <div className="stop-heading">
             <p className="eyebrow">{theme.label}</p>
-            <p className="date-marker">Theme fixture</p>
+            <p className="date-marker">{theme.periodLabel}</p>
             <h2 id="theme-preview-title">A Representative Historical Stop</h2>
             <p className="stop-summary">{theme.purpose}</p>
           </div>
 
           <div className="theme-preview-grid">
-            <article className="theme-preview-card">
+            <article className="theme-preview-card theme-preview-type-card">
               <p className="resource-type">Primary source</p>
               <h3>Document or artifact title</h3>
+              <p className="theme-preview-subhead">A secondary heading tests the supporting historical face.</p>
               <p>This paragraph tests body typography, text color, line height, and readable contrast on a standard content surface.</p>
               <p><button type="button" className="primary-button">Primary action</button> <button type="button">Secondary action</button></p>
             </article>
@@ -62,19 +66,25 @@ export default function ThemePreview() {
             <article className="theme-preview-card">
               <h3>Interactive states</h3>
               <label htmlFor="theme-preview-response">Private response</label>
-              <textarea id="theme-preview-response" defaultValue="A learner-authored note remains legible inside the era treatment." />
+              <textarea id="theme-preview-response" defaultValue="A learner-authored note remains legible inside the period treatment." />
               <p><a href="#theme-preview-title">Example text link</a></p>
             </article>
           </div>
         </div>
       </section>
 
-      <aside className="theme-preview-metadata" aria-label="Selected theme metadata">
+      <aside className="theme-preview-metadata" aria-label="Selected design pack metadata">
         <strong>{theme.label}</strong>
+        <span>Status: {theme.status}</span>
         <span>Transition family: {theme.transitionFamily}</span>
         <span>Heading: {theme.variants.heading}</span>
         <span>Surface: {theme.variants.surface}</span>
         <span>Frame: {theme.variants.frame}</span>
+        <span>Display: {theme.typography.display}</span>
+        <span>Secondary: {theme.typography.secondary}</span>
+        <span>Body: {theme.typography.body}</span>
+        <span>Label: {theme.typography.label}</span>
+        {theme.typography.accent && <span>Accent: {theme.typography.accent}</span>}
       </aside>
     </main>
   )
