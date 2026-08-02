@@ -17,6 +17,7 @@ import SynthesisStop from './courseStops/SynthesisStop.jsx'
 import ResourcesStop from './courseStops/ResourcesStop.jsx'
 import TransitionStop from './courseStops/TransitionStop.jsx'
 import NextEraStop from './courseStops/NextEraStop.jsx'
+import DesignSampleStop from './courseStops/DesignSampleStop.jsx'
 import { getEraTheme } from '../data/eraThemes.js'
 
 export default function CourseStop({
@@ -66,10 +67,13 @@ export default function CourseStop({
       content = <ResourcesStop resources={resources} isSaved={isResourceSaved} onToggleSave={onToggleResource} />
       break
     case 'transition':
-      content = <TransitionStop onSelectGlossaryTerm={onSelectGlossaryTerm} />
+      content = <TransitionStop transition={stop.transition} />
       break
     case 'next-era':
       content = <NextEraStop onSelectGlossaryTerm={onSelectGlossaryTerm} onReturnToBeginning={() => onScrollToStop(0)} />
+      break
+    case 'design-sample':
+      content = <DesignSampleStop sample={stop.sample} />
       break
     default:
       content = null

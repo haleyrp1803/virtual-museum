@@ -48,8 +48,8 @@ export default function App() {
 
   const lessonNoteContext = useMemo(() => {
     const isCommonSchool = activeStop?.eraId === 'common-school' || activeStop?.eraId === 'transition'
-    const moduleId = isCommonSchool ? 'common-school' : MODULE_ID
-    const moduleTitle = isCommonSchool ? 'Common School' : MODULE_TITLE
+    const moduleId = activeStop?.moduleId ?? (isCommonSchool ? 'common-school' : MODULE_ID)
+    const moduleTitle = activeStop?.moduleTitle ?? (isCommonSchool ? 'Common School' : MODULE_TITLE)
     return {
       moduleId,
       moduleTitle,
@@ -197,9 +197,11 @@ export default function App() {
         <button className="primary-button" type="button" onClick={() => scrollToStop(activeStopIndex - 1)} disabled={activeStopIndex === 0}>← Previous</button>
         <div className="bottom-timeline">
           <div className="timeline-track" aria-hidden="true"><span style={{ width: `${(activeStopIndex / (courseStops.length - 1)) * 100}%` }} /></div>
-          {timelineSegments.map((segment) => {
+          {timelineSegments.map((segment, segmentIndex) => {
             const targetIndex = segment.stopId ? courseStops.findIndex((stop) => stop.id === segment.stopId) : -1
-            const current = !segment.disabled && courseStops[activeStopIndex]?.eraId === segment.id
+            const nextSegment = timelineSegments[segmentIndex + 1]
+            const nextTargetIndex = nextSegment?.stopId ? courseStops.findIndex((stop) => stop.id === nextSegment.stopId) : -1
+            const current = !segment.disabled && targetIndex >= 0 && targetIndex <= activeStopIndex && (nextTargetIndex < 0 || activeStopIndex < nextTargetIndex)
             const visited = targetIndex >= 0 && targetIndex <= activeStopIndex
             return (
               <button

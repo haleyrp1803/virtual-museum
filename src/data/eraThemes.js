@@ -272,6 +272,51 @@ export const ERA_THEMES = [
     label: 'Common School',
     designPackId: 'victorian-era',
   },
+  {
+    id: 'victorian-jim-crow-transition',
+    label: 'Victorian to Jim Crow',
+    designPackId: 'victorian-to-jim-crow',
+  },
+  {
+    id: 'jim-crow',
+    label: 'Jim Crow era',
+    designPackId: 'jim-crow-era',
+  },
+  {
+    id: 'jim-crow-world-wars-transition',
+    label: 'Jim Crow to World Wars',
+    designPackId: 'jim-crow-to-world-wars',
+  },
+  {
+    id: 'world-wars',
+    label: 'World Wars era',
+    designPackId: 'world-wars-era',
+  },
+  {
+    id: 'world-wars-civil-rights-transition',
+    label: 'World Wars to Civil Rights',
+    designPackId: 'world-wars-to-civil-rights',
+  },
+  {
+    id: 'civil-rights',
+    label: 'Civil Rights era',
+    designPackId: 'civil-rights-era',
+  },
+  {
+    id: 'civil-rights-modern-transition',
+    label: 'Civil Rights to Modern schooling',
+    designPackId: 'civil-rights-to-modern-schooling',
+  },
+  {
+    id: 'modern-schooling',
+    label: 'Modern schooling era',
+    designPackId: 'modern-schooling-era',
+  },
+  {
+    id: 'conclusion',
+    label: 'Conclusion',
+    designPackId: 'course-neutral-conclusion',
+  },
 ]
 
 export const ERA_THEME_IDS = ERA_THEMES.map((theme) => theme.id)

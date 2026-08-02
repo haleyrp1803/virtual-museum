@@ -1,37 +1,45 @@
-/**
- * Course Map layout contract.
- *
- * This file owns only the visual coordinates and SVG connector geometry for
- * the Field Notebook's curving Course Map. Every node ID and segment endpoint
- * must match an ID in `courseStops`; `validateCourseData.js` enforces that
- * connection during development. Keeping geometry separate prevents the large
- * Notebook component from becoming a second source of truth for course order.
- */
+/** Fixed Course Map geometry synchronized with the full design-flow sample. */
 
 export const COURSE_MAP_NODES = [
-  { id: 'course-introduction', label: 'Introduction', module: 'Course orientation', x: 22, y: 7 },
-  { id: 'early-america-introduction', label: 'Early America', module: 'Module 1', x: 68, y: 22 },
-  { id: 'early-america-text', label: 'Primary source', module: 'Early America', x: 33, y: 35, minor: true },
-  { id: 'early-america-image', label: 'Close looking', module: 'Early America', x: 68, y: 44, minor: true },
-  { id: 'early-america-media', label: 'Guided media', module: 'Early America', x: 31, y: 53, minor: true },
-  { id: 'early-america-activity', label: 'Private response', module: 'Early America', x: 69, y: 62, minor: true },
-  { id: 'early-america-synthesis', label: 'Synthesis', module: 'Early America', x: 35, y: 70, minor: true },
-  { id: 'early-america-resources', label: 'Further Study', module: 'Early America', x: 70, y: 78 },
-  { id: 'common-school-transition', label: 'Transition', module: 'Historical transition', x: 35, y: 87 },
-  { id: 'common-school-landing', label: 'Common School', module: 'Module 2', x: 69, y: 95 },
+  { id: 'course-introduction', label: 'Introduction', module: 'Course orientation', x: 22, y: 4 },
+  { id: 'early-america-introduction', label: 'Colonial era', module: 'Module 1', x: 70, y: 9 },
+  { id: 'early-america-text', label: 'Primary source', module: 'Colonial era', x: 34, y: 14, minor: true },
+  { id: 'early-america-image', label: 'Close looking', module: 'Colonial era', x: 68, y: 19, minor: true },
+  { id: 'early-america-media', label: 'Guided media', module: 'Colonial era', x: 32, y: 24, minor: true },
+  { id: 'early-america-activity', label: 'Private response', module: 'Colonial era', x: 69, y: 29, minor: true },
+  { id: 'early-america-synthesis', label: 'Synthesis', module: 'Colonial era', x: 35, y: 34, minor: true },
+  { id: 'early-america-resources', label: 'Further Study', module: 'Colonial era', x: 70, y: 39 },
+  { id: 'common-school-transition', label: 'Transition', module: 'Colonial → Victorian', x: 35, y: 44, minor: true },
+  { id: 'common-school-landing', label: 'Victorian era', module: 'Design sample', x: 69, y: 49 },
+  { id: 'jim-crow-transition', label: 'Transition', module: 'Victorian → Jim Crow', x: 34, y: 54, minor: true },
+  { id: 'jim-crow-design-sample', label: 'Jim Crow era', module: 'Design sample', x: 68, y: 59 },
+  { id: 'world-wars-transition', label: 'Transition', module: 'Jim Crow → World Wars', x: 33, y: 64, minor: true },
+  { id: 'world-wars-design-sample', label: 'World Wars era', module: 'Design sample', x: 69, y: 69 },
+  { id: 'civil-rights-transition', label: 'Transition', module: 'World Wars → Civil Rights', x: 34, y: 74, minor: true },
+  { id: 'civil-rights-design-sample', label: 'Civil Rights era', module: 'Design sample', x: 68, y: 79 },
+  { id: 'modern-schooling-transition', label: 'Transition', module: 'Civil Rights → Modern', x: 33, y: 84, minor: true },
+  { id: 'modern-schooling-design-sample', label: 'Modern schooling', module: 'Design sample', x: 69, y: 89 },
+  { id: 'course-conclusion', label: 'Conclusion', module: 'Course synthesis', x: 34, y: 95 },
 ]
 
-// Each segment is rendered as one complete connector. The UI switches the
-// entire path between dotted and solid states; partial-path progress rendering
-// was intentionally rejected because it produced misleading fragments.
+// Each segment remains a complete connector switched wholesale between dotted and solid states.
 export const COURSE_MAP_SEGMENTS = [
-  { from: 'course-introduction', to: 'early-america-introduction', d: 'M22 7 C82 11,82 20,68 22' },
-  { from: 'early-america-introduction', to: 'early-america-text', d: 'M68 22 C58 26,18 30,33 35' },
-  { from: 'early-america-text', to: 'early-america-image', d: 'M33 35 C49 37,82 39,68 44' },
-  { from: 'early-america-image', to: 'early-america-media', d: 'M68 44 C54 47,15 49,31 53' },
-  { from: 'early-america-media', to: 'early-america-activity', d: 'M31 53 C48 55,83 57,69 62' },
-  { from: 'early-america-activity', to: 'early-america-synthesis', d: 'M69 62 C54 64,20 66,35 70' },
-  { from: 'early-america-synthesis', to: 'early-america-resources', d: 'M35 70 C50 72,82 73,70 78' },
-  { from: 'early-america-resources', to: 'common-school-transition', d: 'M70 78 C55 80,18 82,35 87' },
-  { from: 'common-school-transition', to: 'common-school-landing', d: 'M35 87 C52 89,82 91,69 95' },
+  { from: 'course-introduction', to: 'early-america-introduction', d: 'M22 4 C40 6,52 7,70 9' },
+  { from: 'early-america-introduction', to: 'early-america-text', d: 'M70 9 C52 11,52 12,34 14' },
+  { from: 'early-america-text', to: 'early-america-image', d: 'M34 14 C52 16,50 17,68 19' },
+  { from: 'early-america-image', to: 'early-america-media', d: 'M68 19 C50 21,50 22,32 24' },
+  { from: 'early-america-media', to: 'early-america-activity', d: 'M32 24 C50 26,51 27,69 29' },
+  { from: 'early-america-activity', to: 'early-america-synthesis', d: 'M69 29 C51 31,53 32,35 34' },
+  { from: 'early-america-synthesis', to: 'early-america-resources', d: 'M35 34 C53 36,52 37,70 39' },
+  { from: 'early-america-resources', to: 'common-school-transition', d: 'M70 39 C52 41,53 42,35 44' },
+  { from: 'common-school-transition', to: 'common-school-landing', d: 'M35 44 C53 46,51 47,69 49' },
+  { from: 'common-school-landing', to: 'jim-crow-transition', d: 'M69 49 C51 51,52 52,34 54' },
+  { from: 'jim-crow-transition', to: 'jim-crow-design-sample', d: 'M34 54 C52 56,50 57,68 59' },
+  { from: 'jim-crow-design-sample', to: 'world-wars-transition', d: 'M68 59 C50 61,51 62,33 64' },
+  { from: 'world-wars-transition', to: 'world-wars-design-sample', d: 'M33 64 C51 66,51 67,69 69' },
+  { from: 'world-wars-design-sample', to: 'civil-rights-transition', d: 'M69 69 C51 71,52 72,34 74' },
+  { from: 'civil-rights-transition', to: 'civil-rights-design-sample', d: 'M34 74 C52 76,50 77,68 79' },
+  { from: 'civil-rights-design-sample', to: 'modern-schooling-transition', d: 'M68 79 C50 81,51 82,33 84' },
+  { from: 'modern-schooling-transition', to: 'modern-schooling-design-sample', d: 'M33 84 C51 86,51 87,69 89' },
+  { from: 'modern-schooling-design-sample', to: 'course-conclusion', d: 'M69 89 C51 91,52 93,34 95' },
 ]

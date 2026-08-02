@@ -592,3 +592,40 @@ Transition textures are supporting material evidence, not dominant split-screen 
 - native aspect-ratio preservation through cropping rather than stretching.
 
 The intended result is gradual historical movement. A learner should perceive the outgoing material receding and the incoming one becoming more salient without encountering a visible seam or a stark half-and-half composition.
+
+## Full-course design-flow sample
+
+A development-only live sequence now places one representative stop for each
+approved historical pack after the existing Colonial vertical slice. These
+stops use deliberately generic source, media, response, and interaction content
+so Haley and Georga can assess visual continuity without treating placeholder
+copy as drafted historical instruction.
+
+The review sequence is:
+
+```text
+Introduction
+→ Colonial module sample
+→ Colonial–Victorian transition
+→ Victorian sample
+→ Victorian–Jim Crow transition
+→ Jim Crow sample
+→ Jim Crow–World Wars transition
+→ World Wars sample
+→ World Wars–Civil Rights transition
+→ Civil Rights sample
+→ Civil Rights–Modern schooling transition
+→ Modern schooling sample
+→ Conclusion sample
+```
+
+The design samples are temporary development fixtures. They establish stable
+stop IDs, timeline targets, Course Map nodes, and representative component
+states, but they do not define final module length, historical claims,
+activities, sources, or pedagogy. They should be replaced or expanded only when
+Georga's lesson architecture and content are ready.
+
+
+### Civil Rights transition texture correction
+
+The Civil Rights noise texture is a repeatable print field, not a photographic material. In both adjacent transitions it uses independent repeat controls, a 240px tile, and low opacity. This prevents a single enlarged rectangular patch while preserving the long feathered historical handoff.

@@ -1,14 +1,17 @@
-/** Historical transition renderer; visual grammar remains defined in CSS. */
-import KeyTerm from '../KeyTerm.jsx'
-import { getGlossaryTerm } from '../../data/glossary.js'
+/** Historical transition renderer; content comes from the stop data while the visual grammar remains CSS-owned. */
+export default function TransitionStop({ transition }) {
+  if (!transition) return null
 
-export default function TransitionStop({ onSelectGlossaryTerm }) {
   return (
     <div className="transition-experience">
-      <div className="transition-domestic"><span>handwritten</span><span>household</span><span>local</span></div>
+      <div className="transition-domestic" aria-label={`${transition.fromLabel} characteristics`}>
+        {transition.from.map((item) => <span key={item}>{item}</span>)}
+      </div>
       <div className="transition-arrow" aria-hidden="true">→</div>
-      <div className="transition-institutional"><span>printed</span><span><KeyTerm term={getGlossaryTerm('standardization')} onSelect={onSelectGlossaryTerm} /></span><span>public</span></div>
-      <p>The visual grammar becomes more regular as the course approaches the common-school era. Final transitions may use sound, typography, archival materials, and restrained animation.</p>
+      <div className="transition-institutional" aria-label={`${transition.toLabel} characteristics`}>
+        {transition.to.map((item) => <span key={item}>{item}</span>)}
+      </div>
+      <p>{transition.note}</p>
     </div>
   )
 }
