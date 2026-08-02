@@ -541,3 +541,54 @@ Muted-text values were modestly deepened where necessary so normal-sized muted c
 
 The QA pass changes no course data, learner workspace behavior, notebook architecture, or historical content. Colonial, Victorian, and the active Colonial-to-Victorian transition remain the only design packs mapped to the live vertical slice. Later packs and transitions remain preview-only.
 
+
+## Pass 7 Historical Texture and Background Asset Record
+
+Pass 7 replaces the generated demonstration textures with optimized local image assets selected from Wikimedia Commons. Every committed image is stored as WebP under `public/assets/themes/textures/`; the original downloads are not retained in the repository. Images were resized to a maximum dimension of 1,600 pixels and compressed for web delivery. Color overlays remain in CSS so the approved semantic palettes continue to govern contrast and mood.
+
+### Asset provenance
+
+| Local file | Design use | Source | Creator / institution | Rights status | Review status |
+|---|---|---|---|---|---|
+| `colonial-paper.webp` | Colonial page parchment | `https://commons.wikimedia.org/wiki/File:Old_paper6.jpg` | Digital Yard Sale; author not identified | Public domain dedication | Approved |
+| `colonial-wood.webp` | Colonial source-frame wood | `https://commons.wikimedia.org/wiki/File:Pressed_pine_wood_grain_and_texture_close_up.jpg` | Kurt Kaiser | CC0 1.0 | Approved substitute |
+| `victorian-linen.webp` | Victorian woven page material | `https://commons.wikimedia.org/wiki/File:Linen_Cloth_MET_12.187.46_EGDP020594.jpg` | Metropolitan Museum of Art | CC0 1.0 | Approved |
+| `victorian-rust.webp` | Victorian iron/rust surfaces | `https://commons.wikimedia.org/wiki/File:Wheelbarrowbottom.jpg` | Clump | CC0 1.0 | Approved by Haley |
+| `jim-crow-paper.webp` | Jim Crow institutional paper | `https://commons.wikimedia.org/wiki/File:Blank_page,_brown_paper_texture_(14802136533).jpg` | Internet Archive Book Images; source volume published 1902 | No known copyright restrictions | Approved by Haley |
+| `world-wars-cloth.webp` | World Wars faded textile/poster material | `https://commons.wikimedia.org/wiki/File:Cloth_texture.jpg` | Titus Tscharntke | Public domain dedication | Approved for staging |
+| `civil-rights-noise.webp` | Civil Rights screen-print grain | `https://commons.wikimedia.org/wiki/File:1k_Dissolve_Noise_Texture.png` | Spamrakuen | CC0 1.0 | Approved for staging |
+| `civil-rights-print.webp` | Civil Rights print/compression field | `https://commons.wikimedia.org/wiki/File:JPG_compression_of_printing_texture.png` | Unknown photographer; source published 1922 | Public domain in the United States | Provisional pending visual review |
+| `modern-laminate.webp` | Modern schooling laminate/media surface | `https://commons.wikimedia.org/wiki/File:Decorative_laminate_07850.jpg` | Андрей Перцев 1967 | CC0 1.0 | Provisional pending visual review |
+| `modern-paper.webp` | Modern schooling institutional-paper field | `https://commons.wikimedia.org/wiki/File:Paper003_PREVIEW.jpg` | ambientCG / Lennart Demes | CC0 1.0 | Provisional pending visual review |
+
+The previously proposed oak photograph was not used because its Commons file page identifies the operative license as CC BY 2.0 rather than public domain. The CC0 pressed-pine texture replaces it while preserving the intended wood-grain role.
+
+### Application rules
+
+- Textures remain decorative and never carry historical claims by themselves.
+- CSS color overlays keep each asset subordinate to the approved palette.
+- Increased-contrast and forced-colors modes suppress image textures entirely.
+- If an image fails to load, the semantic page color and gradient remain sufficient.
+- Transition packs layer outgoing and incoming materials asymmetrically; they do not average two images or palettes.
+- The Civil Rights print texture and both Modern schooling assets remain provisional and may be replaced after in-context review.
+
+### Pass 7 outcome
+
+Colonial and Victorian textures are applied to the live vertical slice. Jim Crow, World Wars, Civil Rights, Modern schooling, and the later transitions remain preview-only. The active Colonial → Victorian threshold now stages parchment and linen as outgoing and incoming materials.
+
+### Pass 7D — Transition texture proportion correction
+
+All transition textures now render in overlapping, independently cropped fields. Photographic and material textures use `background-size: cover` so their native proportions are preserved; patterned noise retains a fixed repeat scale. Soft masks blend the two fields across the threshold. Transition imagery must be cropped at its boundary rather than stretched to a percentage width and full height.
+
+
+### Accepted transition texture blending refinement — Pass 7E
+
+Transition textures are supporting material evidence, not dominant split-screen fields. Every threshold now uses:
+
+- overlapping texture fields spanning most of the viewport;
+- low-opacity material layers beneath a dominant multi-stop color wash;
+- long feathered masks that begin fading well before the midpoint and continue well beyond it;
+- per-material opacity controls for dark or visually forceful sources such as hessian, cloth, halftone, and photocopy grain;
+- native aspect-ratio preservation through cropping rather than stretching.
+
+The intended result is gradual historical movement. A learner should perceive the outgoing material receding and the incoming one becoming more salient without encountering a visible seam or a stark half-and-half composition.

@@ -141,6 +141,7 @@
   background-color: var(--era-page);
   background-image: var(--era-background-image);
   background-size: var(--era-background-size);
+  background-position: var(--era-background-position, center);
   font-family: var(--era-font-body);
   font-weight: var(--era-body-weight);
   scroll-snap-align: start;
@@ -227,10 +228,11 @@
   --era-border: var(--pack-border);
   --era-page: var(--pack-page);
   --era-background-image:
-    radial-gradient(circle at 18% 14%, rgba(255,255,255,0.3) 0 1px, transparent 1.6px),
-    radial-gradient(circle at 76% 43%, rgba(90,59,42,0.13) 0 1px, transparent 1.5px),
-    linear-gradient(112deg, rgba(145,182,197,0.12), transparent 28%, rgba(255,255,255,0.08) 58%, rgba(90,59,42,0.05));
-  --era-background-size: 17px 17px, 23px 23px, 100% 100%;
+    linear-gradient(rgba(232,217,184,0.68), rgba(232,217,184,0.68)),
+    url('/virtual-museum/assets/themes/textures/colonial-paper.webp'),
+    linear-gradient(112deg, rgba(145,182,197,0.16), transparent 32%, rgba(90,59,42,0.08));
+  --era-background-size: 100% 100%, cover, 100% 100%;
+  --era-background-position: center, center, center;
 }
 .course-stop[data-era-theme='colonial-to-victorian'] {
   /* Curated threshold: Colonial materials persist while Victorian order arrives. */
@@ -306,10 +308,11 @@
   --era-border: var(--pack-border);
   --era-page: var(--pack-page);
   --era-background-image:
-    repeating-linear-gradient(0deg, rgba(71,74,70,0.035) 0 1px, transparent 1px 9px),
-    repeating-linear-gradient(90deg, rgba(94,112,76,0.035) 0 1px, transparent 1px 12px),
-    linear-gradient(118deg, rgba(152,83,59,0.07), transparent 34%, rgba(94,112,76,0.08));
-  --era-background-size: auto, auto, 100% 100%;
+    linear-gradient(rgba(231,221,199,0.82), rgba(231,221,199,0.82)),
+    url('/virtual-museum/assets/themes/textures/victorian-linen.webp'),
+    linear-gradient(118deg, rgba(152,83,59,0.12), transparent 38%, rgba(94,112,76,0.11));
+  --era-background-size: 100% 100%, cover, 100% 100%;
+  --era-background-position: center, center, center;
   --era-heading-letter-spacing: 0.025em;
 }
 
@@ -647,9 +650,11 @@
   --era-border: var(--pack-border);
   --era-page: var(--pack-page);
   --era-background-image:
-    linear-gradient(90deg, transparent 0 48.7%, rgba(30,31,31,0.32) 48.7% 51.3%, transparent 51.3%),
-    repeating-linear-gradient(0deg, rgba(32,33,33,0.035) 0 1px, transparent 1px 7px);
-  --era-background-size: 100% 100%, 100% 7px;
+    linear-gradient(rgba(238,237,232,0.9), rgba(238,237,232,0.9)),
+    url('/virtual-museum/assets/themes/textures/jim-crow-paper.webp'),
+    linear-gradient(90deg, transparent 0 48.7%, rgba(30,31,31,0.38) 48.7% 51.3%, transparent 51.3%);
+  --era-background-size: 100% 100%, cover, 100% 100%;
+  --era-background-position: center, center, center;
   --era-frame-radius: 0;
   --era-frame-border-width: 2px;
 }
@@ -702,10 +707,11 @@
   --era-border: var(--pack-border);
   --era-page: var(--pack-page);
   --era-background-image:
-    radial-gradient(circle at 14% 18%, rgba(101,117,82,0.16) 0 2px, transparent 2.5px),
-    repeating-linear-gradient(-4deg, rgba(52,77,93,0.028) 0 1px, transparent 1px 8px),
-    linear-gradient(128deg, rgba(84,122,145,0.14), transparent 42%, rgba(169,78,75,0.08));
-  --era-background-size: 34px 34px, 100% 8px, 100% 100%;
+    linear-gradient(rgba(238,225,200,0.82), rgba(238,225,200,0.82)),
+    url('/virtual-museum/assets/themes/textures/world-wars-cloth.webp'),
+    linear-gradient(128deg, rgba(84,122,145,0.16), transparent 42%, rgba(169,78,75,0.1));
+  --era-background-size: 100% 100%, 520px auto, 100% 100%;
+  --era-background-position: center, center, center;
   --era-frame-radius: 2px;
   --era-frame-border-width: 2px;
 }
@@ -754,10 +760,11 @@
   --era-border: var(--pack-border);
   --era-page: var(--pack-page);
   --era-background-image:
-    radial-gradient(circle at 13% 21%, rgba(38,60,104,0.11) 0 2px, transparent 2.8px),
-    linear-gradient(118deg, rgba(216,106,50,0.18) 0 13%, transparent 13% 70%, rgba(43,140,136,0.17) 70% 82%, transparent 82%),
-    linear-gradient(28deg, transparent 0 78%, rgba(214,166,47,0.18) 78% 88%, transparent 88%);
-  --era-background-size: 22px 22px, 100% 100%, 100% 100%;
+    linear-gradient(rgba(241,229,201,0.88), rgba(241,229,201,0.88)),
+    url('/virtual-museum/assets/themes/textures/civil-rights-noise.webp'),
+    linear-gradient(118deg, rgba(216,106,50,0.2) 0 13%, transparent 13% 70%, rgba(43,140,136,0.2) 70% 82%, transparent 82%);
+  --era-background-size: 100% 100%, 420px 420px, 100% 100%;
+  --era-background-position: center, center, center;
   --era-frame-radius: 6px;
   --era-frame-border-width: 3px;
 }
@@ -810,10 +817,11 @@
   --era-border: var(--pack-border);
   --era-page: var(--pack-page);
   --era-background-image:
-    linear-gradient(90deg, rgba(36,75,80,0.09) 1px, transparent 1px),
-    linear-gradient(rgba(36,75,80,0.07) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(100,82,125,0.12), transparent 42%, rgba(115,170,166,0.14));
-  --era-background-size: 44px 44px, 44px 44px, 100% 100%;
+    linear-gradient(rgba(231,229,223,0.9), rgba(231,229,223,0.9)),
+    url('/virtual-museum/assets/themes/textures/modern-paper.webp'),
+    linear-gradient(135deg, rgba(100,82,125,0.14), transparent 42%, rgba(115,170,166,0.16));
+  --era-background-size: 100% 100%, 520px 520px, 100% 100%;
+  --era-background-position: center, center, center;
   --era-frame-radius: 2px;
   --era-frame-border-width: 2px;
 }
@@ -1059,3 +1067,184 @@ kbd { padding: 0.12rem 0.35rem; border: 1px solid currentColor; border-radius: 4
   .theme-preview-stage .primary-button { color: ButtonText; background: ButtonFace; border: 2px solid ButtonText; }
   .theme-preview-stage :focus-visible { outline: 3px solid Highlight; }
 }
+
+
+/* Pass 7 sourced material assets. These remain decorative and are suppressed
+   in increased-contrast and forced-colors modes below. */
+.course-stop[data-era-theme='colonial-era'] .source-stage {
+  background-image: linear-gradient(rgba(244,233,207,0.9), rgba(244,233,207,0.9)), url('/virtual-museum/assets/themes/textures/colonial-wood.webp');
+  background-size: 100% 100%, cover;
+}
+.course-stop[data-era-theme='victorian-era'] .source-stage,
+.course-stop[data-era-theme='victorian-era'] .slate-placeholder {
+  background-image: linear-gradient(rgba(71,74,70,0.88), rgba(71,74,70,0.88)), url('/virtual-museum/assets/themes/textures/victorian-rust.webp');
+  background-size: 100% 100%, cover;
+}
+.course-stop[data-era-theme='civil-rights-era'] .theme-preview-media > div {
+  background-image: linear-gradient(rgba(214,166,47,0.76), rgba(214,166,47,0.76)), url('/virtual-museum/assets/themes/textures/civil-rights-print.webp');
+  background-size: 100% 100%, cover;
+}
+.course-stop[data-era-theme='modern-schooling-era'] .theme-preview-media > div {
+  background-image: linear-gradient(rgba(216,212,199,0.74), rgba(216,212,199,0.74)), url('/virtual-museum/assets/themes/textures/modern-laminate.webp');
+  background-size: 100% 100%, cover;
+}
+@media (prefers-contrast: more), (forced-colors: active) {
+  .course-stop,
+  .course-stop .source-stage,
+  .course-stop .slate-placeholder,
+  .course-stop .theme-preview-media > div {
+    background-image: none !important;
+  }
+}
+
+/* Threshold material staging uses two overlapping texture fields. Each
+   texture keeps its native aspect ratio through background-size: cover and is
+   cropped inside its side of the threshold rather than stretched into a
+   percentage-sized background layer. The overlap and masks preserve a gradual
+   historical handoff without distorting either material. */
+.course-stop:is(
+  [data-era-theme='colonial-to-victorian'],
+  [data-era-theme='victorian-to-jim-crow'],
+  [data-era-theme='jim-crow-to-world-wars'],
+  [data-era-theme='world-wars-to-civil-rights'],
+  [data-era-theme='civil-rights-to-modern-schooling']
+) {
+  --transition-texture-overlap: 86%;
+  --transition-outgoing-size: cover;
+  --transition-incoming-size: cover;
+  --transition-outgoing-opacity: 0.30;
+  --transition-incoming-opacity: 0.30;
+  --era-background-image: var(--transition-color-wash);
+  --era-background-size: 100% 100%;
+  --era-background-position: center;
+  background-repeat: no-repeat;
+  isolation: isolate;
+}
+.course-stop:is(
+  [data-era-theme='colonial-to-victorian'],
+  [data-era-theme='victorian-to-jim-crow'],
+  [data-era-theme='jim-crow-to-world-wars'],
+  [data-era-theme='world-wars-to-civil-rights'],
+  [data-era-theme='civil-rights-to-modern-schooling']
+)::before,
+.course-stop:is(
+  [data-era-theme='colonial-to-victorian'],
+  [data-era-theme='victorian-to-jim-crow'],
+  [data-era-theme='jim-crow-to-world-wars'],
+  [data-era-theme='world-wars-to-civil-rights'],
+  [data-era-theme='civil-rights-to-modern-schooling']
+)::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  width: var(--transition-texture-overlap);
+  z-index: -1;
+  pointer-events: none;
+  background-repeat: var(--transition-texture-repeat, no-repeat);
+  opacity: var(--transition-texture-opacity, 0.30);
+}
+.course-stop:is(
+  [data-era-theme='colonial-to-victorian'],
+  [data-era-theme='victorian-to-jim-crow'],
+  [data-era-theme='jim-crow-to-world-wars'],
+  [data-era-theme='world-wars-to-civil-rights'],
+  [data-era-theme='civil-rights-to-modern-schooling']
+)::before {
+  inset-inline-start: 0;
+  background-image: var(--transition-outgoing-texture);
+  background-size: var(--transition-outgoing-size);
+  background-position: left center;
+  opacity: var(--transition-outgoing-opacity);
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    #000 0 18%,
+    rgba(0,0,0,0.9) 34%,
+    rgba(0,0,0,0.58) 52%,
+    rgba(0,0,0,0.24) 70%,
+    transparent 92%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    #000 0 18%,
+    rgba(0,0,0,0.9) 34%,
+    rgba(0,0,0,0.58) 52%,
+    rgba(0,0,0,0.24) 70%,
+    transparent 92%
+  );
+}
+.course-stop:is(
+  [data-era-theme='colonial-to-victorian'],
+  [data-era-theme='victorian-to-jim-crow'],
+  [data-era-theme='jim-crow-to-world-wars'],
+  [data-era-theme='world-wars-to-civil-rights'],
+  [data-era-theme='civil-rights-to-modern-schooling']
+)::after {
+  inset-inline-end: 0;
+  background-image: var(--transition-incoming-texture);
+  background-size: var(--transition-incoming-size);
+  background-position: right center;
+  opacity: var(--transition-incoming-opacity);
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 8%,
+    rgba(0,0,0,0.24) 30%,
+    rgba(0,0,0,0.58) 48%,
+    rgba(0,0,0,0.9) 66%,
+    #000 82% 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 8%,
+    rgba(0,0,0,0.24) 30%,
+    rgba(0,0,0,0.58) 48%,
+    rgba(0,0,0,0.9) 66%,
+    #000 82% 100%
+  );
+}
+.course-stop:is(
+  [data-era-theme='colonial-to-victorian'],
+  [data-era-theme='victorian-to-jim-crow'],
+  [data-era-theme='jim-crow-to-world-wars'],
+  [data-era-theme='world-wars-to-civil-rights'],
+  [data-era-theme='civil-rights-to-modern-schooling']
+) > * {
+  position: relative;
+  z-index: 1;
+}
+.course-stop[data-era-theme='colonial-to-victorian'] {
+  --transition-color-wash: linear-gradient(90deg, rgba(232,217,184,0.94) 0%, rgba(229,218,193,0.92) 34%, rgba(224,214,190,0.92) 66%, rgba(221,211,189,0.94) 100%);
+  --transition-outgoing-texture: url('/virtual-museum/assets/themes/textures/colonial-paper.webp');
+  --transition-incoming-texture: url('/virtual-museum/assets/themes/textures/victorian-linen.webp');
+  --transition-incoming-opacity: 0.24;
+}
+.course-stop[data-era-theme='victorian-to-jim-crow'] {
+  --transition-color-wash: linear-gradient(90deg, rgba(231,221,199,0.94) 0%, rgba(233,226,211,0.93) 34%, rgba(236,232,224,0.93) 66%, rgba(238,237,232,0.95) 100%);
+  --transition-outgoing-texture: url('/virtual-museum/assets/themes/textures/victorian-linen.webp');
+  --transition-incoming-texture: url('/virtual-museum/assets/themes/textures/jim-crow-paper.webp');
+  --transition-outgoing-opacity: 0.23;
+  --transition-incoming-opacity: 0.20;
+}
+.course-stop[data-era-theme='jim-crow-to-world-wars'] {
+  --transition-color-wash: linear-gradient(90deg, rgba(238,237,232,0.95) 0%, rgba(238,233,220,0.94) 36%, rgba(238,229,208,0.93) 68%, rgba(238,225,200,0.94) 100%);
+  --transition-outgoing-texture: url('/virtual-museum/assets/themes/textures/jim-crow-paper.webp');
+  --transition-incoming-texture: url('/virtual-museum/assets/themes/textures/world-wars-cloth.webp');
+  --transition-outgoing-opacity: 0.19;
+  --transition-incoming-opacity: 0.22;
+}
+.course-stop[data-era-theme='world-wars-to-civil-rights'] {
+  --transition-color-wash: linear-gradient(90deg, rgba(238,225,200,0.94) 0%, rgba(239,226,199,0.93) 36%, rgba(240,228,200,0.93) 68%, rgba(241,229,201,0.95) 100%);
+  --transition-outgoing-texture: url('/virtual-museum/assets/themes/textures/world-wars-cloth.webp');
+  --transition-incoming-texture: url('/virtual-museum/assets/themes/textures/civil-rights-noise.webp');
+  --transition-incoming-size: 420px 420px;
+  --transition-outgoing-opacity: 0.21;
+  --transition-incoming-opacity: 0.16;
+}
+.course-stop[data-era-theme='civil-rights-to-modern-schooling'] {
+  --transition-color-wash: linear-gradient(90deg, rgba(241,229,201,0.95) 0%, rgba(238,229,207,0.94) 36%, rgba(234,229,216,0.94) 68%, rgba(231,229,223,0.96) 100%);
+  --transition-outgoing-texture: url('/virtual-museum/assets/themes/textures/civil-rights-noise.webp');
+  --transition-incoming-texture: url('/virtual-museum/assets/themes/textures/modern-paper.webp');
+  --transition-outgoing-size: 420px 420px;
+  --transition-outgoing-opacity: 0.15;
+  --transition-incoming-opacity: 0.18;
+}
+
