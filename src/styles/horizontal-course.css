@@ -111,6 +111,24 @@
   --era-frame-border-style: solid;
   --era-motion-duration: 180ms;
 
+  /* Approved period-palette specification. These `--pack-*` tokens are the
+     durable design contract. During Pass 2 they are exposed in the preview
+     without replacing the live `--era-*` presentation values; Pass 3 performs
+     that application for the active Colonial and Victorian course stops. */
+  --pack-page: #e8e1d3;
+  --pack-surface: #f4efe6;
+  --pack-surface-raised: #faf7f0;
+  --pack-deep-surface: #365b4b;
+  --pack-text: #292621;
+  --pack-muted: #6f685e;
+  --pack-accent-primary: #365b4b;
+  --pack-accent-secondary: #713b48;
+  --pack-accent-tertiary: #88765f;
+  --pack-accent-hover: #28483b;
+  --pack-border: #88765f;
+  --pack-focus: #3d7ea0;
+  --pack-accent-contrast: #fffaf0;
+
   position: relative;
   flex: 0 0 100vw;
   width: 100vw;
@@ -149,6 +167,19 @@
    named variants; CSS owns all actual presentation values. */
 .course-stop[data-era-theme='course-neutral-introduction'],
 .course-stop[data-era-theme='course-neutral-conclusion'] {
+  --pack-page: #e8e1d3;
+  --pack-surface: #f4efe6;
+  --pack-surface-raised: #faf7f0;
+  --pack-deep-surface: #365b4b;
+  --pack-text: #292621;
+  --pack-muted: #6f685e;
+  --pack-accent-primary: #365b4b;
+  --pack-accent-secondary: #713b48;
+  --pack-accent-tertiary: #88765f;
+  --pack-accent-hover: #28483b;
+  --pack-border: #88765f;
+  --pack-focus: #3d7ea0;
+  --pack-accent-contrast: #fffaf0;
   --era-text: var(--paper);
   --era-muted: #dfcdb2;
   --era-accent: var(--dusty-rose);
@@ -160,6 +191,19 @@
   --era-heading-letter-spacing: 0.01em;
 }
 .course-stop[data-era-theme='colonial-era'] {
+  --pack-page: #e8d9b8;
+  --pack-surface: #f4e9cf;
+  --pack-surface-raised: #fff6df;
+  --pack-deep-surface: #5a3b2a;
+  --pack-text: #262a2d;
+  --pack-muted: #6f665b;
+  --pack-accent-primary: #173b55;
+  --pack-accent-secondary: #91b6c5;
+  --pack-accent-tertiary: #8b7354;
+  --pack-accent-hover: #285a73;
+  --pack-border: #8b7354;
+  --pack-focus: #3d7ea0;
+  --pack-accent-contrast: #fffaf0;
   --era-font-display: 'antiquarian-scribe', 'Snell Roundhand', cursive;
   --era-font-secondary: 'garamond-atf-subhead', 'Adobe Garamond Pro', Garamond, serif;
   --era-font-body: 'adobe-caslon-pro', 'Book Antiqua', Georgia, serif;
@@ -167,17 +211,36 @@
   --era-display-weight: 400;
   --era-secondary-weight: 500;
   --era-heading-letter-spacing: 0.005em;
-  --era-text: var(--ink);
-  --era-muted: var(--muted);
-  --era-accent: var(--burgundy);
-  --era-surface: rgba(245,236,216,0.92);
-  --era-surface-text: var(--ink);
-  --era-border: var(--line);
-  --era-page: #d8c4a4;
-  --era-background-image: radial-gradient(circle at 20% 15%, rgba(255,255,255,0.25) 0 1px, transparent 1.5px), radial-gradient(circle at 75% 42%, rgba(74,48,29,0.13) 0 1px, transparent 1.5px), linear-gradient(96deg, rgba(255,255,255,0.08), transparent 18%, rgba(74,48,29,0.05) 48%, transparent 72%);
+  /* Pass 3 applies the approved Colonial palette to the live course. */
+  --era-text: var(--pack-text);
+  --era-muted: var(--pack-muted);
+  --era-accent: var(--pack-accent-primary);
+  --era-accent-contrast: var(--pack-accent-contrast);
+  --era-surface: var(--pack-surface);
+  --era-surface-text: var(--pack-text);
+  --era-border: var(--pack-border);
+  --era-page: var(--pack-page);
+  --era-background-image:
+    radial-gradient(circle at 18% 14%, rgba(255,255,255,0.3) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 76% 43%, rgba(90,59,42,0.13) 0 1px, transparent 1.5px),
+    linear-gradient(112deg, rgba(145,182,197,0.12), transparent 28%, rgba(255,255,255,0.08) 58%, rgba(90,59,42,0.05));
   --era-background-size: 17px 17px, 23px 23px, 100% 100%;
 }
 .course-stop[data-era-theme='colonial-to-victorian'] {
+  /* Curated threshold tokens: staged persistence and emergence, not averaging. */
+  --pack-page: #ddd3bd;
+  --pack-surface: #eee4d1;
+  --pack-surface-raised: #f8efdd;
+  --pack-deep-surface: #4f4a3d;
+  --pack-text: #292d2b;
+  --pack-muted: #716a5f;
+  --pack-accent-primary: #5f5942;
+  --pack-accent-secondary: #536c59;
+  --pack-accent-tertiary: #89634d;
+  --pack-accent-hover: #485f50;
+  --pack-border: #726c5f;
+  --pack-focus: #557f75;
+  --pack-accent-contrast: #fffaf0;
   --era-font-display: 'garamond-atf-subhead', 'Adobe Garamond Pro', Garamond, serif;
   --era-font-secondary: 'clarendon-text-pro', Rockwell, 'Roboto Slab', serif;
   --era-font-body: 'adobe-caslon-pro', 'Book Antiqua', Georgia, serif;
@@ -195,6 +258,19 @@
   --era-background-image: linear-gradient(90deg, #6e4d32 0%, #5c4433 36%, #3b4b45 72%, #263c35 100%);
 }
 .course-stop[data-era-theme='victorian-era'] {
+  --pack-page: #e7ddc7;
+  --pack-surface: #f1e9d9;
+  --pack-surface-raised: #faf4e8;
+  --pack-deep-surface: #474a46;
+  --pack-text: #292b29;
+  --pack-muted: #756f63;
+  --pack-accent-primary: #98533b;
+  --pack-accent-secondary: #5e704c;
+  --pack-accent-tertiary: #777e7b;
+  --pack-accent-hover: #7f4432;
+  --pack-border: #5a5c56;
+  --pack-focus: #718c59;
+  --pack-accent-contrast: #fffaf0;
   --era-font-display: 'hwt-slab-columbian', 'Roboto Slab', Rockwell, serif;
   --era-font-secondary: 'clarendon-text-pro', Rockwell, 'Roboto Slab', serif;
   --era-font-body: 'clarendon-text-pro', Rockwell, 'Roboto Slab', serif;
@@ -202,45 +278,205 @@
   --era-display-weight: 400;
   --era-secondary-weight: 700;
   --era-label-weight: 900;
-  --era-text: #f3eddd;
-  --era-muted: #d6cdbd;
-  --era-accent: var(--dusty-rose);
-  --era-surface: rgba(245,236,216,0.92);
-  --era-surface-text: var(--ink);
-  --era-border: rgba(255,255,255,0.22);
-  --era-page: #263c35;
-  --era-background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-  --era-background-size: 44px 44px;
+  /* Pass 3 applies the approved Victorian palette to the live course. */
+  --era-text: var(--pack-text);
+  --era-muted: var(--pack-muted);
+  --era-accent: var(--pack-accent-primary);
+  --era-accent-contrast: var(--pack-accent-contrast);
+  --era-surface: var(--pack-surface);
+  --era-surface-text: var(--pack-text);
+  --era-border: var(--pack-border);
+  --era-page: var(--pack-page);
+  --era-background-image:
+    repeating-linear-gradient(0deg, rgba(71,74,70,0.035) 0 1px, transparent 1px 9px),
+    repeating-linear-gradient(90deg, rgba(94,112,76,0.035) 0 1px, transparent 1px 12px),
+    linear-gradient(118deg, rgba(152,83,59,0.07), transparent 34%, rgba(94,112,76,0.08));
+  --era-background-size: auto, auto, 100% 100%;
   --era-heading-letter-spacing: 0.025em;
+}
+
+/* Live palette application for the current Colonial and Victorian stops.
+   These rules translate semantic pack roles into existing shared components
+   without changing their structure or course behavior. */
+.course-stop:is([data-era-theme='colonial-era'], [data-era-theme='victorian-era']) :focus-visible {
+  outline-color: var(--pack-focus);
+}
+.course-stop:is([data-era-theme='colonial-era'], [data-era-theme='victorian-era']) a,
+.course-stop:is([data-era-theme='colonial-era'], [data-era-theme='victorian-era']) .text-button {
+  color: var(--pack-accent-primary);
+}
+.course-stop:is([data-era-theme='colonial-era'], [data-era-theme='victorian-era']) .primary-button {
+  color: var(--pack-accent-contrast);
+  background: var(--pack-accent-primary);
+}
+.course-stop:is([data-era-theme='colonial-era'], [data-era-theme='victorian-era']) .primary-button:hover {
+  background: var(--pack-accent-hover);
+}
+.course-stop:is([data-era-theme='colonial-era'], [data-era-theme='victorian-era']) .secondary-button {
+  color: var(--pack-text);
+  border: 1px solid var(--pack-border);
+  background: var(--pack-surface-raised);
+}
+.course-stop:is([data-era-theme='colonial-era'], [data-era-theme='victorian-era']) .date-marker,
+.course-stop:is([data-era-theme='colonial-era'], [data-era-theme='victorian-era']) .eyebrow,
+.course-stop:is([data-era-theme='colonial-era'], [data-era-theme='victorian-era']) .resource-type {
+  color: var(--pack-accent-primary);
+}
+.course-stop:is([data-era-theme='colonial-era'], [data-era-theme='victorian-era']) .source-stage {
+  border-color: var(--pack-deep-surface);
+  background: var(--pack-surface-raised);
+}
+.course-stop:is([data-era-theme='colonial-era'], [data-era-theme='victorian-era']) :is(.resource-card, .activity-prototype textarea) {
+  color: var(--pack-text);
+  border-color: var(--pack-border);
+  background: var(--pack-surface-raised);
+}
+.course-stop:is([data-era-theme='colonial-era'], [data-era-theme='victorian-era']) :is(.resource-creator, .resource-access) {
+  color: var(--pack-muted);
+}
+.course-stop[data-era-theme='colonial-era'] .era-number {
+  color: rgba(23,59,85,0.18);
+}
+.course-stop[data-era-theme='colonial-era'] .source-stage {
+  box-shadow: 0 14px 28px rgba(38,42,45,0.18);
+}
+.course-stop[data-era-theme='victorian-era'] .era-number {
+  color: rgba(152,83,59,0.2);
+}
+.course-stop[data-era-theme='victorian-era'] .slate-placeholder {
+  border-color: var(--pack-deep-surface);
+  color: var(--pack-surface-raised);
+  background:
+    linear-gradient(rgba(255,255,255,0.025), rgba(255,255,255,0.025)),
+    #3f4d3f;
+}
+.course-stop[data-era-theme='victorian-era'] .next-era-landing > div:last-child {
+  color: var(--pack-text);
 }
 
 .intro-layout { display: grid; grid-template-columns: minmax(480px, 1.3fr) minmax(330px, 0.7fr); gap: 2rem; align-items: start; margin-top: 2rem; }
 .placeholder-video { border: 1px solid rgba(255,255,255,0.26); border-radius: 18px; overflow: hidden; background: rgba(255,255,255,0.08); }
 
-/* Period packs reserved for future modules. Their current visual treatment is
-   intentionally typography-led and provisional; colors, textures, and framing
-   will be designed in later bounded passes. */
-.course-stop[data-era-theme='jim-crow-era'],
-.course-stop[data-era-theme='world-wars-era'] {
+/* Future historical packs are fully rendered in the internal preview but are
+   not yet mapped to live course-era IDs. Their visual rules may therefore be
+   reviewed independently of lesson content and navigation. */
+.course-stop[data-era-theme='jim-crow-era'] {
+  --pack-page: #eeede8;
+  --pack-surface: #f8f7f3;
+  --pack-surface-raised: #fff;
+  --pack-deep-surface: #1e1f1f;
+  --pack-text: #202121;
+  --pack-muted: #676a69;
+  --pack-accent-primary: #3d4142;
+  --pack-accent-secondary: #b7bab8;
+  --pack-accent-tertiary: #672f32;
+  --pack-accent-hover: #292c2d;
+  --pack-border: #242525;
+  --pack-focus: #356d8c;
+  --pack-accent-contrast: #fff;
   --era-font-display: 'century-gothic', Futura, 'Trebuchet MS', sans-serif;
   --era-font-secondary: 'grad', 'Century Schoolbook', Georgia, serif;
   --era-font-body: 'grad', 'Century Schoolbook', Georgia, serif;
   --era-font-label: 'century-gothic', Futura, 'Trebuchet MS', sans-serif;
   --era-display-weight: 700;
   --era-secondary-weight: 600;
-  --era-heading-letter-spacing: 0.015em;
-  --era-text: #262a2b;
-  --era-muted: #5e6567;
-  --era-accent: #5f1830;
-  --era-surface: rgba(248,246,239,0.94);
-  --era-surface-text: #262a2b;
-  --era-border: #8c8f8d;
-  --era-page: #d9d7cf;
-  --era-background-image: linear-gradient(rgba(54,58,57,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(54,58,57,0.035) 1px, transparent 1px);
-  --era-background-size: 28px 28px;
-  --era-frame-radius: 4px;
+  --era-heading-letter-spacing: 0.02em;
+  --era-text: var(--pack-text);
+  --era-muted: var(--pack-muted);
+  --era-accent: var(--pack-accent-primary);
+  --era-accent-contrast: var(--pack-accent-contrast);
+  --era-surface: var(--pack-surface);
+  --era-surface-text: var(--pack-text);
+  --era-border: var(--pack-border);
+  --era-page: var(--pack-page);
+  --era-background-image:
+    linear-gradient(90deg, transparent 0 48.7%, rgba(30,31,31,0.32) 48.7% 51.3%, transparent 51.3%),
+    repeating-linear-gradient(0deg, rgba(32,33,33,0.035) 0 1px, transparent 1px 7px);
+  --era-background-size: 100% 100%, 100% 7px;
+  --era-frame-radius: 0;
+  --era-frame-border-width: 2px;
 }
+.course-stop[data-era-theme='jim-crow-era'] .theme-preview-grid {
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  border: 2px solid var(--pack-border);
+  background: var(--pack-border);
+}
+.course-stop[data-era-theme='jim-crow-era'] .theme-preview-card {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.course-stop[data-era-theme='jim-crow-era'] .theme-preview-card + .theme-preview-card {
+  border-left: 2px solid var(--pack-border);
+}
+.course-stop[data-era-theme='jim-crow-era'] .resource-type,
+.course-stop[data-era-theme='jim-crow-era'] .date-marker { color: var(--pack-accent-tertiary); }
+
+.course-stop[data-era-theme='world-wars-era'] {
+  --pack-page: #eee1c8;
+  --pack-surface: #f5ead4;
+  --pack-surface-raised: #fff4df;
+  --pack-deep-surface: #344d5d;
+  --pack-text: #29343a;
+  --pack-muted: #756f66;
+  --pack-accent-primary: #547a91;
+  --pack-accent-secondary: #a94e4b;
+  --pack-accent-tertiary: #657552;
+  --pack-accent-hover: #41677e;
+  --pack-border: #4a616d;
+  --pack-focus: #376e91;
+  --pack-accent-contrast: #fffaf0;
+  --era-font-display: 'century-gothic', Futura, 'Trebuchet MS', sans-serif;
+  --era-font-secondary: 'grad', 'Century Schoolbook', Georgia, serif;
+  --era-font-body: 'grad', 'Century Schoolbook', Georgia, serif;
+  --era-font-label: 'century-gothic', Futura, 'Trebuchet MS', sans-serif;
+  --era-display-weight: 700;
+  --era-secondary-weight: 600;
+  --era-heading-letter-spacing: 0.025em;
+  --era-text: var(--pack-text);
+  --era-muted: var(--pack-muted);
+  --era-accent: var(--pack-accent-primary);
+  --era-accent-contrast: var(--pack-accent-contrast);
+  --era-surface: var(--pack-surface);
+  --era-surface-text: var(--pack-text);
+  --era-border: var(--pack-border);
+  --era-page: var(--pack-page);
+  --era-background-image:
+    radial-gradient(circle at 14% 18%, rgba(101,117,82,0.16) 0 2px, transparent 2.5px),
+    repeating-linear-gradient(-4deg, rgba(52,77,93,0.028) 0 1px, transparent 1px 8px),
+    linear-gradient(128deg, rgba(84,122,145,0.14), transparent 42%, rgba(169,78,75,0.08));
+  --era-background-size: 34px 34px, 100% 8px, 100% 100%;
+  --era-frame-radius: 2px;
+  --era-frame-border-width: 2px;
+}
+.course-stop[data-era-theme='world-wars-era'] .theme-preview-card {
+  box-shadow: 5px 5px 0 rgba(52,77,93,0.14);
+}
+.course-stop[data-era-theme='world-wars-era'] .theme-preview-card:nth-child(2) {
+  border-color: var(--pack-accent-secondary);
+}
+.course-stop[data-era-theme='world-wars-era'] .resource-type { color: var(--pack-accent-secondary); }
+.course-stop[data-era-theme='world-wars-era'] .theme-preview-media > div {
+  border-color: var(--pack-deep-surface);
+  background: linear-gradient(145deg, rgba(84,122,145,0.28), rgba(169,78,75,0.18)), var(--pack-surface-raised);
+}
+
 .course-stop[data-era-theme='civil-rights-era'] {
+  --pack-page: #f1e5c9;
+  --pack-surface: #f8efd9;
+  --pack-surface-raised: #fff7e5;
+  --pack-deep-surface: #263c68;
+  --pack-text: #202a3a;
+  --pack-muted: #6e685f;
+  --pack-accent-primary: #d86a32;
+  --pack-accent-secondary: #2b8c88;
+  --pack-accent-tertiary: #d6a62f;
+  --pack-accent-hover: #b95025;
+  --pack-border: #334a72;
+  --pack-focus: #167da3;
+  --pack-accent-contrast: #fffaf0;
+  --pack-accent-additional: #a94769;
   --era-font-display: 'goodland-variable', 'Cooper Black', Georgia, serif;
   --era-font-secondary: 'goodland-variable', 'Cooper Black', Georgia, serif;
   --era-font-body: 'news-gothic-std', 'Franklin Gothic Medium', Arial, sans-serif;
@@ -248,35 +484,91 @@
   --era-display-weight: 650;
   --era-secondary-weight: 600;
   --era-heading-letter-spacing: 0.01em;
-  --era-text: #28251f;
-  --era-muted: #686054;
-  --era-accent: #874229;
-  --era-surface: rgba(248,239,213,0.94);
-  --era-surface-text: #28251f;
-  --era-border: #8d765c;
-  --era-page: #c9b875;
-  --era-background-image: radial-gradient(circle at 16% 22%, rgba(255,255,255,0.18) 0 2px, transparent 2.5px), linear-gradient(135deg, rgba(129,66,42,0.08), transparent 55%);
-  --era-background-size: 26px 26px, 100% 100%;
-  --era-frame-radius: 10px;
+  --era-text: var(--pack-text);
+  --era-muted: var(--pack-muted);
+  --era-accent: var(--pack-accent-primary);
+  --era-accent-contrast: var(--pack-accent-contrast);
+  --era-surface: var(--pack-surface);
+  --era-surface-text: var(--pack-text);
+  --era-border: var(--pack-border);
+  --era-page: var(--pack-page);
+  --era-background-image:
+    radial-gradient(circle at 13% 21%, rgba(38,60,104,0.11) 0 2px, transparent 2.8px),
+    linear-gradient(118deg, rgba(216,106,50,0.18) 0 13%, transparent 13% 70%, rgba(43,140,136,0.17) 70% 82%, transparent 82%),
+    linear-gradient(28deg, transparent 0 78%, rgba(214,166,47,0.18) 78% 88%, transparent 88%);
+  --era-background-size: 22px 22px, 100% 100%, 100% 100%;
+  --era-frame-radius: 6px;
+  --era-frame-border-width: 3px;
 }
+.course-stop[data-era-theme='civil-rights-era'] .stop-heading h2 {
+  max-width: 850px;
+  color: var(--pack-deep-surface);
+  text-shadow: 3px 3px 0 rgba(214,166,47,0.35);
+}
+.course-stop[data-era-theme='civil-rights-era'] .theme-preview-card:nth-child(1) { transform: rotate(-0.45deg); }
+.course-stop[data-era-theme='civil-rights-era'] .theme-preview-card:nth-child(2) { transform: rotate(0.4deg); border-color: var(--pack-accent-secondary); }
+.course-stop[data-era-theme='civil-rights-era'] .theme-preview-card:nth-child(3) { border-color: var(--pack-accent-additional); }
+.course-stop[data-era-theme='civil-rights-era'] .resource-type { color: var(--pack-accent-additional); }
+.course-stop[data-era-theme='civil-rights-era'] .primary-button { background: var(--pack-accent-primary); }
+.course-stop[data-era-theme='civil-rights-era'] .theme-preview-media > div {
+  border-color: var(--pack-deep-surface);
+  background: repeating-radial-gradient(circle, rgba(38,60,104,0.18) 0 1px, transparent 1px 4px), var(--pack-accent-tertiary);
+}
+
 .course-stop[data-era-theme='modern-schooling-era'] {
+  --pack-page: #e7e5df;
+  --pack-surface: #f2f0e8;
+  --pack-surface-raised: #faf9f4;
+  --pack-deep-surface: #244b50;
+  --pack-text: #262b2d;
+  --pack-muted: #687074;
+  --pack-accent-primary: #287b7a;
+  --pack-accent-secondary: #64527d;
+  --pack-accent-tertiary: #d96862;
+  --pack-accent-hover: #1f6564;
+  --pack-border: #60747b;
+  --pack-focus: #2587a2;
+  --pack-accent-contrast: #fff;
+  --pack-accent-additional: #73aaa6;
   --era-font-display: 'centrifuge', Impact, sans-serif;
   --era-font-secondary: 'aktiv-grotesk', 'Helvetica Neue', Arial, sans-serif;
   --era-font-body: 'aktiv-grotesk', 'Helvetica Neue', Arial, sans-serif;
   --era-font-label: 'centrifuge', Impact, sans-serif;
   --era-display-weight: 400;
   --era-secondary-weight: 600;
-  --era-heading-letter-spacing: 0.04em;
+  --era-heading-letter-spacing: 0.045em;
   --era-heading-transform: uppercase;
-  --era-text: #20272c;
-  --era-muted: #5a666d;
-  --era-accent: #31585a;
-  --era-surface: rgba(248,250,249,0.95);
-  --era-surface-text: #20272c;
-  --era-border: #819096;
-  --era-page: #d8dfe0;
-  --era-background-image: linear-gradient(120deg, rgba(49,88,90,0.07), transparent 52%), linear-gradient(rgba(255,255,255,0.35), rgba(255,255,255,0.08));
+  --era-text: var(--pack-text);
+  --era-muted: var(--pack-muted);
+  --era-accent: var(--pack-accent-primary);
+  --era-accent-contrast: var(--pack-accent-contrast);
+  --era-surface: var(--pack-surface);
+  --era-surface-text: var(--pack-text);
+  --era-border: var(--pack-border);
+  --era-page: var(--pack-page);
+  --era-background-image:
+    linear-gradient(90deg, rgba(36,75,80,0.09) 1px, transparent 1px),
+    linear-gradient(rgba(36,75,80,0.07) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(100,82,125,0.12), transparent 42%, rgba(115,170,166,0.14));
+  --era-background-size: 44px 44px, 44px 44px, 100% 100%;
   --era-frame-radius: 2px;
+  --era-frame-border-width: 2px;
+}
+.course-stop[data-era-theme='modern-schooling-era'] .theme-preview-card {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 8px 8px 0 rgba(36,75,80,0.12);
+}
+.course-stop[data-era-theme='modern-schooling-era'] .theme-preview-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 8px;
+  background: linear-gradient(var(--pack-accent-secondary), var(--pack-accent-tertiary), var(--pack-accent-additional));
+}
+.course-stop[data-era-theme='modern-schooling-era'] .theme-preview-media > div {
+  border-color: var(--pack-deep-surface);
+  background: linear-gradient(135deg, rgba(40,123,122,0.26), rgba(100,82,125,0.22)), #d8d4c7;
 }
 
 .placeholder-video-screen { min-height: 310px; display: grid; place-items: center; align-content: center; gap: 0.7rem; padding: 2rem; color: inherit; text-align: center; background: radial-gradient(circle at center, rgba(255,255,255,0.12), transparent 55%), rgba(0,0,0,0.16); }
@@ -384,6 +676,19 @@ kbd { padding: 0.12rem 0.35rem; border: 1px solid currentColor; border-radius: 4
 .theme-preview-card textarea { box-sizing: border-box; width: 100%; min-height: 120px; padding: 0.75rem; border: 1px solid var(--era-border); border-radius: 8px; font: inherit; }
 .theme-preview-media > div { min-height: 190px; display: grid; place-items: center; border: 8px solid var(--wood-mid); background: rgba(0,0,0,0.1); }
 .theme-preview-metadata { display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; padding: 1rem 2rem; border-top: 1px solid var(--line); background: var(--paper); }
+.theme-preview-palette { margin-top: 1.4rem; padding: 1.25rem; border: 1px solid var(--pack-border); border-radius: 14px; color: var(--pack-text); background: var(--pack-surface); }
+.theme-preview-palette h3 { margin: 0 0 0.35rem; }
+.theme-preview-palette > p { margin: 0 0 1rem; color: var(--pack-muted); }
+.theme-preview-swatches { display: grid; grid-template-columns: repeat(6, minmax(110px, 1fr)); gap: 0.8rem; }
+.theme-preview-swatch { min-width: 0; overflow: hidden; border: 1px solid var(--pack-border); border-radius: 8px; background: var(--pack-surface-raised); }
+.theme-preview-swatch-color { min-height: 72px; border-bottom: 1px solid var(--pack-border); background: var(--swatch-color); }
+.theme-preview-swatch-label { display: grid; gap: 0.12rem; padding: 0.6rem; color: var(--pack-text); font-family: var(--era-font-ui); font-size: 0.78rem; line-height: 1.25; }
+.theme-preview-swatch-label strong { font-size: 0.8rem; }
+.theme-preview-swatch-label code { color: var(--pack-muted); font-size: 0.7rem; overflow-wrap: anywhere; }
+.theme-preview-cues { margin-top: 1rem; padding: 1rem 1.25rem; border-left: 6px solid var(--era-accent); color: var(--era-surface-text); background: var(--era-surface); }
+.theme-preview-cues h3 { margin: 0 0 0.55rem; font-family: var(--era-font-secondary); }
+.theme-preview-cues ul { display: flex; flex-wrap: wrap; gap: 0.45rem 1.5rem; margin: 0; padding-left: 1.15rem; }
+.theme-preview-cues li { color: var(--era-muted); }
 
 @media (prefers-reduced-motion: reduce) {
   .timeline-track span { transition: none; }
@@ -393,6 +698,7 @@ kbd { padding: 0.12rem 0.35rem; border: 1px solid currentColor; border-radius: 4
 @media (max-width: 1100px) {
   .course-stop { min-width: 900px; }
   .resource-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .theme-preview-swatches { grid-template-columns: repeat(3, minmax(110px, 1fr)); }
   .course-timeline { grid-template-columns: repeat(8, 125px); overflow-x: auto; }
 }
 

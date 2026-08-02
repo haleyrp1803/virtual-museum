@@ -2,14 +2,14 @@
 
 ## Status and role
 
-Current implementation checkpoint at the start of this design-system sequence:
+Current synchronized checkpoint at the start of the accepted theme-design sequence:
 
 ```text
-1f1e7cd — Add era theme foundation and preview
+bde9bfe — Add historical theme taxonomy typography and design preview
 Branch: main
 ```
 
-The local working tree also includes the accepted Adobe typography and period-preview checkpoints that follow `1f1e7cd` and have not yet been committed. This document is the authoritative design-direction record for reusable historical design packs: typography, color roles, texture, layout character, transitions, asset provenance, and deferred continuity work.
+This document is the authoritative design-direction record for reusable historical design packs: typography, color roles, texture, layout character, transitions, asset provenance, and deferred continuity work.
 
 Pedagogical reasons for historical transitions remain in `core_documentation/LESSON_DESIGN_AND_TEACHING_GUIDE.md`. Current technical architecture remains in `core_documentation/MAINTAINERS_GUIDE.md`. Full core-document synchronization is reserved for Pass 8 of the theme implementation sequence.
 
@@ -42,6 +42,12 @@ Each historical pack should communicate interpretation through a coordinated sys
 - motion and transition rhythm.
 
 Visual differences must carry pedagogical meaning rather than operate as decorative theme changes. The same component vocabulary should remain recognizable across the course, while each period changes how that vocabulary looks and feels.
+
+## Palette implementation contract
+
+Pass 2 defined each approved palette through durable `--pack-*` semantic tokens for page, surface, raised surface, deep surface, text, muted text, primary/secondary/tertiary accents, hover, border, focus, and accent contrast. The internal preview exposes every role as a labeled swatch.
+
+Pass 3 maps the approved Colonial and Victorian pack roles onto the active learner-facing vertical slice. Shared components retain their structure and behavior while their page, text, surface, border, accent, focus, button, source-frame, and supporting-card treatments now consume the approved semantic values. Jim Crow, World Wars, Civil Rights, and Modern schooling now have complete preview-only packs; live-course use remains deferred until corresponding lesson modules exist.
 
 ## Course-neutral framing
 
@@ -458,13 +464,15 @@ Adobe-hosted fonts create third-party requests to Adobe’s font network. Public
 
 ## Pass 3 — Live Colonial and Victorian packs
 
-- Apply Colonial to the current Early America material.
-- Apply Victorian to the current Common School landing.
-- Preserve navigation, notebook behavior, and viewport containment.
+- Applied the approved Colonial palette to the current Early America and Further Study material.
+- Applied the approved Victorian palette to the current Common School landing.
+- Mapped shared page, surface, text, muted, accent, border, focus, button, source-frame, and supporting-card roles without changing component structure.
+- Preserved navigation, notebook behavior, and viewport containment.
+- Left the active Colonial → Victorian transition unchanged for the dedicated transition architecture in Pass 5.
 
-## Pass 4 — Future era preview packs
+## Pass 4 — Future era preview packs (implemented)
 
-- Add preview-only implementations for Jim Crow, World Wars, Civil Rights, and Modern schooling.
+- Implemented preview-only packs for Jim Crow, World Wars, Civil Rights, and Modern schooling, including approved palettes, provisional typography, generated material cues, framing, and layout character.
 
 ## Pass 5 — Transition packs
 

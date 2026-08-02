@@ -10,6 +10,21 @@
 import { useState } from 'react'
 import { DESIGN_PACKS } from '../data/eraThemes.js'
 
+const PALETTE_ROLES = [
+  ['Page', '--pack-page'],
+  ['Surface', '--pack-surface'],
+  ['Raised surface', '--pack-surface-raised'],
+  ['Deep surface', '--pack-deep-surface'],
+  ['Text', '--pack-text'],
+  ['Muted text', '--pack-muted'],
+  ['Primary accent', '--pack-accent-primary'],
+  ['Secondary accent', '--pack-accent-secondary'],
+  ['Tertiary accent', '--pack-accent-tertiary'],
+  ['Accent hover', '--pack-accent-hover'],
+  ['Border', '--pack-border'],
+  ['Focus', '--pack-focus'],
+]
+
 export default function ThemePreview() {
   const [selectedId, setSelectedId] = useState(DESIGN_PACKS[0].id)
   const theme = DESIGN_PACKS.find((item) => item.id === selectedId) ?? DESIGN_PACKS[0]
@@ -70,6 +85,31 @@ export default function ThemePreview() {
               <p><a href="#theme-preview-title">Example text link</a></p>
             </article>
           </div>
+
+          <section className="theme-preview-palette" aria-labelledby="theme-preview-palette-title">
+            <h3 id="theme-preview-palette-title">Approved semantic palette</h3>
+            <p>These tokens define the approved palette. Future-era packs are fully staged here while remaining disconnected from live course content.</p>
+            <div className="theme-preview-swatches">
+              {PALETTE_ROLES.map(([label, variable]) => (
+                <div className="theme-preview-swatch" key={variable}>
+                  <div className="theme-preview-swatch-color" style={{ '--swatch-color': `var(${variable})` }} />
+                  <div className="theme-preview-swatch-label">
+                    <strong>{label}</strong>
+                    <code>{variable}</code>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {theme.designCues && (
+            <section className="theme-preview-cues" aria-labelledby="theme-preview-cues-title">
+              <h3 id="theme-preview-cues-title">Design cues</h3>
+              <ul>
+                {theme.designCues.map((cue) => <li key={cue}>{cue}</li>)}
+              </ul>
+            </section>
+          )}
         </div>
       </section>
 

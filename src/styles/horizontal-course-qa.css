@@ -18,6 +18,7 @@
 .eyebrow { color: var(--burgundy); }
 .course-stop[data-era-theme='course-neutral-introduction'] .eyebrow,
 .course-stop[data-era-theme='course-neutral-conclusion'] .eyebrow,
+.course-stop[data-era-theme='colonial-era'] .eyebrow,
 .course-stop[data-era-theme='colonial-to-victorian'] .eyebrow,
 .course-stop[data-era-theme='victorian-era'] .eyebrow { color: var(--era-accent); }
 

@@ -29,7 +29,7 @@ export const DESIGN_PACKS = [
     label: '18th century / Colonial era',
     periodLabel: 'Colonial America and the eighteenth-century Atlantic world',
     purpose: 'Domestic learning, coastal trade, ocean travel, revolution, parchment, wood, and iron-gall ink.',
-    status: 'active typography; color design approved',
+    status: 'active typography and approved live palette',
     transitionFamily: 'domestic-atlantic',
     variants: { heading: 'manuscript', surface: 'warm-paper', frame: 'domestic' },
     typography: {
@@ -44,7 +44,7 @@ export const DESIGN_PACKS = [
     label: 'Pre–Civil War 19th century / Victorian era',
     periodLabel: 'Industrial expansion, agricultural systems, and common schooling',
     purpose: 'Industrial metal and rust meet cotton linen, cotton-leaf greens, wood type, and increasing institutional order.',
-    status: 'active typography; color design approved',
+    status: 'active typography and approved live palette',
     transitionFamily: 'industrial-agricultural',
     variants: { heading: 'institutional', surface: 'slate-grid', frame: 'regular' },
     typography: {
@@ -60,7 +60,8 @@ export const DESIGN_PACKS = [
     label: 'Post–Civil War 19th century / Jim Crow era',
     periodLabel: 'Reconstruction, segregation, and imposed division',
     purpose: 'Stark contrast, divided structures, restricted greyscale, institutional forms, and visual hierarchy without decorative spectacle.',
-    status: 'design direction approved; typography provisional',
+    status: 'preview pack active; typography provisional; live course use deferred',
+    designCues: ['hard partitions', 'greyscale institutional paper', 'restricted oxblood emphasis', 'deliberate visual separation'],
     transitionFamily: 'divided-institutional',
     variants: { heading: 'divided', surface: 'institutional-paper', frame: 'partitioned' },
     typography: {
@@ -75,7 +76,8 @@ export const DESIGN_PACKS = [
     label: 'Early 20th century / World Wars era',
     periodLabel: 'World wars, home-front mobilization, and civic schooling',
     purpose: 'Faded patriotic print, victory gardens, wartime classrooms, practical optimism, and public-information design.',
-    status: 'design direction approved; typography provisional',
+    status: 'preview pack active; typography provisional; live course use deferred',
+    designCues: ['faded civic poster color', 'victory-garden greens', 'ration-card paper', 'stamped public-information structure'],
     transitionFamily: 'civic-mobilization',
     variants: { heading: 'poster', surface: 'poster-paper', frame: 'mobilized' },
     typography: {
@@ -90,7 +92,8 @@ export const DESIGN_PACKS = [
     label: '1960s–1970s / Civil Rights era',
     periodLabel: 'Civil rights, reform, activism, and cultural change',
     purpose: 'Bold public color, movement print, community organizing, strong contrast, and hopeful energy without implying inevitable progress.',
-    status: 'typography candidate; color design approved',
+    status: 'preview pack active; typography provisional; live course use deferred',
+    designCues: ['screen-print color', 'community-flyer layering', 'bold geometric blocks', 'halftone energy'],
     transitionFamily: 'movement-print',
     variants: { heading: 'vernacular', surface: 'editorial-paper', frame: 'poster' },
     typography: {
@@ -105,7 +108,8 @@ export const DESIGN_PACKS = [
     label: '1980–present / Modern schooling era',
     periodLabel: 'Universities, computer labs, educational technology, and contemporary institutions',
     purpose: 'Late twentieth-century campus design, early digital systems, geometric branding, and restrained 1980s–1990s visual language.',
-    status: 'typography candidate; color design approved',
+    status: 'preview pack active; typography provisional; live course use deferred',
+    designCues: ['campus wayfinding', 'computer beige and laminate', 'geometric institutional branding', 'restrained 1980s–1990s forms'],
     transitionFamily: 'late-modern-institutional',
     variants: { heading: 'faceted', surface: 'technical-paper', frame: 'contemporary' },
     typography: {
@@ -120,7 +124,7 @@ export const DESIGN_PACKS = [
     label: 'Course-neutral / Conclusion',
     periodLabel: 'Course-wide synthesis facing toward the present',
     purpose: 'Echoes the introduction while allowing restrained traces of the historical design systems without implying finality.',
-    status: 'design direction approved; implementation deferred',
+    status: 'approved palette tokens defined; implementation deferred',
     transitionFamily: 'scholarly-synthesis',
     variants: { heading: 'scholarly', surface: 'dark-panel', frame: 'restrained' },
     typography: {
