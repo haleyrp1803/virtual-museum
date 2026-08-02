@@ -491,6 +491,12 @@ Adobe-hosted fonts create third-party requests to Adobe’s font network. Public
 
 ## Pass 6 — Design-system QA
 
+### Navigation symmetry and card alignment
+
+- Historical material cues must not depend on physically tilted content cards. Cards remain level across live and preview packs; texture, borders, offsets, and shadows carry period character instead.
+- The persistent Previous and Next controls use the same visual treatment so directional hierarchy is conveyed by position and labels rather than unequal button emphasis.
+
+
 - Audit contrast, font-role clarity, heading overflow, density, spacing, hierarchy, texture interference, reduced motion, forced colors, and preview/live consistency.
 
 ## Pass 7 — Historical texture and background assets
@@ -501,3 +507,37 @@ Adobe-hosted fonts create third-party requests to Adobe’s font network. Public
 ## Pass 8 — Full core-documentation refresh
 
 Synchronize the root README, all four core documents, and this design specification. Update the synchronized checkpoint, architecture ownership, active backlog, Adobe disclosure, deferred fallback task, accepted design packs, and transition architecture.
+
+## Pass 6 Design-System QA Record
+
+Pass 6 audited every era and transition pack for normal-text contrast, functional accent use, preview containment, reduced-motion behavior, increased-contrast presentation, and Windows forced-colors compatibility.
+
+### Accessible functional color roles
+
+The approved historical palettes retain their expressive accent colors, but two additional semantic roles now distinguish decoration from interface meaning:
+
+- `--pack-accent-text`: a palette-related color that reaches readable contrast when used for links, labels, dates, and other normal-sized text;
+- `--pack-action-bg`: a sufficiently dark palette-related background for primary actions paired with `--pack-accent-contrast`.
+
+This distinction is especially important for the Civil Rights, World Wars, and Modern schooling packs, whose brighter expressive accents are appropriate for blocks, borders, poster fields, and ornament but are not consistently dark enough for small text or white button labels.
+
+Muted-text values were modestly deepened where necessary so normal-sized muted copy remains readable on both page and surface colors. The Civil Rights magenta was also deepened slightly because it carries a text-label role in the preview. These are accessibility corrections within the approved palette families, not changes to the historical design direction.
+
+### Layout and typography safeguards
+
+- Preview cards shift from three columns to two and then one as available desktop width narrows.
+- Transition logic shifts from four columns to two and then one, preventing compressed lists and heading overflow.
+- Palette swatches reduce from six columns to four and then two.
+- Toolbar controls wrap rather than colliding with the selected-period label.
+- Existing font stacks remain unchanged; the QA pass does not replace the approved or provisional families.
+
+### Motion and contrast modes
+
+- Reduced-motion mode removes decorative card rotations and effectively disables preview transitions and animations.
+- Increased-contrast mode suppresses texture fields and shadows, strengthens borders, and promotes secondary copy to the primary text color.
+- Forced-colors mode removes decorative pseudo-elements, filters, textures, and shadows; restores system colors; preserves visible borders; and gives controls and focus indicators explicit system-color treatment.
+
+### Pass 6 outcome
+
+The QA pass changes no course data, learner workspace behavior, notebook architecture, or historical content. Colonial, Victorian, and the active Colonial-to-Victorian transition remain the only design packs mapped to the live vertical slice. Later packs and transitions remain preview-only.
+

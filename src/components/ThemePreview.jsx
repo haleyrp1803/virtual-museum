@@ -21,6 +21,8 @@ const PALETTE_ROLES = [
   ['Secondary accent', '--pack-accent-secondary'],
   ['Tertiary accent', '--pack-accent-tertiary'],
   ['Accent hover', '--pack-accent-hover'],
+  ['Accessible accent text', '--pack-accent-text'],
+  ['Accessible action background', '--pack-action-bg'],
   ['Border', '--pack-border'],
   ['Focus', '--pack-focus'],
 ]
@@ -88,7 +90,7 @@ export default function ThemePreview() {
 
           <section className="theme-preview-palette" aria-labelledby="theme-preview-palette-title">
             <h3 id="theme-preview-palette-title">Approved semantic palette</h3>
-            <p>These tokens define the approved palette. Future-era packs are fully staged here while remaining disconnected from live course content.</p>
+            <p>These tokens define the approved palette and its accessible functional roles. Decorative accents remain distinct from colors used for text and primary actions.</p>
             <div className="theme-preview-swatches">
               {PALETTE_ROLES.map(([label, variable]) => (
                 <div className="theme-preview-swatch" key={variable}>

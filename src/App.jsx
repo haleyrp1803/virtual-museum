@@ -194,7 +194,7 @@ export default function App() {
       </main>
 
       <nav className="course-navigation" aria-label="Course timeline and movement controls">
-        <button type="button" onClick={() => scrollToStop(activeStopIndex - 1)} disabled={activeStopIndex === 0}>← Previous</button>
+        <button className="primary-button" type="button" onClick={() => scrollToStop(activeStopIndex - 1)} disabled={activeStopIndex === 0}>← Previous</button>
         <div className="bottom-timeline">
           <div className="timeline-track" aria-hidden="true"><span style={{ width: `${(activeStopIndex / (courseStops.length - 1)) * 100}%` }} /></div>
           {timelineSegments.map((segment) => {
