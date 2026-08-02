@@ -227,7 +227,7 @@
   --era-background-size: 17px 17px, 23px 23px, 100% 100%;
 }
 .course-stop[data-era-theme='colonial-to-victorian'] {
-  /* Curated threshold tokens: staged persistence and emergence, not averaging. */
+  /* Curated threshold: Colonial materials persist while Victorian order arrives. */
   --pack-page: #ddd3bd;
   --pack-surface: #eee4d1;
   --pack-surface-raised: #f8efdd;
@@ -248,14 +248,22 @@
   --era-display-weight: 500;
   --era-secondary-weight: 700;
   --era-label-weight: 900;
-  --era-text: var(--paper);
-  --era-muted: #e4d4bd;
-  --era-accent: var(--dusty-rose);
-  --era-surface: rgba(245,236,216,0.14);
-  --era-surface-text: var(--paper);
-  --era-border: rgba(255,255,255,0.25);
-  --era-page: #5c4433;
-  --era-background-image: linear-gradient(90deg, #6e4d32 0%, #5c4433 36%, #3b4b45 72%, #263c35 100%);
+  --era-text: var(--pack-text);
+  --era-muted: var(--pack-muted);
+  --era-accent: var(--pack-accent-primary);
+  --era-accent-contrast: var(--pack-accent-contrast);
+  --era-surface: rgba(248,239,221,0.88);
+  --era-surface-text: var(--pack-text);
+  --era-border: var(--pack-border);
+  --era-page: var(--pack-page);
+  --era-background-image:
+    repeating-linear-gradient(90deg, transparent 0 31px, rgba(83,108,89,0.06) 31px 32px),
+    linear-gradient(112deg, rgba(145,182,197,0.16) 0 24%, transparent 46%),
+    linear-gradient(90deg, rgba(232,217,184,0.55), rgba(221,211,189,0.72) 48%, rgba(231,221,199,0.74));
+  --era-background-size: auto, 100% 100%, 100% 100%;
+  --era-frame-radius: 8px;
+  --era-frame-border-width: 2px;
+  --era-heading-letter-spacing: 0.018em;
 }
 .course-stop[data-era-theme='victorian-era'] {
   --pack-page: #e7ddc7;
@@ -356,6 +364,235 @@
 
 .intro-layout { display: grid; grid-template-columns: minmax(480px, 1.3fr) minmax(330px, 0.7fr); gap: 2rem; align-items: start; margin-top: 2rem; }
 .placeholder-video { border: 1px solid rgba(255,255,255,0.26); border-radius: 18px; overflow: hidden; background: rgba(255,255,255,0.08); }
+
+
+/* Historical transition packs. Each threshold makes persistence, recession,
+   emergence, and structural change visible; none is a flat palette average. */
+.course-stop[data-era-theme='victorian-to-jim-crow'] {
+  --pack-page: #dedbd2;
+  --pack-surface: #efede6;
+  --pack-surface-raised: #f9f8f4;
+  --pack-deep-surface: #303231;
+  --pack-text: #252726;
+  --pack-muted: #6d6c67;
+  --pack-accent-primary: #555653;
+  --pack-accent-secondary: #8c8276;
+  --pack-accent-tertiary: #6d3938;
+  --pack-accent-hover: #3f4140;
+  --pack-border: #494a47;
+  --pack-focus: #416f88;
+  --pack-accent-contrast: #fff;
+  --era-font-display: 'hwt-slab-columbian', 'Roboto Slab', Rockwell, serif;
+  --era-font-secondary: 'clarendon-text-pro', Rockwell, 'Roboto Slab', serif;
+  --era-font-body: 'clarendon-text-pro', Rockwell, 'Roboto Slab', serif;
+  --era-font-label: 'century-gothic', Futura, 'Trebuchet MS', sans-serif;
+  --era-display-weight: 400;
+  --era-secondary-weight: 700;
+  --era-label-weight: 700;
+  --era-text: var(--pack-text);
+  --era-muted: var(--pack-muted);
+  --era-accent: var(--pack-accent-primary);
+  --era-accent-contrast: var(--pack-accent-contrast);
+  --era-surface: var(--pack-surface);
+  --era-surface-text: var(--pack-text);
+  --era-border: var(--pack-border);
+  --era-page: var(--pack-page);
+  --era-background-image:
+    linear-gradient(90deg, rgba(152,83,59,0.09) 0 18%, transparent 36%),
+    linear-gradient(90deg, transparent 0 56%, rgba(36,37,37,0.25) 56% 58%, transparent 58%),
+    repeating-linear-gradient(0deg, rgba(36,37,37,0.035) 0 1px, transparent 1px 9px);
+  --era-background-size: 100% 100%, 100% 100%, 100% 9px;
+  --era-frame-radius: 2px;
+  --era-frame-border-width: 2px;
+  --era-heading-letter-spacing: 0.025em;
+}
+
+.course-stop[data-era-theme='jim-crow-to-world-wars'] {
+  --pack-page: #e8e3d7;
+  --pack-surface: #f3eee2;
+  --pack-surface-raised: #fbf6e9;
+  --pack-deep-surface: #3d4b52;
+  --pack-text: #293033;
+  --pack-muted: #706e68;
+  --pack-accent-primary: #536f7c;
+  --pack-accent-secondary: #8c5652;
+  --pack-accent-tertiary: #65705b;
+  --pack-accent-hover: #405e6c;
+  --pack-border: #555c5e;
+  --pack-focus: #376e91;
+  --pack-accent-contrast: #fffaf0;
+  --era-font-display: 'century-gothic', Futura, 'Trebuchet MS', sans-serif;
+  --era-font-secondary: 'grad', 'Century Schoolbook', Georgia, serif;
+  --era-font-body: 'grad', 'Century Schoolbook', Georgia, serif;
+  --era-font-label: 'century-gothic', Futura, 'Trebuchet MS', sans-serif;
+  --era-display-weight: 700;
+  --era-secondary-weight: 600;
+  --era-label-weight: 700;
+  --era-text: var(--pack-text);
+  --era-muted: var(--pack-muted);
+  --era-accent: var(--pack-accent-primary);
+  --era-accent-contrast: var(--pack-accent-contrast);
+  --era-surface: var(--pack-surface);
+  --era-surface-text: var(--pack-text);
+  --era-border: var(--pack-border);
+  --era-page: var(--pack-page);
+  --era-background-image:
+    linear-gradient(90deg, rgba(30,31,31,0.12) 0 24%, transparent 43%),
+    radial-gradient(circle at 72% 18%, rgba(169,78,75,0.12) 0 3px, transparent 3.5px),
+    repeating-linear-gradient(-4deg, rgba(52,77,93,0.026) 0 1px, transparent 1px 8px),
+    linear-gradient(120deg, transparent 45%, rgba(84,122,145,0.13));
+  --era-background-size: 100% 100%, 24px 24px, 100% 8px, 100% 100%;
+  --era-frame-radius: 4px;
+  --era-frame-border-width: 2px;
+  --era-heading-letter-spacing: 0.025em;
+}
+
+.course-stop[data-era-theme='world-wars-to-civil-rights'] {
+  --pack-page: #efe1c6;
+  --pack-surface: #f7ead0;
+  --pack-surface-raised: #fff1d5;
+  --pack-deep-surface: #30465f;
+  --pack-text: #27303b;
+  --pack-muted: #716a61;
+  --pack-accent-primary: #b9633d;
+  --pack-accent-secondary: #397e7c;
+  --pack-accent-tertiary: #b18d38;
+  --pack-accent-hover: #9c4d31;
+  --pack-border: #4c5d68;
+  --pack-focus: #167da3;
+  --pack-accent-contrast: #fffaf0;
+  --era-font-display: 'goodland-variable', 'Cooper Black', Georgia, serif;
+  --era-font-secondary: 'goodland-variable', 'Cooper Black', Georgia, serif;
+  --era-font-body: 'news-gothic-std', 'Franklin Gothic Medium', Arial, sans-serif;
+  --era-font-label: 'news-gothic-std', 'Franklin Gothic Medium', Arial, sans-serif;
+  --era-display-weight: 650;
+  --era-secondary-weight: 600;
+  --era-label-weight: 700;
+  --era-text: var(--pack-text);
+  --era-muted: var(--pack-muted);
+  --era-accent: var(--pack-accent-primary);
+  --era-accent-contrast: var(--pack-accent-contrast);
+  --era-surface: var(--pack-surface);
+  --era-surface-text: var(--pack-text);
+  --era-border: var(--pack-border);
+  --era-page: var(--pack-page);
+  --era-background-image:
+    radial-gradient(circle at 22% 22%, rgba(84,122,145,0.12) 0 2px, transparent 2.5px),
+    radial-gradient(circle at 76% 34%, rgba(43,140,136,0.14) 0 5px, transparent 5.5px),
+    linear-gradient(132deg, rgba(169,78,75,0.1), transparent 38%, rgba(216,106,50,0.16) 68%, rgba(43,140,136,0.11));
+  --era-background-size: 14px 14px, 28px 28px, 100% 100%;
+  --era-frame-radius: 5px;
+  --era-frame-border-width: 2px;
+  --era-heading-letter-spacing: 0.012em;
+}
+
+.course-stop[data-era-theme='civil-rights-to-modern-schooling'] {
+  --pack-page: #e9e4d8;
+  --pack-surface: #f3eee2;
+  --pack-surface-raised: #fbf7ed;
+  --pack-deep-surface: #284d55;
+  --pack-text: #272e31;
+  --pack-muted: #6b6d6c;
+  --pack-accent-primary: #2e8481;
+  --pack-accent-secondary: #625b7e;
+  --pack-accent-tertiary: #bd6860;
+  --pack-accent-hover: #236c6a;
+  --pack-border: #5f7178;
+  --pack-focus: #2587a2;
+  --pack-accent-contrast: #fff;
+  --era-font-display: 'centrifuge', 'Arial Black', sans-serif;
+  --era-font-secondary: 'aktiv-grotesk', Helvetica, Arial, sans-serif;
+  --era-font-body: 'aktiv-grotesk', Helvetica, Arial, sans-serif;
+  --era-font-label: 'centrifuge', 'Arial Black', sans-serif;
+  --era-display-weight: 500;
+  --era-secondary-weight: 500;
+  --era-label-weight: 500;
+  --era-text: var(--pack-text);
+  --era-muted: var(--pack-muted);
+  --era-accent: var(--pack-accent-primary);
+  --era-accent-contrast: var(--pack-accent-contrast);
+  --era-surface: var(--pack-surface);
+  --era-surface-text: var(--pack-text);
+  --era-border: var(--pack-border);
+  --era-page: var(--pack-page);
+  --era-background-image:
+    radial-gradient(circle at 16% 24%, rgba(216,106,50,0.11) 0 5px, transparent 5.5px),
+    linear-gradient(90deg, transparent 0 62%, rgba(115,170,166,0.16) 62% 63%, transparent 63%),
+    repeating-linear-gradient(0deg, rgba(96,116,123,0.035) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(90deg, rgba(96,116,123,0.035) 0 1px, transparent 1px 22px);
+  --era-background-size: 30px 30px, 100% 100%, 22px 22px, 22px 22px;
+  --era-frame-radius: 3px;
+  --era-frame-border-width: 2px;
+  --era-heading-letter-spacing: 0.035em;
+}
+
+.course-stop:is(
+  [data-era-theme='colonial-to-victorian'],
+  [data-era-theme='victorian-to-jim-crow'],
+  [data-era-theme='jim-crow-to-world-wars'],
+  [data-era-theme='world-wars-to-civil-rights'],
+  [data-era-theme='civil-rights-to-modern-schooling']
+) :focus-visible { outline-color: var(--pack-focus); }
+
+.course-stop:is(
+  [data-era-theme='colonial-to-victorian'],
+  [data-era-theme='victorian-to-jim-crow'],
+  [data-era-theme='jim-crow-to-world-wars'],
+  [data-era-theme='world-wars-to-civil-rights'],
+  [data-era-theme='civil-rights-to-modern-schooling']
+) :is(.theme-preview-card, .theme-preview-palette, .theme-preview-cues, .theme-preview-transition-logic) {
+  color: var(--pack-text);
+  border-color: var(--pack-border);
+  background: color-mix(in srgb, var(--pack-surface) 92%, transparent);
+}
+
+.course-stop:is(
+  [data-era-theme='colonial-to-victorian'],
+  [data-era-theme='victorian-to-jim-crow'],
+  [data-era-theme='jim-crow-to-world-wars'],
+  [data-era-theme='world-wars-to-civil-rights'],
+  [data-era-theme='civil-rights-to-modern-schooling']
+) .theme-preview-grid {
+  position: relative;
+}
+
+.course-stop:is(
+  [data-era-theme='colonial-to-victorian'],
+  [data-era-theme='victorian-to-jim-crow'],
+  [data-era-theme='jim-crow-to-world-wars'],
+  [data-era-theme='world-wars-to-civil-rights'],
+  [data-era-theme='civil-rights-to-modern-schooling']
+) .theme-preview-grid::after {
+  content: 'THRESHOLD';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  z-index: 2;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--pack-border);
+  color: var(--pack-text);
+  background: var(--pack-surface-raised);
+  font-family: var(--era-font-label);
+  font-size: 0.68rem;
+  font-weight: var(--era-label-weight);
+  letter-spacing: 0.12em;
+  transform: translate(-50%, -50%) rotate(-2deg);
+}
+
+.course-stop[data-era-theme='victorian-to-jim-crow'] .theme-preview-card:nth-child(1) { transform: translateX(0.45rem); }
+.course-stop[data-era-theme='victorian-to-jim-crow'] .theme-preview-card:nth-child(2) { border-left-width: 6px; border-right-width: 6px; border-radius: 0; filter: grayscale(0.7); }
+.course-stop[data-era-theme='victorian-to-jim-crow'] .theme-preview-card:nth-child(3) { transform: translateX(-0.45rem); filter: grayscale(1); }
+
+.course-stop[data-era-theme='jim-crow-to-world-wars'] .theme-preview-card:nth-child(1) { filter: grayscale(0.75); }
+.course-stop[data-era-theme='jim-crow-to-world-wars'] .theme-preview-card:nth-child(2) { transform: rotate(-0.7deg); box-shadow: 7px 7px 0 rgba(84,122,145,0.14); }
+.course-stop[data-era-theme='jim-crow-to-world-wars'] .theme-preview-card:nth-child(3) { transform: rotate(0.8deg); border-style: dashed; }
+
+.course-stop[data-era-theme='world-wars-to-civil-rights'] .theme-preview-card:nth-child(1) { transform: rotate(-0.6deg); }
+.course-stop[data-era-theme='world-wars-to-civil-rights'] .theme-preview-card:nth-child(2) { transform: translateY(-0.6rem) rotate(0.8deg); box-shadow: 8px 8px 0 rgba(43,140,136,0.18); }
+.course-stop[data-era-theme='world-wars-to-civil-rights'] .theme-preview-card:nth-child(3) { transform: translateY(0.45rem) rotate(-1deg); border-color: var(--pack-accent-primary); }
+
+.course-stop[data-era-theme='civil-rights-to-modern-schooling'] .theme-preview-card:nth-child(1) { transform: rotate(-0.5deg); }
+.course-stop[data-era-theme='civil-rights-to-modern-schooling'] .theme-preview-card:nth-child(2) { transform: none; border-radius: 0; box-shadow: 8px 8px 0 rgba(100,82,125,0.16); }
+.course-stop[data-era-theme='civil-rights-to-modern-schooling'] .theme-preview-card:nth-child(3) { transform: none; border-radius: 0; background-image: linear-gradient(135deg, transparent 0 78%, rgba(115,170,166,0.17) 78%); }
 
 /* Future historical packs are fully rendered in the internal preview but are
    not yet mapped to live course-era IDs. Their visual rules may therefore be
@@ -613,11 +850,11 @@ kbd { padding: 0.12rem 0.35rem; border: 1px solid currentColor; border-radius: 4
 .resource-card button { margin-top: auto; }
 
 .transition-experience { display: grid; grid-template-columns: 1fr auto 1fr; gap: 2rem; align-items: center; min-height: 350px; margin-top: 2rem; }
-.transition-domestic, .transition-institutional { display: grid; gap: 0.7rem; padding: 2rem; border: 1px solid rgba(255,255,255,0.25); border-radius: 18px; }
-.transition-domestic { transform: rotate(-1deg); background: rgba(245,236,216,0.14); font-family: 'adobe-caslon-pro', 'Book Antiqua', Georgia, serif; }
-.transition-institutional { background: rgba(15,31,26,0.38); font-family: 'hwt-gothic-round', 'Arial Narrow', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 0.09em; }
-.transition-domestic span, .transition-institutional span { padding: 0.7rem 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.25); }
-.transition-arrow { font-size: 4rem; color: var(--gold); }
+.transition-domestic, .transition-institutional { display: grid; gap: 0.7rem; padding: 2rem; border: 2px solid var(--pack-border); border-radius: var(--era-frame-radius); color: var(--pack-text); }
+.transition-domestic { transform: rotate(-1deg); background: rgba(244,233,207,0.88); font-family: 'adobe-caslon-pro', 'Book Antiqua', Georgia, serif; box-shadow: 0 12px 24px rgba(90,59,42,0.16); }
+.transition-institutional { border-radius: 2px; background: rgba(241,233,217,0.92); font-family: 'hwt-gothic-round', 'Arial Narrow', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 0.09em; background-image: repeating-linear-gradient(0deg, rgba(71,74,70,0.035) 0 1px, transparent 1px 9px); }
+.transition-domestic span, .transition-institutional span { padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--pack-border); }
+.transition-arrow { font-size: 4rem; color: var(--pack-accent-tertiary); }
 .transition-experience > p { grid-column: 1 / -1; max-width: 800px; margin: 0 auto; text-align: center; line-height: 1.7; }
 
 .next-era-landing { grid-template-columns: 1.1fr 0.9fr; }
@@ -707,3 +944,12 @@ kbd { padding: 0.12rem 0.35rem; border: 1px solid currentColor; border-radius: 4
   .course-app::after { content: "This prototype is designed for a desktop or laptop screen."; position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; padding: 2rem; color: var(--paper); background: var(--green-dark); text-align: center; font-size: 1.4rem; }
 }
 
+
+.theme-preview-transition-logic { margin-top: 1.4rem; padding: 1.25rem; border: 2px solid var(--pack-border); border-radius: var(--era-frame-radius); color: var(--pack-text); background: var(--pack-surface); }
+.theme-preview-transition-logic > h3 { margin: 0 0 0.35rem; }
+.theme-preview-transition-logic > p { max-width: 820px; margin: 0 0 1rem; color: var(--pack-muted); }
+.theme-preview-transition-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.8rem; }
+.theme-preview-transition-grid article { min-height: 100%; padding: 1rem; border: 1px solid var(--pack-border); background: var(--pack-surface-raised); }
+.theme-preview-transition-grid h4 { margin: 0 0 0.55rem; color: var(--pack-accent-primary); font-family: var(--era-font-label); font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.theme-preview-transition-grid ul { display: grid; gap: 0.35rem; margin: 0; padding-left: 1.1rem; }
+.theme-preview-transition-grid p { margin: 0; line-height: 1.55; }

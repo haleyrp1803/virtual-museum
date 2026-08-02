@@ -110,6 +110,31 @@ export default function ThemePreview() {
               </ul>
             </section>
           )}
+
+          {theme.transitionDetails && (
+            <section className="theme-preview-transition-logic" aria-labelledby="theme-preview-transition-title">
+              <h3 id="theme-preview-transition-title">Intentional transition logic</h3>
+              <p>Each threshold is composed by deciding what remains legible, what recedes, what arrives, and how visual order changes.</p>
+              <div className="theme-preview-transition-grid">
+                <article>
+                  <h4>Persists</h4>
+                  <ul>{theme.transitionDetails.persists.map((item) => <li key={item}>{item}</li>)}</ul>
+                </article>
+                <article>
+                  <h4>Fades</h4>
+                  <ul>{theme.transitionDetails.fades.map((item) => <li key={item}>{item}</li>)}</ul>
+                </article>
+                <article>
+                  <h4>Emerges</h4>
+                  <ul>{theme.transitionDetails.emerges.map((item) => <li key={item}>{item}</li>)}</ul>
+                </article>
+                <article>
+                  <h4>Structural change</h4>
+                  <p>{theme.transitionDetails.structure}</p>
+                </article>
+              </div>
+            </section>
+          )}
         </div>
       </section>
 

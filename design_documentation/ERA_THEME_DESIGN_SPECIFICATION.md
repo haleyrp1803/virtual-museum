@@ -372,6 +372,13 @@ Centrifuge is especially appropriate for higher education, laboratories, researc
 
 Transitions are teaching and design structures, not decorative gradients. Each transition must define what persists, fades, enters, and changes in visual order.
 
+Implementation status after Pass 5:
+
+- all five thresholds are registered as independent reusable design packs;
+- every threshold exposes structured `persists`, `fades`, `emerges`, and `structure` metadata in the preview;
+- the current Colonial → Victorian course stop uses its approved transition palette and material shift;
+- later thresholds remain preview-only and do not create placeholder course modules.
+
 ## Colonial → Victorian
 
 - parchment remains;
@@ -474,11 +481,13 @@ Adobe-hosted fonts create third-party requests to Adobe’s font network. Public
 
 - Implemented preview-only packs for Jim Crow, World Wars, Civil Rights, and Modern schooling, including approved palettes, provisional typography, generated material cues, framing, and layout character.
 
-## Pass 5 — Transition packs
+## Pass 5 — Transition packs (implemented)
 
-- Add all five historical transition systems.
-- Specify persistence, fading, emergence, and structural change.
-- Do not use flat palette averaging.
+- Added all five historical transition systems to the reusable design-pack registry and internal preview.
+- Recorded explicit persistence, fading, emergence, and structural-change logic for every threshold.
+- Applied the curated Colonial → Victorian transition to the current live transition stop.
+- Kept the remaining four transitions preview-only until matching course content exists.
+- Used staged materials, typography, palette emphasis, and layout behavior rather than flat palette averaging.
 
 ## Pass 6 — Design-system QA
 
