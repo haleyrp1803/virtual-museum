@@ -2,16 +2,17 @@
 
 ## Status and role
 
-Current synchronized checkpoint at the start of the accepted theme-design sequence:
+Current synchronized implementation checkpoint:
 
 ```text
-bde9bfe — Add historical theme taxonomy typography and design preview
+0d0d09d — Add full-course era design flow samples
 Branch: main
+Status: local and origin/main aligned
 ```
 
 This document is the authoritative design-direction record for reusable historical design packs: typography, color roles, texture, layout character, transitions, asset provenance, and deferred continuity work.
 
-Pedagogical reasons for historical transitions remain in `core_documentation/LESSON_DESIGN_AND_TEACHING_GUIDE.md`. Current technical architecture remains in `core_documentation/MAINTAINERS_GUIDE.md`. Full core-document synchronization is reserved for Pass 8 of the theme implementation sequence.
+Pedagogical reasons for historical transitions remain in `core_documentation/LESSON_DESIGN_AND_TEACHING_GUIDE.md`. Current technical architecture remains in `core_documentation/MAINTAINERS_GUIDE.md`. Asset-level credits and licenses remain in `THEME_ASSET_PROVENANCE.md`.
 
 ## Approved period taxonomy
 
@@ -47,7 +48,7 @@ Visual differences must carry pedagogical meaning rather than operate as decorat
 
 Pass 2 defined each approved palette through durable `--pack-*` semantic tokens for page, surface, raised surface, deep surface, text, muted text, primary/secondary/tertiary accents, hover, border, focus, and accent contrast. The internal preview exposes every role as a labeled swatch.
 
-Pass 3 maps the approved Colonial and Victorian pack roles onto the active learner-facing vertical slice. Shared components retain their structure and behavior while their page, text, surface, border, accent, focus, button, source-frame, and supporting-card treatments now consume the approved semantic values. Jim Crow, World Wars, Civil Rights, and Modern schooling now have complete preview-only packs; live-course use remains deferred until corresponding lesson modules exist.
+The approved packs now appear in one chronological development flow on the main course. The Colonial cluster remains the substantive multi-stop interaction slice; Victorian, Jim Crow, World Wars, Civil Rights, Modern schooling, and Conclusion use explicitly generic design-sample stops. Shared components retain their structure and behavior while each stop consumes reusable design-pack metadata and semantic values.
 
 ## Course-neutral framing
 
@@ -372,12 +373,12 @@ Centrifuge is especially appropriate for higher education, laboratories, researc
 
 Transitions are teaching and design structures, not decorative gradients. Each transition must define what persists, fades, enters, and changes in visual order.
 
-Implementation status after Pass 5:
+Current implementation status:
 
 - all five thresholds are registered as independent reusable design packs;
 - every threshold exposes structured `persists`, `fades`, `emerges`, and `structure` metadata in the preview;
-- the current Colonial → Victorian course stop uses its approved transition palette and material shift;
-- later thresholds remain preview-only and do not create placeholder course modules.
+- all five transitions now appear in the chronological development flow on the main course;
+- the later transition stops remain explicitly generic development fixtures pending real historical modules.
 
 ## Colonial → Victorian
 
@@ -472,21 +473,22 @@ Adobe-hosted fonts create third-party requests to Adobe’s font network. Public
 ## Pass 3 — Live Colonial and Victorian packs
 
 - Applied the approved Colonial palette to the current Early America and Further Study material.
-- Applied the approved Victorian palette to the current Common School landing.
+- Applied the approved Victorian palette to the Victorian development sample and its shared component states.
 - Mapped shared page, surface, text, muted, accent, border, focus, button, source-frame, and supporting-card roles without changing component structure.
 - Preserved navigation, notebook behavior, and viewport containment.
 - Left the active Colonial → Victorian transition unchanged for the dedicated transition architecture in Pass 5.
 
-## Pass 4 — Future era preview packs (implemented)
+## Pass 4 — Future era preview packs (historical implementation stage)
 
-- Implemented preview-only packs for Jim Crow, World Wars, Civil Rights, and Modern schooling, including approved palettes, provisional typography, generated material cues, framing, and layout character.
+- Initially implemented Jim Crow, World Wars, Civil Rights, and Modern schooling as preview-only packs, including approved palettes, provisional typography, generated material cues, framing, and layout character.
+- These packs were later placed into the main development flow as generic design-sample stops at `0d0d09d`.
 
-## Pass 5 — Transition packs (implemented)
+## Pass 5 — Transition packs (historical implementation stage)
 
 - Added all five historical transition systems to the reusable design-pack registry and internal preview.
 - Recorded explicit persistence, fading, emergence, and structural-change logic for every threshold.
-- Applied the curated Colonial → Victorian transition to the current live transition stop.
-- Kept the remaining four transitions preview-only until matching course content exists.
+- Initially applied only Colonial → Victorian to the live sequence.
+- Later placed all five transitions into the main development flow as explicitly generic fixtures.
 - Used staged materials, typography, palette emphasis, and layout behavior rather than flat palette averaging.
 
 ## Pass 6 — Design-system QA
@@ -504,9 +506,9 @@ Adobe-hosted fonts create third-party requests to Adobe’s font network. Public
 - Select or create actual textures only after palettes stabilize.
 - Verify rights, provenance, file size, legibility, and credits.
 
-## Pass 8 — Full core-documentation refresh
+## Documentation synchronization — completed from `0d0d09d`
 
-Synchronize the root README, all four core documents, and this design specification. Update the synchronized checkpoint, architecture ownership, active backlog, Adobe disclosure, deferred fallback task, accepted design packs, and transition architecture.
+The root README, all four core documents, this design specification, and the provenance ledger were refreshed against the full-course development-flow checkpoint. The documentation identifies `0d0d09d` as the synchronized implementation baseline; the documentation-only commit follows it.
 
 ## Pass 6 Design-System QA Record
 
@@ -539,7 +541,7 @@ Muted-text values were modestly deepened where necessary so normal-sized muted c
 
 ### Pass 6 outcome
 
-The QA pass changes no course data, learner workspace behavior, notebook architecture, or historical content. Colonial, Victorian, and the active Colonial-to-Victorian transition remain the only design packs mapped to the live vertical slice. Later packs and transitions remain preview-only.
+The QA pass changed no learner workspace behavior, notebook architecture, or historical content. Subsequent full-course design-flow work now maps every approved era and transition pack to explicitly labeled development stops while retaining the Colonial cluster as the only multi-stop lesson sample.
 
 
 ## Pass 7 Historical Texture and Background Asset Record
@@ -552,7 +554,7 @@ Pass 7 replaces the generated demonstration textures with optimized local image 
 |---|---|---|---|---|---|
 | `colonial-paper.webp` | Colonial page parchment | `https://commons.wikimedia.org/wiki/File:Old_paper6.jpg` | Digital Yard Sale; author not identified | Public domain dedication | Approved |
 | `colonial-wood.webp` | Colonial source-frame wood | `https://commons.wikimedia.org/wiki/File:Pressed_pine_wood_grain_and_texture_close_up.jpg` | Kurt Kaiser | CC0 1.0 | Approved substitute |
-| `victorian-linen.webp` | Victorian woven page material | `https://commons.wikimedia.org/wiki/File:Linen_Cloth_MET_12.187.46_EGDP020594.jpg` | Metropolitan Museum of Art | CC0 1.0 | Approved |
+| `victorian-linen.webp` | Victorian woven page material | `https://commons.wikimedia.org/wiki/File:Hessian_230_(Rico_Cilliers_and_colormass_via_Poly_Haven).webp` | Rico Cilliers; colormass; Poly Haven | CC0 1.0 | Approved replacement |
 | `victorian-rust.webp` | Victorian iron/rust surfaces | `https://commons.wikimedia.org/wiki/File:Wheelbarrowbottom.jpg` | Clump | CC0 1.0 | Approved by Haley |
 | `jim-crow-paper.webp` | Jim Crow institutional paper | `https://commons.wikimedia.org/wiki/File:Blank_page,_brown_paper_texture_(14802136533).jpg` | Internet Archive Book Images; source volume published 1902 | No known copyright restrictions | Approved by Haley |
 | `world-wars-cloth.webp` | World Wars faded textile/poster material | `https://commons.wikimedia.org/wiki/File:Cloth_texture.jpg` | Titus Tscharntke | Public domain dedication | Approved for staging |
@@ -574,7 +576,7 @@ The previously proposed oak photograph was not used because its Commons file pag
 
 ### Pass 7 outcome
 
-Colonial and Victorian textures are applied to the live vertical slice. Jim Crow, World Wars, Civil Rights, Modern schooling, and the later transitions remain preview-only. The active Colonial → Victorian threshold now stages parchment and linen as outgoing and incoming materials.
+All era and transition textures now appear in the chronological development design flow. The Colonial and Victorian materials also support the substantive early course slice. Later historical pages remain design fixtures rather than completed lessons.
 
 ### Pass 7D — Transition texture proportion correction
 
@@ -629,3 +631,16 @@ Georga's lesson architecture and content are ready.
 ### Civil Rights transition texture correction
 
 The Civil Rights noise texture is a repeatable print field, not a photographic material. In both adjacent transitions it uses independent repeat controls, a 240px tile, and low opacity. This prevents a single enlarged rectangular patch while preserving the long feathered historical handoff.
+
+
+## Current implementation status at 0d0d09d
+
+The main development course now presents all approved design packs and transitions in chronological order. This is a sequence-level design review fixture, not a claim that all historical modules are complete.
+
+- The Colonial era retains the multi-stop interaction slice.
+- Victorian, Jim Crow, World Wars, Civil Rights, Modern schooling, and Conclusion use generic design-sample stops.
+- All five transitions use color-led gradual blends, long feathered masks, low-opacity material cues, and aspect-preserving crops.
+- Civil Rights noise repeats as a subtle 240px tile in both adjacent transitions.
+- Cards are level and Previous/Next share one visual treatment.
+- The internal preview remains available in development through `?theme-preview`; its header link is excluded from production.
+- Real content may revise provisional typography or texture choices, but changes should preserve the documented historical rationale or record a new decision.

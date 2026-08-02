@@ -4,7 +4,7 @@
 
 This Charter is the controlling process document for safely changing the History of Education horizontal-course project. It defines source-of-truth continuity, bounded-pass planning, full-file review, delivery and testing safeguards, recovery procedure, documentation governance, dependency constraints, and the durable human–AI division of labor.
 
-Use it before every implementation or documentation pass. The [Maintainer’s Guide](MAINTAINERS_GUIDE.md) governs current architecture, the [Lesson Design and Teaching Guide](LESSON_DESIGN_AND_TEACHING_GUIDE.md) governs pedagogical/curatorial requirements, and the [Changelog](CHANGELOG.md) governs chronology.
+Use it before every implementation or documentation pass. The [Maintainer’s Guide](MAINTAINERS_GUIDE.md) governs current architecture, the [Lesson Design and Teaching Guide](LESSON_DESIGN_AND_TEACHING_GUIDE.md) governs pedagogical and curatorial requirements, the design documentation governs exact visual choices and provenance, and the [Changelog](CHANGELOG.md) governs chronology.
 
 ## Quick Navigation
 
@@ -19,12 +19,12 @@ Use it before every implementation or documentation pass. The [Maintainer’s Gu
 
 ## Document Role and Boundaries
 
-This Charter owns mandatory process rules, source-of-truth continuity, delivery/recovery protocol, commit discipline, documentation preservation, tooling constraints, and decision governance. It does not own the full architecture, lesson-authoring manual, public workflow, or commit history.
+This Charter owns mandatory process rules, source-of-truth continuity, delivery/recovery protocol, commit discipline, documentation preservation, tooling constraints, and decision governance. It does not own full architecture, lesson-authoring detail, exact theme values, asset credits, public orientation, or commit history.
 
-Current synchronized checkpoint:
+Current synchronized implementation checkpoint:
 
 ```text
-68b2fd4 — Complete architecture cleanup and documentation sync
+0d0d09d — Add full-course era design flow samples
 Branch: main
 Status: local and origin/main aligned after the latest sync ritual
 ```
@@ -37,7 +37,7 @@ At the start of every pass, establish one authoritative source:
 
 - the local project folder;
 - a specific uploaded full project;
-- or a synchronized Git commit confirmed through the user’s latest sync ritual.
+- or a synchronized Git commit confirmed through the latest sync ritual.
 
 Current project source of truth:
 
@@ -45,35 +45,35 @@ Current project source of truth:
 C:\Users\haley\OneDrive\Desktop\virtual-museum\
 ```
 
-Do not treat generated ZIPs, temporary extraction folders, prior uploads, the live GitHub Pages build, and GitHub source as co-equal authorities during one pass.
+Do not treat generated ZIPs, extraction folders, previous uploads, live GitHub Pages output, and GitHub source as co-equal authorities during one pass.
 
-After Haley applies and tests an uncommitted replacement, the resulting local file becomes authoritative for that file. Before later changing it:
+After Haley applies and tests an uncommitted replacement, the resulting local file becomes authoritative for that file. Before later changing it, obtain the exact current file or reconstruct it only when continuity is complete and explicit.
 
-- obtain the exact current file; or
-- work from a newly committed synchronized state.
+A fresh repository ZIP is **not required for every consecutive pass**. Continue from the accepted current state when:
 
-Do not regenerate broad replacements from an older pass package.
+- the assistant has the full prior source;
+- every intervening replacement file is known;
+- Haley made no additional manual edits to affected files;
+- the commit/checkpoint is confirmed.
+
+Request a fresh source package when there is a genuine continuity gap, unknown local edit, conflicting upload, or newly affected file whose current contents are unavailable.
 
 ### 1.2 Main-branch default
 
-The normal project line is `main`.
-
-Do not create an experimental branch merely because a design direction is changing. Use a branch only when Haley explicitly requests one or when a clearly stated high-risk experiment needs isolation.
-
-The horizontal-course prototype was briefly placed on a separate branch because preservation of the prior museum model was incorrectly inferred as a requirement. That assumption was corrected; `main` is authoritative.
+The normal project line is `main`. Do not create an experimental branch merely because design direction changes. Use a branch only when Haley explicitly requests one or a clearly stated high-risk experiment requires isolation.
 
 ### 1.3 Bounded-pass rule
 
 Before implementation, state:
 
-- change type: behavior, visual, structural, or documentation;
+- change type;
 - goal;
 - in-scope files or systems;
 - out-of-scope systems;
 - plain-language acceptance test;
 - expected artifact.
 
-Do not combine unrelated feature work, visual redesign, structural cleanup, and documentation synchronization unless Haley explicitly chooses that scope.
+Do not combine unrelated behavior, visual redesign, structural cleanup, and documentation synchronization unless Haley explicitly chooses that scope.
 
 ### 1.4 Full-file review
 
@@ -82,59 +82,60 @@ Before editing, read the complete current affected files from the real source of
 This is mandatory for fragile files including:
 
 - `src/App.jsx`
+- `src/main.jsx`
 - `src/components/Notebook.jsx`
 - `src/components/CourseStop.jsx`
+- `src/components/ThemePreview.jsx`
 - `src/hooks/useCourseNavigation.js`
 - `src/hooks/useLocalWorkspace.js`
 - `src/hooks/useWorkspacePersistence.js`
-- `src/styles/global.css` and the affected imported stylesheet layer
 - `src/data/course.js`
+- `src/data/eraThemes.js`
+- `src/data/courseMapLayout.js`
 - `src/data/validateCourseData.js`
+- `src/styles/global.css` and every affected imported layer.
 
-Do not patch from remembered snippets or an older prototype archive.
+Do not patch from remembered snippets or an older archive.
 
-Small targeted edits are allowed only after full-file review and only when:
-
-- the anchor is unique;
-- the edit is truly local;
-- stale code cannot be reintroduced;
-- risk is lower than a complete replacement.
+Small targeted edits are allowed only after full-file review and when the anchor is unique, the edit is local, stale code cannot be reintroduced, and risk is lower than complete replacement.
 
 ### 1.5 Ordered stylesheet safeguard
 
-`src/styles/global.css` is an import ledger for six ordered plain-CSS layers. The import order is a high-risk shared dependency because later layers intentionally preserve accepted overrides.
+`src/styles/global.css` is an import ledger for six ordered CSS layers. Source order is a high-risk shared dependency.
 
-For a styling correction:
+For styling work:
 
-- read `global.css` and the complete affected layer;
-- identify which later layers may override the same selectors;
-- verify selectors against current component markup;
-- preserve the import order unless the pass explicitly changes cascade architecture;
-- prefer a narrow source-verified edit;
-- do not copy rules into a different layer merely for thematic neatness;
-- do not assume repeated selectors are duplicates—many are partial historical overrides.
+- read `global.css` and complete affected layers;
+- identify later overriding layers;
+- verify selectors against current markup;
+- preserve import order unless the pass explicitly changes cascade architecture;
+- prefer narrow source-verified edits;
+- do not move rules merely for thematic neatness;
+- do not assume repeated selectors are duplicates.
 
-Earlier notebook anchoring defects were caused by class/selector mismatch. Pass 6B also confirmed that most repeated selectors could not be deleted safely. Inspect both markup and all relevant cascade layers before changing docking or viewport behavior.
+### 1.6 Theme-system safeguard
 
-### 1.6 Human-readable comments
+Before changing a design pack or transition:
 
-Code comments should explain:
+- read `src/data/eraThemes.js`;
+- read the relevant `horizontal-course.css` sections;
+- read `ERA_THEME_DESIGN_SPECIFICATION.md`;
+- read `THEME_ASSET_PROVENANCE.md` when assets are involved;
+- verify live course and preview behavior;
+- distinguish decorative colors from accessible functional roles;
+- test adjacent transitions, not only the target era.
 
-- ownership boundaries;
-- non-obvious data flow;
-- fragile coupling;
-- compatibility paths;
-- why a decision exists.
+Do not treat transitions as flat palette averages. Preserve the documented persists/fades/emerges/structure logic.
 
-Do not add comments that merely restate syntax. Update nearby comments when a route, component role, or workflow changes.
+### 1.7 Human-readable comments
 
-### 1.7 Most-recent-upload rule
+Comments should explain ownership, non-obvious data flow, fragile coupling, compatibility paths, and decision rationale. Do not add comments that merely restate syntax.
 
-When current files are uploaded for a pass, the newest upload is authoritative unless Haley states otherwise.
+### 1.8 Most-recent-upload rule
 
-Do not assume same-name files already present in `/mnt/data` are current.
+When current files are uploaded, the newest upload is authoritative unless Haley states otherwise. Do not assume same-name files already present in temporary storage are current.
 
-### 1.8 Fragile-zone preflight
+### 1.9 Fragile-zone preflight
 
 Before touching a fragile zone, state:
 
@@ -142,39 +143,53 @@ Before touching a fragile zone, state:
 - what is deliberately out of scope;
 - how the result will be verified.
 
-The detailed regression matrix belongs in the Maintainer’s Guide.
+### 1.10 Diagnose before repair
+
+When Haley asks why something is broken, explain the concrete implementation cause before repairing it. Do not stack speculative fixes.
 
 ## 2. Delivery, Testing, and Commit Protocol
 
 ### 2.1 Assistant responsibility
 
-The assistant prepares code edits and replacement files. Do not instruct Haley to manually edit source code except in an explicitly agreed emergency.
+The assistant prepares code edits and replacement files. Do not instruct Haley to manually edit source except in an explicitly agreed emergency.
 
 ### 2.2 Delivery format
 
 Default implementation delivery:
 
-- complete, uniquely versioned replacement ZIP for broad multi-file passes when Haley requests or accepts ZIP workflow;
+- complete uniquely versioned replacement ZIP for multi-file passes;
 - complete individual replacement files for narrow work;
 - exact PowerShell extraction/copy commands;
-- local run command;
-- explicit QA sequence.
+- local validation/build/run commands;
+- explicit QA sequence;
+- known residual risks.
 
-Do not reuse a prior replacement filename.
+Do not reuse replacement filenames. Do not add a separate manifest when the chat can state the changed files directly.
 
 On Windows PowerShell use:
 
 ```powershell
 npm.cmd run dev
+npm.cmd run build
+npm.cmd run validate:architecture
 ```
-
-rather than `npm run dev` when execution policy blocks `npm.ps1`.
 
 ### 2.3 Testing before commit
 
 A replacement is not accepted merely because it was generated.
 
-Haley tests locally. The assistant should provide a bounded acceptance sequence.
+Haley tests locally. The assistant provides a bounded acceptance sequence.
+
+Typical pre-commit checks:
+
+```powershell
+npm.cmd run validate:architecture
+npm.cmd run build
+```
+
+Feature-specific QA follows the Maintainer’s Guide regression matrix.
+
+### 2.4 Commit and sync ritual
 
 After acceptance:
 
@@ -189,18 +204,26 @@ git log -3 --oneline
 
 A clean final ritual aligned with `origin/main` establishes the new synchronized source.
 
-### 2.4 Checkpoint versus commit
+### 2.5 Checkpoint versus commit
 
 - **Checkpoint:** tested recoverable state that may still be revised immediately.
-- **Commit:** coherent completed pass with one clear outcome.
+- **Commit:** coherent completed outcome.
 
-Use meaningful commits after accepted feature groups. Do not force a commit after every cosmetic adjustment unless recoverability or handoff requires it.
+Use meaningful commits after accepted feature groups. Do not force a commit after every minor visual adjustment unless recoverability requires it.
 
-### 2.5 GitHub Pages
+### 2.6 Git object warnings
 
-Pushing to `main` triggers GitHub Actions deployment. GitHub Pages must use GitHub Actions, not branch/Jekyll deployment.
+A transient permission warning from a OneDrive-hosted `.git` object should be verified with:
 
-Do not add `.nojekyll` as a speculative fix when the Vite Actions pipeline is configured correctly.
+```powershell
+git fsck --full
+```
+
+A successful fsck with only dangling unreachable objects does not indicate repository corruption. Reclone only if errors persist or reachable objects are missing.
+
+### 2.7 GitHub Pages
+
+Pushing to `main` triggers GitHub Actions deployment. GitHub Pages must use GitHub Actions, not branch/Jekyll deployment. Do not add `.nojekyll` as a speculative fix when the Vite pipeline is correct.
 
 ## 3. Recovery Protocol
 
@@ -208,7 +231,7 @@ When something goes wrong:
 
 1. Stop further edits.
 2. Identify the current source of truth.
-3. Inspect the browser console early for runtime errors.
+3. Inspect the browser console early.
 4. Restore or verify the last accepted checkpoint.
 5. Restate the goal in one sentence.
 6. Diagnose the actual implementation cause.
@@ -217,19 +240,32 @@ When something goes wrong:
 
 Do not stack speculative fixes.
 
-When Haley asks why something is broken, explain the concrete cause before repairing it. The notebook docking correction established this expectation: identify selector/class or layout-state failures rather than blindly moving CSS.
+For asset/display regressions, distinguish among:
+
+- wrong source asset;
+- wrong crop;
+- wrong `background-size`;
+- wrong repeat behavior;
+- wrong opacity;
+- wrong mask/blend geometry;
+- contrast overlay failure.
 
 ## 4. Documentation Governance
 
-### 4.1 Core documents
+### 4.1 Documentation set
 
-The core documentation set is:
+Core documents:
 
 - root `README.md`
 - `core_documentation/MAINTAINERS_GUIDE.md`
 - `core_documentation/LESSON_DESIGN_AND_TEACHING_GUIDE.md`
 - `core_documentation/PROJECT_WORKFLOW_CHARTER.md`
 - `core_documentation/CHANGELOG.md`
+
+Design documents:
+
+- `design_documentation/ERA_THEME_DESIGN_SPECIFICATION.md`
+- `design_documentation/THEME_ASSET_PROVENANCE.md`
 
 ### 4.2 Required front matter
 
@@ -239,27 +275,29 @@ Each core document begins with:
 2. Executive Summary
 3. Quick Navigation
 4. Document Role and Boundaries
-5. Current Synchronized Checkpoint
+5. Current synchronized implementation checkpoint
 
-Only the Changelog expands the current checkpoint into a milestone narrative.
+Only the Changelog expands the checkpoint into milestone narrative.
 
 ### 4.3 Primary ownership
 
 | Information | Primary home |
 |---|---|
 | Public purpose and learner workflow | README |
-| Current architecture and technical implementation | Maintainer’s Guide |
+| Current architecture and implementation contracts | Maintainer’s Guide |
 | Pedagogy, curation, lesson structure, source requirements | Lesson Design and Teaching Guide |
 | Mandatory process and decision governance | Project Workflow Charter |
 | Milestones, redirected work, commit chronology | Changelog |
+| Exact theme taxonomy, type, color, texture, transition rationale | Era Theme Design Specification |
+| Asset source, creator, license, transformation, status | Theme Asset Provenance |
 
-Use concise cross-references instead of maintaining competing copies.
+Use cross-references instead of competing copies.
 
 ### 4.4 Additive preservation rule
 
-Core documentation is additive and exhaustive by default.
+Documentation is additive and exhaustive by default.
 
-Before removing or condensing information, identify where the following will remain available:
+Before removing or condensing information, identify where the following remain available:
 
 - decision rationale;
 - historical redirections;
@@ -269,55 +307,52 @@ Before removing or condensing information, identify where the following will rem
 - accessibility contracts;
 - accepted interface models;
 - file references;
-- test expectations.
+- test expectations;
+- design provenance and licensing.
 
 Reorganization is not permission to delete project knowledge.
 
-### 4.5 What may be revised normally
+### 4.5 Historical labels
 
-Normal maintenance may revise:
-
-- Executive Summaries;
-- Quick Navigation;
-- role/boundary statements;
-- checkpoint blocks;
-- headings and section order;
-- cross-references;
-- clear duplication;
-- demonstrably obsolete or misleading claims.
-
-Historical material should be labeled:
+Use explicit labels:
 
 - Current
 - Historical
 - Archived
+- Removed
 - Deferred
 - Rolled back
 - Superseded
 - Compatibility path
 - Experimental
+- Development fixture
+- Provisional
 
 ### 4.6 Documentation preflight
 
-Before a core-documentation pass:
+Before a full documentation pass:
 
-1. read all five current documents in full;
-2. confirm the clean synchronized checkpoint;
-3. inspect the current source files affected by documented claims;
-4. classify each new fact by primary home;
-5. identify what must be preserved;
-6. state the documentation-pass boundary.
+1. read all five core documents in full;
+2. read both design documents in full when theme work is involved;
+3. confirm the clean synchronized checkpoint;
+4. inspect current source files supporting documented claims;
+5. classify each fact by primary home;
+6. identify preserved rationale and historical records;
+7. state the pass boundary.
 
 ### 4.7 Documentation completion
 
 Before delivery:
 
-- verify the checkpoint in all documents;
+- verify checkpoint language;
 - verify links and paths;
 - verify no stale current-state claim remains;
 - preserve redirected and rejected approaches;
-- add the documentation milestone to the Changelog;
+- update the Changelog;
+- update design provenance where applicable;
 - provide complete replacement files and exact copy commands.
+
+Because a documentation commit’s hash cannot be known before it is created, documents may identify the synchronized **implementation checkpoint** used as their source and state that the documentation-only commit follows it.
 
 ## 5. Dependency and Tooling Freeze
 
@@ -334,56 +369,66 @@ Do not change:
 
 unless the pass is explicitly about tooling or architecture.
 
-The current package declares React 19.2.8, React DOM 19.2.8, Vite 8.1.5, and `@vitejs/plugin-react` 6.0.4.
+Current declarations:
+
+- React 19.2.8
+- React DOM 19.2.8
+- Vite 8.1.5
+- `@vitejs/plugin-react` 6.0.4
+
+Do not add a dependency merely to solve a problem already handled by platform APIs or existing architecture.
 
 ## 6. Project-Specific Cautions
 
 ### Horizontal course viewport
 
-Routine vertical page scrolling conflicts with the chosen interaction model. Preserve stop-level viewport containment.
+Routine vertical page scrolling conflicts with the chosen interaction model. Preserve stop-level containment.
+
+### Full-course design samples
+
+Later-era samples are development fixtures. Do not let generic copy become de facto historical content. Real modules should replace or expand them only after Georga supplies lesson architecture and sources.
 
 ### Notebook anchoring
 
-The side notebook must:
-
-- dock on the right;
-- begin below the header;
-- end above the bottom timeline;
-- remain outside ordinary document flow.
-
-Component classes and CSS docking selectors must agree.
+The side notebook must dock on the right, begin below the header, end above the timeline, and remain outside document flow. Component classes and CSS selectors must agree.
 
 ### Course Map
 
-The accepted Course Map uses complete discrete SVG segments switched between dotted and solid states. Do not restore clipped-progress or path-length interpolation without an explicit replacement design.
+The current map contains 19 nodes and complete discrete segments. Keep stop IDs, node IDs, segment endpoints, and map height synchronized.
+
+### Era design packs
+
+Course-era identities and design-pack identities are separate. New course modules should point to existing reusable packs where appropriate rather than creating CSS named after lesson placeholders.
+
+### Transitions
+
+Transitions must be gradual and historically intentional. Preserve aspect ratio, long overlap, low texture opacity, and documented logic. Do not create stark half-and-half screens or visible seams.
+
+### Adobe Fonts
+
+Do not commit downloaded Adobe font files. Use the licensed Web Project mechanism. Fallback-font selection is deferred but mandatory before final publication.
+
+### Texture licensing
+
+Verify the operative license on the actual source page. Do not infer public-domain status from filename, metadata fragments, or search snippets. Record creator, source, license, and transformations.
 
 ### Learner privacy
 
-Do not introduce external storage, analytics, authentication, or learner submission without a dedicated privacy/security decision.
+Do not introduce remote learner storage, analytics, authentication, public submissions, or instructor tracking without a dedicated privacy/security decision.
 
 ### Published lessons
 
-The intended product direction treats modules as fully designed and polished before publication. Future corrections still need a formal versioning policy.
-
-### Active versus archival source
-
-Root-level source is active. The tracked `virtual-museum-prototype-pass2/` folder is archival and must not be used as an implementation baseline.
+Published modules should be fully designed and polished before release. Future corrections still require a versioning and correction policy.
 
 ## 7. Decision Records
 
 ### 7.1 Product model
 
-**Decision:** Use a horizontal historical course rather than a virtual museum.
+**Decision:** Use a horizontal historical course rather than virtual museum rooms.
 
-**Context:** The project needed a stronger interaction sequence and a clearer relationship between chronology, module grouping, and learner progress.
+**Reason:** The course model better supports Georga’s guided teaching, chronological movement, module grouping, and transitions.
 
-**Chosen approach:** A horizontally progressing course with visually coherent eras, persistent timeline navigation, and transition zones.
-
-**Rejected alternative:** A set of virtual museum rooms organized around free artifact exploration.
-
-**Reason:** The course model better supports Georga’s guided teaching, chronological movement, and modular lesson design.
-
-**Maintenance consequence:** New features should reinforce course stops, era clusters, and historical transitions rather than reintroducing room-navigation architecture.
+**Maintenance consequence:** New features should reinforce course stops, era clusters, and historical thresholds rather than restore room navigation.
 
 ### 7.2 Learner data
 
@@ -391,51 +436,71 @@ Root-level source is active. The tracked `virtual-museum-prototype-pass2/` folde
 
 **Chosen approach:** IndexedDB after consent or fully functional session-only storage.
 
-**Rejected alternative:** Accounts, remote database, discussion boards, public submissions.
-
-**Reason:** The team does not want to assume cybersecurity, moderation, and student-data responsibilities.
-
 **Maintenance consequence:** Every learner feature must work without a backend.
 
 ### 7.3 Field Notebook
 
 **Decision:** Present learner records as a game-inspired academic fieldbook.
 
-**Chosen approach:** Minimized, docked, and full modes with stable Notes, Glossary, Activities, Bookmarks, Resources, and Course Map sections.
+**Chosen approach:** minimized, docked, and full modes with Notes, Glossary, Activities, Bookmarks, Resources, and Course Map.
 
-**Rejected alternative:** Generic LMS dashboard and notification-driven journal.
-
-**Reason:** The fieldbook should model what the learner has encountered and support retrieval without gamified compliance.
-
-**Maintenance consequence:** Avoid alert bubbles, points, streaks, and completion rewards.
+**Maintenance consequence:** Avoid alerts, points, streaks, and completion rewards.
 
 ### 7.4 Course Map
 
-**Decision:** Use a vertically curving chronological route inside the notebook.
+**Decision:** Use a vertically curving chronological route with fixed nodes and complete discrete segments.
 
-**Chosen approach:** Fixed nodes and complete discrete connector segments.
+**Rejected:** clipped continuous paths and percentage reveal.
 
-**Rejected alternatives:** Straight horizontal timeline compressed into the notebook; clipped continuous path; percentage-based path reveal.
+**Maintenance consequence:** IDs and geometry must remain synchronized.
 
-**Reason:** Curving fits the vertical page while discrete states avoid rendering artifacts.
+### 7.5 Historical design packs
 
-**Maintenance consequence:** Stop IDs, node IDs, and segments must remain synchronized.
+**Decision:** Use reusable period design packs rather than module-specific stylesheets.
 
-### 7.5 Accessibility scope
+**Chosen approach:** content `eraId` → registry `designPackId` → semantic CSS tokens and variants.
 
-**Decision:** Support multiple equivalent desktop navigation methods rather than drag-only or wheel-only movement.
+**Maintenance consequence:** New content should reuse or explicitly extend the registry; component structure remains shared.
 
-**Chosen approach:** wheel, trackpad, keyboard, buttons, timeline, and Course Map.
+### 7.6 Transition design
 
-**Maintenance consequence:** Every navigation change must be keyboard-tested and provide reduced-motion behavior.
+**Decision:** Treat transitions as authored historical thresholds.
 
-### 7.6 Mobile
+**Chosen approach:** explicit persists/fades/emerges/structure logic; color-led gradual blends; low-opacity aspect-preserving materials.
+
+**Rejected:** abrupt theme switches, simple color averaging, stark split screens, stretched textures.
+
+### 7.7 Fonts
+
+**Decision:** Prototype with Adobe Fonts through a Web Project.
+
+**Constraint:** Adobe font binaries are not committed or self-hosted under the current subscription model.
+
+**Deferred requirement:** choose and document backup fonts before development ends.
+
+### 7.8 Texture assets
+
+**Decision:** Prefer local public-domain/CC0 material textures with provenance records.
+
+**Reason:** historical character without a large rights-management burden or live external image dependency.
+
+### 7.9 Accessibility scope
+
+**Decision:** Support equivalent desktop navigation methods and nonvisual/contrast alternatives rather than drag-only, wheel-only, color-only, or texture-dependent interaction.
+
+### 7.10 Mobile
 
 **Decision:** Do not support mobile during the current design phase.
 
-**Reason:** Translating the horizontal, viewport-contained course and docked fieldbook would require a distinct experience rather than a simple responsive compression.
+**Reason:** the horizontal course and docked fieldbook require a distinct mobile experience.
 
-**Maintenance consequence:** Do not claim mobile support based on residual CSS.
+### 7.11 Full-course design-flow fixtures
+
+**Decision:** Place representative pages for all eras on the main development course before final documentation and real-content integration.
+
+**Reason:** sequence-level review reveals transition and continuity problems that isolated theme previews cannot.
+
+**Maintenance consequence:** fixtures remain explicitly generic and temporary.
 
 ## 8. Handoff and Completion Template
 
@@ -445,7 +510,7 @@ Every implementation pass ends with:
 - what changed;
 - exact files changed;
 - acceptance test;
-- whether it is a checkpoint or commit;
+- checkpoint or commit status;
 - exact extraction/copy/run commands;
 - known residual risks.
 
@@ -454,7 +519,7 @@ A fresh-chat handoff should include:
 ```text
 Source: C:\Users\haley\OneDrive\Desktop\virtual-museum\
 Branch: main
-Checkpoint: 68b2fd4 — Complete architecture cleanup and documentation sync
+Implementation checkpoint: 0d0d09d — Add full-course era design flow samples
 ```
 
-It should also include the narrow current task and the affected current source files. Before development, read the root README and all four core documents.
+It should also include the narrow current task and affected files. Before development, read the README, all four core documents, and relevant design documentation in full.

@@ -2,43 +2,44 @@
 
 ## Executive Summary
 
-This guide is the authoritative current architecture and maintenance reference for the History of Education horizontal-course prototype. It documents the active source tree, course and Field Notebook architecture, learner-state model, storage boundaries, accessibility/privacy contracts, fragile systems, regression expectations, and current technical backlog.
+This guide is the authoritative current architecture and maintenance reference for the History of Education horizontal-course prototype. It documents the active source tree, course and Field Notebook architecture, learner-state model, storage boundaries, historical design-pack system, accessibility/privacy contracts, fragile systems, regression expectations, and current technical backlog.
 
-Use this guide before changing source code. For mandatory process rules, use the [Project Workflow Charter](PROJECT_WORKFLOW_CHARTER.md). For lesson-authoring and pedagogical guidance, use the [Lesson Design and Teaching Guide](LESSON_DESIGN_AND_TEACHING_GUIDE.md). For chronology, use the [Changelog](CHANGELOG.md).
+Use this guide before changing source code. For mandatory process rules, use the [Project Workflow Charter](PROJECT_WORKFLOW_CHARTER.md). For lesson-authoring and pedagogical guidance, use the [Lesson Design and Teaching Guide](LESSON_DESIGN_AND_TEACHING_GUIDE.md). For chronology, use the [Changelog](CHANGELOG.md). For exact visual decisions, use the design documentation.
 
 ## Quick Navigation
 
 - [Current architecture snapshot](#1-current-architecture-snapshot)
 - [Application and navigation model](#2-application-and-navigation-model)
 - [Course content model](#3-course-content-model)
-- [Field Notebook architecture](#4-field-notebook-architecture)
-- [Learner workspace and storage](#5-learner-workspace-and-storage)
-- [Media and activities](#6-media-and-activities)
-- [Accessibility and privacy](#7-accessibility-and-privacy)
-- [Styling and visual transitions](#8-styling-and-visual-transitions)
-- [Module ownership index](#9-module-ownership-index)
-- [Fragile zones and regression matrix](#10-fragile-zones-and-regression-matrix)
-- [Active technical backlog](#11-active-technical-backlog)
-- [Archived and compatibility paths](#12-archived-and-compatibility-paths)
-- [Fresh-chat handoff essentials](#13-fresh-chat-handoff-essentials)
+- [Historical design-pack architecture](#4-historical-design-pack-architecture)
+- [Field Notebook architecture](#5-field-notebook-architecture)
+- [Learner workspace and storage](#6-learner-workspace-and-storage)
+- [Media and activities](#7-media-and-activities)
+- [Accessibility, privacy, and third parties](#8-accessibility-privacy-and-third-parties)
+- [Styling and asset ownership](#9-styling-and-asset-ownership)
+- [Module ownership index](#10-module-ownership-index)
+- [Fragile zones and regression matrix](#11-fragile-zones-and-regression-matrix)
+- [Active technical backlog](#12-active-technical-backlog)
+- [Historical and compatibility paths](#13-historical-and-compatibility-paths)
+- [Fresh-chat handoff essentials](#14-fresh-chat-handoff-essentials)
 
 ## Document Role and Boundaries
 
-This document owns current architecture, source/module ownership, state and data contracts, accessibility/privacy implementation, fragile-zone descriptions, regression matrices, compatibility paths, and active technical backlog. It does not own the complete teaching rationale, mandatory workflow law, public orientation, or full commit chronology.
+This document owns current architecture, source/module ownership, state and data contracts, accessibility/privacy implementation, design-system implementation, fragile-zone descriptions, regression matrices, compatibility paths, and the active technical backlog. It does not own the complete teaching rationale, mandatory workflow law, public orientation, detailed design rationale, asset credit ledger, or full commit chronology.
 
-Current synchronized checkpoint:
+Current synchronized implementation checkpoint:
 
 ```text
-68b2fd4 — Complete architecture cleanup and documentation sync
+0d0d09d — Add full-course era design flow samples
 Branch: main
 Status: local and origin/main aligned after the latest sync ritual
 ```
 
-For detailed checkpoint interpretation and complete history, see [CHANGELOG.md](CHANGELOG.md).
+This documentation refresh was prepared from that synchronized implementation checkpoint.
 
 ## 1. Current Architecture Snapshot
 
-The active application is a static, client-side React application built with Vite and deployed to GitHub Pages. It has no backend, authentication, remote learner database, public posting surface, or instructor dashboard.
+The active application is a static, client-side React application built with Vite and deployed to GitHub Pages. It has no backend, authentication, remote learner database, public posting surface, analytics layer, or instructor dashboard.
 
 ### Technology
 
@@ -47,60 +48,81 @@ The active application is a static, client-side React application built with Vit
 | UI | React 19 |
 | Build system | Vite 8 |
 | Styling | Ordered plain-CSS layers imported by `src/styles/global.css` |
-| Persistence | IndexedDB or session storage |
+| Persistence | IndexedDB after consent or session storage |
 | Deployment | GitHub Actions → GitHub Pages |
-| Routing | Stateful single-page course; no external router |
+| Routing | Stateful single-page course; query-based development preview; no external router |
 | Media | Native HTML audio/video and local static assets |
+| Fonts | Adobe Fonts Web Project plus CSS fallback stacks |
+| Theme assets | Local optimized WebP textures under `public/assets/themes/textures/` |
 | Export | Browser-generated Markdown download |
 
 ### Current source context
 
-- Local source of truth: `C:\Users\haley\OneDrive\Desktop\virtual-museum\`
-- Active branch: `main`
-- Repository: `https://github.com/haleyrp1803/virtual-museum`
-- Live site: `https://haleyrp1803.github.io/virtual-museum/`
-- Active checkpoint: `68b2fd4`
+```text
+Local source of truth: C:\Users\haley\OneDrive\Desktop\virtual-museum\
+Active branch: main
+Repository: https://github.com/haleyrp1803/virtual-museum
+Live site: https://haleyrp1803.github.io/virtual-museum/
+Implementation checkpoint: 0d0d09d
+```
 
 ### Application-boundary inventory
 
 | System | Primary owner | Core responsibility | Sensitive coupling | Minimum regression check |
 |---|---|---|---|---|
-| Top-level composition | `src/App.jsx` | screen mode, notebook coordination, glossary/study flows, workspace callbacks | course shell, notebook context, bottom navigation | traverse all screens and notebook entry points |
+| Top-level composition | `src/App.jsx` | screen mode, notebook coordination, glossary/study flows, workspace callbacks, header and bottom navigation | course shell, notebook context, preview feature flag | traverse all screens and notebook entry points |
+| Browser entry | `src/main.jsx` | global CSS, development validation, normal app vs. query preview | `?theme-preview`, development-only validation | normal course and preview both mount |
+| Development feature switches | `src/config/developmentFeatures.js` | centralized temporary development controls | Vite `import.meta.env.DEV` behavior | preview link absent from production build |
 | Course navigation | `src/hooks/useCourseNavigation.js` | active stop, refs, wheel/keyboard movement, observer synchronization | stable stop IDs, focus-field exclusions, reduced motion | every navigation method and form-field protection |
-| Course-stop dispatch | `src/components/CourseStop.jsx` | shared stop wrapper and stop-type dispatch | section IDs/classes/refs, renderer contract | every stop type renders and remains observable |
-| Stop renderers | `src/components/courseStops/` | type-specific course-stop presentation | course data fields, artifact/resource callbacks | each stop type and action path |
-| Course structure | `src/data/course.js` | ordered stops, timeline segments, Further Study catalog | Course Map IDs, backlinks, visual era classes | validation passes and every target resolves |
-| Course and architecture validation | `src/data/validateCourseData.js` and `scripts/validate-architecture.mjs` | browser-time data checks plus dependency-free import, reachability, cycle, stylesheet, storage-key, and data-contract checks | shared IDs, source graph, cascade order, compatibility identifiers | app starts cleanly and `npm.cmd run validate:architecture` passes |
-| Field Notebook shell | `src/components/Notebook.jsx` | modes, focus, section navigation, shared state, settings | section contracts, workspace API, docking CSS | minimized/docked/full, focus, all sections |
-| Notebook sections | `src/components/notebookSections/` | Notes, Glossary, Activities, Bookmarks, Resources, Course Map interfaces | shell-owned filters/selections, callbacks | each section’s full workflow |
-| Course Map | `CourseMap.jsx` and `data/courseMapLayout.js` | rendering and fixed route geometry | course stop IDs, visited-state semantics | all nodes and complete solid/dotted segments |
-| Workspace facade | `src/hooks/useLocalWorkspace.js` | UI-facing learner action API and identifiers/timestamps | pure actions, persistence hook, export | all 22 returned API properties and workflows |
+| Course-stop dispatch | `src/components/CourseStop.jsx` | shared wrapper, era/design metadata, stop-type dispatch | section IDs/classes/refs, theme registry | every stop type renders and remains observable |
+| Stop renderers | `src/components/courseStops/` | type-specific presentation, including reusable design samples and transitions | course data fields, callbacks | every stop type and action path |
+| Course structure | `src/data/course.js` | 19 ordered stops, 8 timeline segments, resources and artifacts | Course Map IDs, theme IDs, backlinks | validation passes and every target resolves |
+| Theme registry | `src/data/eraThemes.js` | maps course-era identities to reusable period design packs | CSS `data-era-theme` selectors, preview metadata | every `eraId` resolves; all packs preview correctly |
+| Course and architecture validation | `src/data/validateCourseData.js`, `scripts/validate-architecture.mjs` | browser-time shared-ID checks plus source/import/cascade/storage validation | shared IDs, source graph, stylesheet ledger | app starts cleanly and architecture script passes |
+| Theme preview | `src/components/ThemePreview.jsx` | internal period-pack fixture and transition comparison surface | theme registry and CSS sample selectors | every pack, swatch, state, and transition renders |
+| Course Map | `src/components/CourseMap.jsx`, `src/data/courseMapLayout.js` | 19-node route and complete connector geometry | course stop IDs, visited semantics | every node and complete segment |
+| Field Notebook shell | `src/components/Notebook.jsx` | modes, focus, section navigation, shared notebook state | section contracts, workspace API, docking CSS | minimized/docked/full, focus, all sections |
+| Notebook sections | `src/components/notebookSections/` | Notes, Glossary, Activities, Bookmarks, Resources, Course Map | shell-owned filters/selections, callbacks | each section’s full workflow |
+| Workspace facade | `src/hooks/useLocalWorkspace.js` | stable UI-facing learner action API and IDs/timestamps | pure actions, persistence hook, export | all returned API properties and workflows |
 | Persistence lifecycle | `src/hooks/useWorkspacePersistence.js` | consent, load/save effects, storage states, retry, clearing | IndexedDB adapter and compatibility keys | persistent/session/upgrade/error paths |
 | Pure workspace actions | `src/storage/workspaceActions.js` | immutable domain transformations | workspace schema and action metadata | notes, bookmarks, activities, glossary, resources |
-| Workspace export | `src/storage/workspaceExport.js` | Markdown construction and download | workspace record shapes and learner-facing terminology | populated export audit |
+| Workspace export | `src/storage/workspaceExport.js` | Markdown construction and browser download | workspace record shapes and learner terminology | populated export audit |
 | IndexedDB adapter | `src/storage/workspaceDb.js` | schema normalization and database mechanics | compatibility identifiers and blocked-tab behavior | reopen, save, delete, error/retry |
-| Styling | `src/styles/global.css` plus six imported layers | documented cascade and system-level visual ownership | import order, docking, viewport, accessibility overrides | full visual regression after any stylesheet change |
+| Styling | `src/styles/global.css` plus six imported layers | documented cascade, course viewport, theme packs, notebook | import order, docking, viewport, accessibility overrides | full visual regression after stylesheet change |
+| Texture assets | `public/assets/themes/textures/` | local decorative material fields | stable filenames and CSS paths | asset load, fallback, contrast modes |
+| Design documentation | `design_documentation/` | exact theme rationale and provenance | source metadata and CSS implementation | update after accepted design changes |
 
 ## 2. Application and Navigation Model
 
 ### Active course model
 
-The site is one horizontally scrolling course canvas. `App.jsx` composes the course, while `useCourseNavigation.js` owns `activeStopIndex`, course refs, and all movement/observer synchronization. `CourseStop.jsx` preserves the shared section wrapper and dispatches each stop to a type-specific renderer.
+The site is one horizontally scrolling course canvas. `App.jsx` composes the course, while `useCourseNavigation.js` owns `activeStopIndex`, course refs, and movement/observer synchronization. `CourseStop.jsx` preserves shared section markup and applies both content-era and design-pack metadata before dispatching to type-specific renderers.
 
-The active prototype sequence is:
+The current nineteen-stop development sequence is:
 
 ```text
 Introduction
-→ Early America landing
-→ Text artifact
-→ Image artifact
-→ Audio/video pair
-→ Activity
-→ Synthesis
-→ Further Study
-→ Transition
-→ Common School landing
+→ Colonial landing
+→ Colonial text artifact
+→ Colonial image artifact
+→ Colonial audio/video pair
+→ Colonial activity
+→ Colonial synthesis
+→ Colonial Further Study
+→ Colonial–Victorian transition
+→ Victorian design sample
+→ Victorian–Jim Crow transition
+→ Jim Crow design sample
+→ Jim Crow–World Wars transition
+→ World Wars design sample
+→ World Wars–Civil Rights transition
+→ Civil Rights design sample
+→ Civil Rights–Modern schooling transition
+→ Modern schooling design sample
+→ Conclusion design sample
 ```
+
+Only the Colonial cluster currently demonstrates a multi-stop lesson. Later stops are development fixtures for visual review.
 
 ### Navigation inputs
 
@@ -112,27 +134,34 @@ Introduction
 - Page Up / Page Down;
 - Home / End;
 - Previous / Next buttons;
-- timeline segment buttons;
+- eight timeline segment buttons;
 - Course Map node navigation;
 - notebook backlinks.
 
-The active stop is also derived with `IntersectionObserver`. Every stop ID must remain stable because several systems reference the same ID.
+The active stop is also derived with `IntersectionObserver`. Every stop ID is a cross-system contract.
+
+### Bottom timeline
+
+The timeline is a navigational and contextual index, not a proportional chronological scale. Its eight active segments point to representative stops for Introduction, Colonial, Victorian, Jim Crow, World Wars, Civil Rights, Modern schooling, and Conclusion. Transition stops inherit the neighboring historical context through active-stop logic rather than receiving their own persistent segment.
+
+Previous and Next use the same visual treatment; position and arrow direction distinguish them.
 
 ### Desktop-only contract
 
-The design assumes a computer viewport. It is intentionally not translated into a mobile course. Do not silently add a compressed mobile mode without a dedicated design pass.
+The design assumes a computer viewport. Do not silently add a compressed mobile mode without a dedicated product and design pass.
 
 ### Navigation acceptance contract
 
 After any course-shell change, verify:
 
 1. each input method moves predictably;
-2. focusable fields do not trigger course-level key navigation while being edited;
+2. focusable fields do not trigger course-level key navigation while edited;
 3. reduced-motion mode uses direct movement;
 4. the current timeline segment updates;
-5. the notebook launcher does not cover Previous or Next;
-6. Course Map and artifact backlinks restore the correct stop;
-7. no stop requires page-level vertical scrolling at the accepted desktop viewport.
+5. the notebook launcher does not cover navigation;
+6. Course Map and backlinks restore the correct stop;
+7. Previous and Next remain visually symmetric;
+8. no stop requires routine page-level vertical scrolling.
 
 ## 3. Course Content Model
 
@@ -143,14 +172,17 @@ After any course-shell change, verify:
 | Field | Purpose |
 |---|---|
 | `id` | stable navigation and notebook-backlink key |
-| `eraId` | visual and contextual grouping |
-| `timelineLabel` | compact bottom-timeline label |
-| `eyebrow` | stop-level orientation label |
+| `eraId` | content-era identity resolved through `ERA_THEMES` |
+| `timelineLabel` | compact orientation label |
+| `eyebrow` | stop-level label |
 | `title` | stop heading |
 | `dateLabel` | historical orientation text |
 | `type` | renderer choice |
 | `summary` | contextual or transition copy |
 | `artifactId` / `artifactIds` | related artifact references |
+| `transition` | from/to labels, terms, and explanatory note |
+| `moduleId` / `moduleTitle` | notebook context for design-sample stops |
+| `sample` | generic design-fixture content |
 
 Current stop types:
 
@@ -162,80 +194,142 @@ Current stop types:
 - `synthesis`
 - `resources`
 - `transition`
-- `next-era`
+- `design-sample`
 
-### `timelineSegments`
+`next-era` remains implemented as a renderer but is not used by the current sequence.
 
-The persistent bottom timeline is not a proportional historical scale. It is a navigational and contextual index. Segments may point to a stop or remain disabled placeholders for later modules.
+### Design-sample contract
+
+`DesignSampleStop.jsx` provides one reusable fixture containing representative:
+
+- heading and label hierarchy;
+- body copy;
+- source/artifact card;
+- caption and provenance line;
+- media frame;
+- private response field;
+- primary and secondary actions.
+
+Design samples must remain explicitly labeled. They test the visual system and must not be mistaken for final course content.
+
+### Timeline segments
+
+`timelineSegments` contains eight active entries. Each points to a stable course stop. The validator checks that every target resolves.
 
 ### Artifact model
 
-`src/data/modules.js` currently contains artifact records used by the vertical slice. Common fields include:
+`src/data/modules.js` contains the placeholder artifacts used by the Colonial vertical slice. Common fields include:
 
-| Field | Purpose |
-|---|---|
-| `id` | stable source key |
-| `moduleId` | module ownership |
-| `type` | Text, Image, Audio, or Video |
-| `title` | learner-facing title |
-| `description` | concise source summary |
-| `rights` | rights status or required statement |
-| `provenance` | collection/source origin |
-| `commentary` | Georga’s interpretive guidance |
-| `media` | type-specific payload |
-
-Type-specific `media` fields include text excerpts/transcriptions, image source/alt/caption/long description, audio/video paths, MIME type, captions, transcripts, source type, and external-provider disclosure.
+- stable `id`;
+- `moduleId`;
+- media `type`;
+- title and description;
+- rights and provenance;
+- professor commentary;
+- type-specific media payload.
 
 ### Glossary model
 
-`src/data/glossary.js` defines the complete course vocabulary catalog, including undiscovered terms. Each term needs:
-
-- stable `id`;
-- visible `term`;
-- `moduleId`;
-- `moduleTitle`;
-- `stopId`;
-- `stopTitle`;
-- optional occurrence/context guidance.
-
-Learner-authored definitions are stored separately in the workspace.
+`src/data/glossary.js` defines the complete vocabulary catalog. Each term needs a stable ID, visible term, module ownership, stop location, and optional occurrence/context guidance. Learner definitions remain separate workspace records.
 
 ### Resource model
 
-`placeholderResources` in `src/data/course.js` currently includes:
+`placeholderResources` remains a fixed catalog. Learner save/status records remain in the workspace.
 
-- `id`
-- `moduleId`
-- `moduleTitle`
-- `type`
-- `title`
-- `creator`
-- `access`
-- `note`
+## 4. Historical Design-Pack Architecture
 
-Saved status belongs to the learner workspace, not the catalog.
+### Identity separation
 
-## 4. Field Notebook Architecture
+Course data uses stable content-era IDs. `ERA_THEMES` maps each content era to a reusable `designPackId`. `DESIGN_PACKS` owns human-readable period labels, purpose, status, variant names, typography metadata, transition logic, and preview guidance.
+
+This separation prevents CSS and future content from being named after temporary module titles.
+
+### Current design packs
+
+- Course-neutral Introduction
+- Colonial era
+- Victorian era
+- Jim Crow era
+- World Wars era
+- Civil Rights era
+- Modern schooling era
+- Course-neutral Conclusion
+
+### Current transition packs
+
+- Colonial → Victorian
+- Victorian → Jim Crow
+- Jim Crow → World Wars
+- World Wars → Civil Rights
+- Civil Rights → Modern schooling
+
+### Semantic color layers
+
+The design system distinguishes:
+
+- approved palette roles (`--pack-*`);
+- live component-consumption roles (`--era-*`);
+- functional accessible colors such as `--pack-accent-text` and `--pack-action-bg`;
+- decorative accents that may not be suitable for small text or button backgrounds.
+
+Core semantic roles include page, surface, raised surface, deep surface, text, muted text, primary/secondary/tertiary accents, hover, border, focus, accent contrast, accessible accent text, and accessible action background.
+
+### Typography
+
+Adobe Fonts are loaded once through the Web Project stylesheet in `index.html`. The repository contains CSS family names and fallback stacks, not Adobe font binaries.
+
+Current principal roles include:
+
+- Colonial: Antiquarian Scribe, ATF Garamond Subhead, Adobe Caslon Pro;
+- Victorian: HWT Slab Columbian, HWT Gothic Round, Clarendon Text;
+- Civil Rights: Goodland Variable and News Gothic;
+- Modern schooling: Centrifuge and Aktiv Grotesk;
+- Jim Crow and World Wars: provisional Century Gothic / Grad direction.
+
+Before final publication, choose, test, and document fallback or replacement fonts for every Adobe family.
+
+### Transition grammar
+
+Transitions are curated thresholds rather than color averages. Every transition records:
+
+- what persists;
+- what fades;
+- what emerges;
+- how structure changes.
+
+Texture fields preserve aspect ratio, overlap across most of the viewport, and use long feathered masks. Color progression carries the main shift; textures remain low-opacity material cues. The Civil Rights noise is a repeatable tiled field, not a cover image.
+
+### Development preview
+
+`ThemePreview.jsx` is mounted when the query string contains `theme-preview`. The preview includes:
+
+- period-based selector;
+- typography roles;
+- representative component states;
+- approved semantic swatches;
+- design cues;
+- transition logic;
+- accessibility-oriented functional colors.
+
+`SHOW_DESIGN_PREVIEW_LINK` is centralized in `src/config/developmentFeatures.js`, and `App.jsx` also gates the visible link behind `import.meta.env.DEV`. The link must not appear in production.
+
+## 5. Field Notebook Architecture
 
 ### Three presentation modes
 
-The Field Notebook supports:
-
 ```text
-minimized
-→ side
-→ full
+minimized → side → full
 ```
 
 - **Minimized:** persistent closed-book launcher.
-- **Side:** docked quick-use fieldbook bounded below the header and above the bottom timeline.
+- **Side:** docked quick-use fieldbook below the header and above the timeline.
 - **Full:** modal fieldbook with focus containment and Escape-to-dock behavior.
 
-The component must render both `notebook` and `notebook-panel` classes. Earlier anchoring defects occurred when CSS expected `.notebook-panel.notebook-side` but the component omitted `notebook-panel`.
+The component must render both `notebook` and `notebook-panel` classes. Earlier anchoring defects resulted from class/selector mismatch.
 
 ### Permanent sections
 
-`NOTEBOOK_SECTIONS` in `notebookModel.js` defines:
+`NOTEBOOK_SECTIONS` defines:
 
 1. Notes
 2. Glossary
@@ -246,65 +340,22 @@ The component must render both `notebook` and `notebook-panel` classes. Earlier 
 
 Their order and IDs are stable navigation contracts.
 
-### Notes
+### Notes, activities, bookmarks, glossary, resources
 
-The notebook uses a master–detail model:
-
-- compact index;
-- module filter;
-- text search;
-- sort order;
-- selected-note detail;
-- edit;
-- delete;
-- return to lesson;
-- quick composer.
-
-### Activities
-
-Activity records combine written responses and quiz attempts into a journal-like index. Current states are derived rather than independently stored:
-
-- completed;
-- to revisit.
-
-A true skipped state is not implemented because lesson activities do not yet create explicit skip records.
-
-### Bookmarks
-
-Bookmarks operate as a saved-evidence shelf. They can be grouped by module or media type, opened, converted into a targeted note, or removed.
-
-### Glossary
-
-The notebook merges the fixed glossary catalog with learner entries. States are:
-
-- Not encountered
-- Added without definition
-- Defined
-
-State meaning must not rely on color alone. Undiscovered terms provide a route to their lesson location. Added terms support definition editing.
-
-### Resources
-
-The Resources section merges the fixed catalog with saved learner-state records. Learners may assign:
-
-- saved;
-- started;
-- finished.
-
-These are private, self-reported states and are not verified.
+The notebook uses compact master–detail patterns. Persistence remains callback-driven through the workspace facade. Learner states are private and descriptive rather than graded or gamified.
 
 ### Course Map
 
-The Course Map uses fixed node coordinates and discrete complete SVG segments. Each segment changes wholesale between:
+The Course Map now contains nineteen fixed nodes and eighteen complete SVG connector segments. Every node ID must match a course stop ID exactly.
 
-- solid green visited;
-- dotted grey unvisited.
+Each complete segment switches wholesale between:
 
-Do not restore path clipping or percentage-based progressive reveal. Those approaches produced partial line artifacts and were rejected.
+- solid visited;
+- dotted unvisited.
 
-The current map is a vertically curving chronological route. Node IDs must match course stop IDs exactly.
+Do not restore clipped path reveal or percentage-length interpolation.
 
-## 5. Learner Workspace and Storage
+## 6. Learner Workspace and Storage
 
 ### Workspace schema
 
@@ -324,48 +375,37 @@ The current map is a vertically curving chronological route. Node IDs must match
 }
 ```
 
-`normalizeWorkspace()` must remain additive. Missing arrays or objects are replaced with safe defaults so older saved work can load after new fields are added.
+`normalizeWorkspace()` must remain additive.
 
 ### Storage modes
 
 #### Persistent mode
 
-- Consent is stored in `localStorage`.
-- Workspace data is stored in IndexedDB:
-  - database: `virtual-museum-workspace`
-  - store: `workspace`
-  - key: `primary`
+- consent in `localStorage`;
+- workspace data in IndexedDB;
+- database: `virtual-museum-workspace`;
+- store: `workspace`;
+- key: `primary`.
 
 #### Session-only mode
 
-- Mode and workspace are stored in browser session storage.
-- The Field Notebook remains fully functional.
-- Closing the session removes the learner’s work.
+- mode and workspace in session storage;
+- full notebook functionality;
+- closing the session removes work.
 
-### Storage status states
+### Storage states
 
-The UI handles:
-
-- opening;
-- saving;
-- saved;
-- disabled/session-only;
-- unavailable;
-- error.
-
-Error states must allow retry. Storage choice must remain available inside notebook settings, not in a persistent page banner.
+The UI handles opening, saving, saved, session-only, unavailable, and error states. Error states must allow retry. Storage choice remains inside notebook settings after first use.
 
 ### Workspace operations
 
-`useLocalWorkspace.js` is the stable UI-facing facade. It owns action validation, IDs/timestamps, delegation to pure transformations, and export initiation. `useWorkspacePersistence.js` owns consent, loading, IndexedDB/session synchronization, retry, status transitions, and clearing browser storage. `workspaceActions.js` owns immutable note, bookmark, progress, activity, glossary, and resource updates.
-
-All UI writes must go through this facade rather than directly mutating browser storage. Pure transformations belong in `workspaceActions.js`; browser lifecycle work belongs in `useWorkspacePersistence.js`.
+All UI writes go through `useLocalWorkspace.js`. Pure transformations belong in `workspaceActions.js`; browser lifecycle belongs in `useWorkspacePersistence.js`; IndexedDB mechanics belong in `workspaceDb.js`.
 
 ### Markdown export
 
-Export is human-readable and personal-use. It includes the learner’s saved material, contextual source information, activity records, glossary definitions, bookmarks, and resources. It is not a complete workspace restore format.
+Export is human-readable personal-use output, not a complete restorable backup format.
 
-## 6. Media and Activities
+## 7. Media and Activities
 
 ### Media component
 
@@ -375,65 +415,71 @@ Minimum requirements:
 
 - text: excerpt and full transcription;
 - image: concise alt text, caption, extended description;
-- audio: native controls and full transcript;
-- video: native controls, captions, and full transcript;
+- audio: native controls and transcript;
+- video: native controls, captions, transcript;
 - external providers: explicit privacy/source disclosure.
 
-Do not make transcript access dependent on media playback.
+Transcript access must not depend on playback.
 
 ### Activities
 
-The active vertical-slice activity renderer is `src/components/courseStops/ActivityStop.jsx`. It currently supports the Pause and Respond written-response workflow and delegates persistence through the workspace facade. Activity definitions remain in data rather than being hard-coded into persistence logic.
+`ActivityStop.jsx` currently supports the Pause and Respond workflow and delegates persistence through the workspace facade. Additional activity forms should be added only for concrete teaching needs. Interpretive prompts must not be reduced falsely to binary grading.
 
-The earlier reusable `LearningActivities.jsx` component was removed after the final import audit proved it was unreachable from `src/main.jsx`. Future multiple-choice or compare-your-response renderers should be introduced only when a concrete lesson requires them. Interpretive prompts should not be forced into binary grading.
-
-## 7. Accessibility and Privacy
+## 8. Accessibility, Privacy, and Third Parties
 
 ### Accessibility contract
 
-The current implementation includes:
+The implementation includes:
 
-- semantic buttons and form controls;
-- visible focus states;
+- semantic controls;
+- visible focus;
 - skip-to-content support;
 - keyboard course navigation;
-- keyboard notebook-section navigation;
-- full-screen focus trap;
-- focus restoration;
+- keyboard notebook navigation;
+- full-screen focus trap and restoration;
 - Escape-to-dock;
 - reduced-motion behavior;
-- forced-colors and increased-contrast CSS;
+- increased-contrast and forced-colors CSS;
 - text alternatives for media;
-- non-color state labels;
-- screen-reader announcements for notebook-section changes.
+- non-color status labels;
+- screen-reader announcements.
 
-After any custom interaction change, test with keyboard only.
+Theme QA additionally requires:
+
+- no bright decorative color used automatically for normal-sized text;
+- accessible action backgrounds;
+- texture suppression in contrast modes;
+- no tilted cards;
+- readable typography at supported viewport widths.
 
 ### Course viewport contract
 
-Because horizontal navigation conflicts with page-level vertical scrolling, each stop must fit between the header and bottom timeline. Long optional content may scroll inside a bounded panel, but the main course page must not develop routine vertical scrolling.
+Each stop must fit between the header and bottom timeline. Long optional content may scroll inside bounded panels; the main course page must not develop routine vertical scrolling.
 
 ### Privacy contract
 
-The application must not claim that no network request occurs at all: GitHub Pages serves the site, and future external media providers may collect data. The accurate claim is that learner-generated notebook data is not sent to the project.
+The accurate claim is that learner-generated notebook data is not sent to the project. Do not claim that the site makes no network requests: GitHub Pages serves the application and Adobe currently serves web fonts.
 
-Do not add:
+Do not add analytics, authentication, public comments, learner uploads, instructor dashboards, external submissions, or embedded third-party media without explicit review.
 
-- analytics;
-- authentication;
-- public comments;
-- learner uploads;
-- instructor dashboards;
-- external form submissions;
-- embedded third-party media
+### Adobe Fonts
 
-without an explicit privacy/security review.
+The licensed implementation uses an Adobe Fonts Web Project. Do not commit downloaded Adobe font binaries to the repository. Before final publication:
 
-## 8. Styling and Visual Transitions
+- confirm durable project ownership of the Web Project;
+- disclose the third-party request accurately;
+- choose and test fallback fonts;
+- document replacement behavior if Adobe access ends.
+
+### Texture assets
+
+Texture assets are local WebP derivatives selected from public-domain, CC0, or no-known-restrictions sources. Exact provenance belongs in `THEME_ASSET_PROVENANCE.md`.
+
+## 9. Styling and Asset Ownership
 
 ### Ordered stylesheet layers
 
-`src/styles/global.css` is now a short import ledger rather than a monolith. Its order is behavioral and must remain:
+`src/styles/global.css` imports six layers in this exact order:
 
 ```css
 @import './foundation.css';
@@ -447,188 +493,175 @@ without an explicit privacy/security review.
 Ownership:
 
 - `foundation.css`: reset, base elements, early shared component rules;
-- `classroom-aesthetic.css`: paper/wood visual system and accepted classroom styling;
-- `horizontal-course.css`: fixed course viewport, stops, eras, timeline;
+- `classroom-aesthetic.css`: paper/wood visual system and desktop docking ancestry;
+- `horizontal-course.css`: viewport, stops, theme tokens, preview, transitions, timeline;
 - `horizontal-course-qa.css`: accepted containment and navigation corrections;
-- `glossary-study.css`: key terms, glossary dialog/study, flashcards;
-- `field-notebook.css`: current notebook shell, section layouts, Course Map, final accessibility refinements.
+- `glossary-study.css`: key terms, dialog/study, flashcards;
+- `field-notebook.css`: notebook shell, sections, Course Map, final accessibility refinements.
 
-Before editing, read the import ledger and the complete affected layer. Verify selectors against current markup. Do not reorder imports or consolidate cross-layer overrides casually. Pass 6B found that most repeated selectors were partial overrides rather than safe duplicates; only demonstrably inactive compatibility rules were removed.
+Do not reorder imports casually. Repeated selectors are often intentional partial overrides.
 
-### Era transitions
+### Texture asset paths
 
-The visual system uses era classes and gradients to make historical movement perceptible:
+Theme textures live under:
 
-- introduction: neutral scholarly framing;
-- Early America: warm paper/domestic cues;
-- transition: gradual material and color shift;
-- Common School: more regular, slate-like institutional language.
+```text
+public/assets/themes/textures/
+```
 
-Aesthetic differences carry pedagogical meaning. They should be documented in the Lesson Design and Teaching Guide and should not become decorative theme changes detached from historical rationale.
+Stable local filenames are implementation contracts. If an asset changes but keeps the same role, preserve the filename where practical and update provenance.
 
-## 9. Module Ownership Index
+### Design documentation
+
+Exact colors, typography, textures, status, and transition rationale belong in:
+
+```text
+design_documentation/ERA_THEME_DESIGN_SPECIFICATION.md
+design_documentation/THEME_ASSET_PROVENANCE.md
+```
+
+## 10. Module Ownership Index
 
 ### `src/App.jsx`
 
-Top-level composition and cross-feature coordination. Owns notebook mode/context, glossary dialog, study screen, activity draft state, workspace callbacks, and course/timeline composition. Navigation mechanics and stop rendering no longer belong here.
+Top-level composition and cross-feature coordination. Owns notebook mode/context, glossary dialog, study screen, activity draft state, workspace callbacks, header, preview link, and course/timeline composition.
+
+### `src/main.jsx`
+
+Loads global CSS, runs development-time validation, and mounts either `App` or `ThemePreview` based on the query string.
+
+### `src/config/developmentFeatures.js`
+
+Central owner of temporary development-only feature switches.
 
 ### `src/hooks/useCourseNavigation.js`
 
-Single owner of active stop state, refs, bounded navigation, stable-ID navigation, keyboard/wheel handling, `IntersectionObserver`, wheel locking, reduced-motion behavior, and form-field exclusions.
+Single owner of active stop, refs, bounded navigation, stable-ID navigation, input handling, observer synchronization, wheel locking, reduced motion, and form-field exclusions.
 
 ### `src/components/CourseStop.jsx`
 
-Preserves the shared stop section markup, IDs, classes, refs, headings, and accessibility contract. Dispatches by `stop.type` to `src/components/courseStops/`.
+Preserves shared stop markup, IDs, classes, refs, theme metadata, headings, and dispatch.
 
 ### `src/components/courseStops/`
 
-Presentational stop-type renderers. They receive only needed data and callbacks and must not acquire navigation or persistence ownership.
+Presentational renderers. `DesignSampleStop.jsx` and `TransitionStop.jsx` are current design-system fixtures; they must not acquire persistence or navigation ownership.
 
-### `src/components/Notebook.jsx`
+### `src/components/ThemePreview.jsx`
 
-Field Notebook shell and shared state coordinator. Owns modes, focus trap/restoration, section navigation, filters/selections/edit state, settings, and dispatch to the six section renderers.
+Internal style gallery for period packs, tokens, typography, component states, and transition logic.
 
-### `src/components/notebookSections/`
+### `src/data/course.js`
 
-Feature renderers for Notes, Glossary, Activities, Bookmarks, Resources, and Course Map. Persistence remains callback-driven; section state deliberately remains in the shell so it survives section changes.
+Authoritative stop order, timeline segments, artifact exposure, and Further Study catalog.
 
-### `src/components/notebookModel.js`
+### `src/data/eraThemes.js`
 
-Stable notebook section vocabulary and pure display selectors.
+Authoritative mapping between content-era IDs and reusable design packs.
 
-### `src/components/CourseMap.jsx` and `src/data/courseMapLayout.js`
+### `src/data/courseMapLayout.js`
 
-Course Map rendering and fixed geometry. Semantic IDs remain validated against `courseStops`.
-
-### `src/hooks/useLocalWorkspace.js`
-
-Stable UI-facing workspace facade. Do not bypass it from components.
-
-### `src/hooks/useWorkspacePersistence.js`
-
-Browser persistence lifecycle. Existing `virtual-museum-*` storage identifiers are compatibility contracts and must not be renamed without an explicit migration.
-
-### `src/storage/workspaceActions.js`
-
-Pure immutable workspace transformations.
-
-### `src/storage/workspaceExport.js`
-
-Human-readable Markdown construction and browser download. It is not a restorable backup format.
-
-### `src/storage/workspaceDb.js`
-
-IndexedDB adapter and additive schema normalizer. Database name, store, key, and schema version are compatibility-sensitive.
+Fixed nineteen-node Course Map geometry and complete connector segments.
 
 ### `src/data/validateCourseData.js`
 
-Development-time validation of unique IDs and cross-file references. New data families should be added to this validator when they create shared identifiers.
+Development-time validation of unique IDs and cross-file references, including era-theme resolution.
 
 ### `scripts/validate-architecture.mjs`
 
-Dependency-free repository validation invoked with `npm.cmd run validate:architecture`. It checks relative-import resolution, reachability from `src/main.jsx`, circular JavaScript dependencies, the six-layer stylesheet ledger, compatibility-sensitive storage identifiers, and the course data graph. Keep it aligned with deliberate architecture changes.
+Dependency-free repository validation for imports, reachability, cycles, stylesheet ledger, compatibility identifiers, and data contracts.
 
-### `src/components/GlossaryStudy.jsx`
+### Workspace and notebook owners
 
-Full-screen flashcard study experience, filters, keyboard controls, and card-flip state.
+Ownership remains as documented in Sections 5 and 6. Do not bypass the workspace facade or move section persistence into renderers.
 
-### `src/components/GlossaryTermDialog.jsx`
-
-Encounter-time definition prompt.
-
-### `src/components/KeyTerm.jsx`
-
-Inline lesson-term trigger.
-
-### `src/components/ArtifactMedia.jsx`
-
-Artifact media and accessibility alternatives.
-
-### `src/components/ConsentDialog.jsx`
-
-First-use storage choice. It reports the learner’s decision to the workspace facade and does not write storage directly.
-
-### `src/data/course.js`, `src/data/glossary.js`, and `src/data/modules.js`
-
-Authoritative course, vocabulary, artifact, and activity catalogs. Shared IDs are checked by `validateCourseData.js`.
-
-### `src/styles/global.css` and imported layers
-
-The import ledger and ordered visual-system layers described in Section 8.
-
-## 10. Fragile Zones and Regression Matrix
+## 11. Fragile Zones and Regression Matrix
 
 | Fragile zone | Typical regression | Minimum test |
 |---|---|---|
 | Horizontal navigation | skipped stops, repeated wheel moves, input-field key conflict | wheel, trackpad, arrows, Page keys, Home/End, buttons |
+| Nineteen-stop sequence | broken target, wrong order, stale timeline | traverse all stops and direct timeline targets |
 | Viewport sizing | vertical page scroll or clipped controls | every stop at accepted desktop viewport |
-| Bottom timeline | notebook overlap or unreadable segment | all stops, Previous/Next, disabled future segments |
-| Notebook anchoring | side panel falls into document flow or covers timeline | open from multiple stops; side/full/minimized |
-| Full-screen focus | focus escapes dialog or fails to restore | Tab cycle, Escape, return focus |
-| Workspace persistence | session mode loses functionality or persistent mode fails reload | both modes, refresh, close/reopen |
-| Glossary | missing catalog term, wrong module grouping, broken backlink | encounter, skip definition, define, edit, navigate |
-| Flashcards | wrong filter/card index, animation inaccessible | flip by card/button/keyboard; reduced motion |
-| Course Map | line fragments, incorrect node state, bad backlink | every current stop, visited/unvisited segments |
-| Resources | catalog/saved state mismatch | save, status change, remove, export |
-| Markdown export | missing learner records or invalid context | populate every section and export |
-| Stylesheet import order/layers | accepted overrides lost or moved earlier in cascade | verify ledger order and full-course visual audit |
+| Bottom timeline | wrong active era, notebook overlap | all stops and all transitions |
+| Notebook anchoring | side panel enters flow or covers timeline | open from multiple stops; side/full/minimized |
+| Full-screen focus | focus escapes or fails to restore | Tab cycle, Escape, return focus |
+| Course Map | bad ID, wrong connector, insufficient height | all 19 nodes and 18 complete segments |
+| Theme registry | missing mapping or wrong pack | validation plus preview every pack |
+| Theme preview | production exposure or overflow | local query, development link, production build |
+| Adobe Fonts | missing family or external failure | network load and fallback-stack test |
+| Texture assets | 404, stretching, seam, excessive contrast | every era and transition; blocked-image fallback |
+| Civil Rights transition texture | single enlarged rectangle | both adjacent transitions tile subtle noise |
+| Contrast modes | texture still visible or controls disappear | reduced motion, increased contrast, forced colors |
+| Workspace persistence | session mode loses functionality or reload fails | both modes, refresh, close/reopen |
+| Glossary | wrong catalog/backlink state | encounter, add, define, edit, navigate |
+| Resources | catalog/saved mismatch | save, status, remove, export |
+| Markdown export | missing records/context | populate all sections and export |
+| Stylesheet order | accepted override lost | ledger check and visual audit |
 
-## 11. Active Technical Backlog
+## 12. Active Technical Backlog
 
-1. Replace placeholder historical and teaching content with one real module.
-2. Define the complete course structure beyond the current vertical slice.
-3. Finalize public title and branding.
-4. Decide whether to remove the tracked `virtual-museum-prototype-pass2/` archive.
-5. Add explicit activity-skip records if the teaching design requires them.
-6. Add a machine-readable workspace backup/import format if personal continuity across devices becomes a priority.
-7. Establish published-lesson stability, correction, and versioning policy.
-8. Review external media providers individually before embedding.
-9. Perform usability testing with intended public learners and disabled users.
-10. Revisit desktop minimum viewport and browser support statement.
-11. Extend automated content validation to captions, transcripts, rights, alt text, and future publication-readiness requirements.
+1. Replace design-sample stops with real modules after Georga finalizes lesson architecture.
+2. Replace placeholder Colonial content with one fully curated publication-quality module.
+3. Finalize the complete course structure and module lengths.
+4. Finalize public title and branding.
+5. Review provisional Jim Crow and World Wars typography against real content.
+6. Reassess provisional Civil Rights print and Modern schooling texture assets.
+7. Choose, test, and document fallback fonts for every Adobe family before development ends.
+8. Confirm durable Adobe Web Project ownership and final privacy disclosure.
+9. Add explicit activity-skip records if teaching design requires them.
+10. Add machine-readable workspace backup/import if cross-device continuity becomes a priority.
+11. Establish published-lesson correction and versioning policy.
+12. Review external media providers individually before embedding.
+13. Perform usability testing with intended public learners and disabled users.
+14. Revisit minimum desktop viewport and browser support statement.
+15. Extend publication validation to captions, transcripts, rights, alt text, and content notices.
+16. Remove or disable development-only design-flow fixtures and preview entry point before publication if they are no longer needed.
 
-## 12. Archived and Compatibility Paths
+## 13. Historical and Compatibility Paths
 
-### Museum-model interface
+### Museum-model interface — superseded
 
-Commits before `083b8c6` preserve the earlier room/module museum metaphor. It is superseded by the horizontal-course direction but remains part of the project history.
+Commits before `083b8c6` preserve the earlier room/module museum metaphor. It is historical, not active architecture.
 
-### Tracked Pass 2 folder
+### Archived prototype folder — removed
 
-`virtual-museum-prototype-pass2/` is tracked inside the repository. The active app uses root-level `src/`, `public/`, and configuration files. Treat the nested folder as an archival snapshot, not a second source of truth.
+The former `virtual-museum-prototype-pass2/` folder was removed at commit `bc95e8f`. It is no longer an active or tracked path. Historical references should identify it as removed, not present.
 
-### Removed standalone storage-status path
+### Removed standalone storage status
 
-`StorageStatus.jsx` and its dead `.storage-status` CSS were removed after an import audit confirmed that the active interface uses only the Field Notebook settings panel. The workspace `storageStatus` state remains active and is not related to the deleted presentation component.
+`StorageStatus.jsx` and dead `.storage-status` CSS were removed after import audit. Workspace storage state remains active through notebook settings.
 
 ### Mobile CSS ancestry
 
-Some early responsive rules remain across the imported stylesheet layers, but the current product decision is desktop-only. Do not treat those rules as a supported mobile contract.
+Residual responsive ancestry does not constitute supported mobile behavior.
 
-## 13. Fresh-Chat Handoff Essentials
+### Compatibility-sensitive storage identifiers
+
+Existing `virtual-museum-*` storage names, database names, store names, and keys must not be renamed without explicit migration.
+
+## 14. Fresh-Chat Handoff Essentials
 
 A future chat should begin with:
 
 ```text
 Source of truth: C:\Users\haley\OneDrive\Desktop\virtual-museum\
 Branch: main
-Checkpoint: 68b2fd4 — Complete architecture cleanup and documentation sync
+Implementation checkpoint: 0d0d09d — Add full-course era design flow samples
 ```
 
 It should also be told:
 
-- the current direction is a horizontally progressing desktop course, not a virtual museum;
+- the current direction is a horizontally progressing desktop course;
+- the current live sequence has 19 stops and 8 timeline segments;
+- only the Colonial cluster is a multi-stop lesson; later eras are design samples;
 - Georga owns historical and teaching decisions;
-- the active prototype ends at the Common School landing;
-- the bottom bar combines Previous, timeline, and Next;
-- all course stop IDs are shared navigation contracts;
 - learner data remains local and private;
-- session-only use retains full notebook functionality;
-- the Field Notebook has Notes, Glossary, Activities, Bookmarks, Resources, and Course Map;
-- Course Map connectors use discrete complete solid/dotted segments;
-- navigation, notebook shell/sections, workspace logic, persistence, course rendering, and styles now have explicit ownership boundaries;
-- `Notebook.jsx`, `useCourseNavigation.js`, `useWorkspacePersistence.js`, and stylesheet import order remain fragile contracts;
-- the nested Pass 2 folder is archival, not active;
+- the Field Notebook has six permanent sections and a 19-node Course Map;
+- era IDs map to reusable design packs through `eraThemes.js`;
+- the design preview is development-only;
+- Adobe Fonts are externally hosted and binaries must not be committed;
+- theme textures are local and provenance-tracked;
+- transitions use gradual color-led blends with low-opacity, aspect-preserving materials;
+- navigation, notebook shell, workspace persistence, Course Map IDs, theme registry, and stylesheet order are fragile contracts;
 - documentation is additive and exhaustive by default.
 
-Before source work, read the current affected files in full. Before documentation work, read all four core documents and the root README in full.
+Before source work, read the current affected files in full. Before documentation work, read the root README, all four core documents, and both design-documentation files in full.
