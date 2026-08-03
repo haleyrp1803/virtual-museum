@@ -436,7 +436,7 @@
 
 .curved-course-map {
   position: relative;
-  min-height: 82rem;
+  min-height: 120rem;
   border: 1px solid rgba(80, 60, 40, 0.25);
   border-radius: 1.2rem;
   overflow: hidden;
@@ -548,7 +548,7 @@
 }
 
 .fieldbook-side .curved-course-map {
-  min-height: 72rem;
+  min-height: 108rem;
 }
 
 .fieldbook-side .course-map-node {

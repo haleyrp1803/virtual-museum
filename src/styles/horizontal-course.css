@@ -1288,3 +1288,203 @@ kbd { padding: 0.12rem 0.35rem; border: 1px solid currentColor; border-radius: 4
 .design-sample-media > div {
   min-height: 10.5rem;
 }
+
+/* --------------------------------------------------------------------------
+   EXPANDED ERA MATERIAL STUDIES
+   Candidate assets are layered as page fields or bounded card materials. They
+   remain development fixtures and never stand in for historical evidence.
+   -------------------------------------------------------------------------- */
+
+.stop-design-sample.design-sample-page-textured {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-image:
+    linear-gradient(var(--design-sample-page-wash, rgba(247, 241, 225, 0.84)), var(--design-sample-page-wash, rgba(247, 241, 225, 0.84))),
+    var(--design-sample-page-asset),
+    var(--era-page-texture, none);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.stop-design-sample.design-sample-page-textured[data-page-treatment='single-cloth'] {
+  background-size: cover, cover, cover;
+  background-repeat: no-repeat;
+}
+
+.stop-design-sample.design-sample-page-textured[data-page-treatment='photographic-soft'] {
+  background-image: var(--era-page-texture, none);
+}
+
+.stop-design-sample.design-sample-page-textured[data-page-treatment='photographic-soft']::before {
+  content: '';
+  position: absolute;
+  inset: -1.25rem;
+  z-index: -2;
+  background-image: var(--design-sample-page-asset);
+  background-position: center;
+  background-size: cover;
+  filter: blur(5px) saturate(0.72);
+  transform: scale(1.035);
+  opacity: 0.42;
+}
+
+.stop-design-sample.design-sample-page-textured[data-page-treatment='photographic-soft']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--design-sample-photo-wash, rgba(231, 229, 223, 0.82));
+}
+
+.design-sample-grid { margin-top: 1.15rem; }
+.design-sample-card { min-height: 16.5rem; }
+.design-sample-card h2 { margin-top: 0.35rem; }
+.design-sample-card button + button { margin-left: 0.4rem; }
+.design-sample-card label {
+  display: block;
+  margin: 0.75rem 0 0.4rem;
+  font-weight: 800;
+}
+.design-sample-card textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 7rem;
+  margin-bottom: 0.7rem;
+  padding: 0.7rem;
+  border: 1px solid var(--era-border);
+  color: var(--era-text);
+  background: var(--pack-surface-raised, var(--era-surface));
+  font: inherit;
+}
+.design-sample-card-textured {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 0;
+  background-image: var(--design-sample-card-asset);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.design-sample-card-inset {
+  margin: 1rem;
+  padding: 1.15rem;
+  border: 1px solid color-mix(in srgb, var(--era-border) 78%, transparent);
+  border-radius: 0.7rem;
+  background: var(--design-sample-card-inset, rgba(250, 247, 239, 0.91));
+  box-shadow: 0 8px 22px rgba(20, 18, 15, 0.12);
+}
+.card-treatment-dark-texture .design-sample-card-inset,
+.card-treatment-high-contrast .design-sample-card-inset,
+.card-treatment-bold-pattern .design-sample-card-inset,
+.card-treatment-photo-texture .design-sample-card-inset {
+  background: rgba(249, 245, 235, 0.93);
+}
+.card-treatment-light-texture .design-sample-card-inset {
+  background: rgba(255, 255, 252, 0.88);
+}
+.design-sample-context-card {
+  background: color-mix(in srgb, var(--era-surface) 92%, transparent);
+}
+.design-sample-asset-note {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--era-border);
+  color: var(--era-muted);
+  font-size: 0.94rem;
+}
+.design-sample-source .design-sample-information-card { grid-column: span 2; }
+.design-sample-interaction .design-sample-response-card { grid-column: span 2; }
+.design-sample-interaction textarea { min-height: 8rem; }
+
+/* Era-specific washes let the source material build atmosphere while keeping
+   text contrast and the established semantic palette in control. */
+.stop-era-common-school {
+  --design-sample-page-wash: rgba(238, 229, 207, 0.78);
+  --design-sample-card-inset: rgba(246, 238, 219, 0.92);
+}
+.stop-era-jim-crow {
+  --design-sample-page-wash: rgba(228, 228, 225, 0.68);
+  --design-sample-card-inset: rgba(246, 246, 243, 0.94);
+}
+.stop-era-world-wars {
+  --design-sample-page-wash: rgba(236, 229, 208, 0.72);
+  --design-sample-card-inset: rgba(247, 240, 221, 0.93);
+}
+.stop-era-civil-rights {
+  --design-sample-page-wash: rgba(246, 229, 187, 0.38);
+  --design-sample-card-inset: rgba(250, 239, 208, 0.94);
+}
+.stop-era-civil-rights .card-treatment-solid-complementary {
+  background: var(--era-deep, #283d61);
+  color: var(--era-accent-contrast, #fff9e8);
+}
+.stop-era-civil-rights .card-treatment-solid-complementary .design-sample-card-inset {
+  background: var(--era-deep, #283d61);
+  color: var(--era-accent-contrast, #fff9e8);
+  border-color: rgba(255,255,255,0.35);
+}
+.stop-era-civil-rights .card-treatment-solid-complementary .eyebrow,
+.stop-era-civil-rights .card-treatment-solid-complementary h2,
+.stop-era-civil-rights .card-treatment-solid-complementary p {
+  color: inherit;
+}
+.stop-era-modern-schooling {
+  --design-sample-photo-wash: rgba(228, 230, 224, 0.78);
+  --design-sample-card-inset: rgba(243, 244, 239, 0.94);
+}
+
+/* Colonial material audit across the existing substantive slice. Neutral paper,
+   wood, and textile fields vary by stop; each textured card remains bounded. */
+#early-america-introduction {
+  background-image: linear-gradient(rgba(244,233,207,0.76), rgba(244,233,207,0.76)), url('/virtual-museum/assets/themes/textures/colonial/page-aged-paper.webp');
+  background-size: cover;
+}
+#early-america-text {
+  background-image: linear-gradient(rgba(236,220,190,0.76), rgba(236,220,190,0.76)), url('/virtual-museum/assets/themes/textures/colonial/page-rough-wood.webp');
+  background-size: cover;
+}
+#early-america-text .source-stage {
+  background-image: linear-gradient(rgba(248,239,217,0.90), rgba(248,239,217,0.90)), url('/virtual-museum/assets/themes/textures/colonial/card-cream-linen.webp');
+  background-size: cover;
+}
+#early-america-image {
+  background-image: linear-gradient(rgba(238,223,194,0.78), rgba(238,223,194,0.78)), url('/virtual-museum/assets/themes/textures/colonial/page-medium-wood.webp');
+  background-size: cover;
+}
+#early-america-image .source-stage {
+  background-image: linear-gradient(rgba(247,236,214,0.90), rgba(247,236,214,0.90)), url('/virtual-museum/assets/themes/textures/colonial/card-tight-weave.webp');
+  background-size: cover;
+}
+#early-america-media {
+  background-image: linear-gradient(rgba(238,224,198,0.80), rgba(238,224,198,0.80)), url('/virtual-museum/assets/themes/textures/colonial/page-light-wood.webp');
+  background-size: cover;
+}
+#early-america-activity {
+  background-image: linear-gradient(rgba(241,228,203,0.84), rgba(241,228,203,0.84)), url('/virtual-museum/assets/themes/textures/colonial/card-tight-weave.webp');
+  background-size: cover;
+}
+#early-america-synthesis {
+  background-image: linear-gradient(rgba(244,233,211,0.86), rgba(244,233,211,0.86)), url('/virtual-museum/assets/themes/textures/colonial/card-cream-linen.webp');
+  background-size: cover;
+}
+
+@media (prefers-contrast: more), (forced-colors: active) {
+  .stop-design-sample.design-sample-page-textured,
+  .stop-design-sample.design-sample-page-textured::before,
+  .stop-design-sample.design-sample-page-textured::after,
+  .design-sample-card-textured,
+  #early-america-introduction,
+  #early-america-text,
+  #early-america-image,
+  #early-america-media,
+  #early-america-activity,
+  #early-america-synthesis,
+  #early-america-text .source-stage,
+  #early-america-image .source-stage {
+    background-image: none !important;
+    filter: none !important;
+  }
+}

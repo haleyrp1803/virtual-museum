@@ -420,3 +420,21 @@ select {
     background-image: none;
   }
 }
+
+/* The global classroom frame now uses the organized dark-wood source derivative.
+   Functional era surfaces continue to own the course interior. */
+html {
+  background-color: var(--wood-dark);
+  background-image:
+    linear-gradient(rgba(35, 20, 12, 0.56), rgba(35, 20, 12, 0.56)),
+    url('/virtual-museum/assets/themes/textures/course-neutral/classroom-dark-wood.webp');
+  background-size: cover;
+  background-position: center;
+}
+.site-header {
+  background-image:
+    linear-gradient(90deg, rgba(51, 29, 18, 0.72), rgba(35, 20, 12, 0.84)),
+    url('/virtual-museum/assets/themes/textures/course-neutral/classroom-dark-wood.webp');
+  background-size: cover;
+  background-position: center;
+}

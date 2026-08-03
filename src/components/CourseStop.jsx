@@ -42,6 +42,8 @@ export default function CourseStop({
   onToggleResource,
 }) {
   const eraTheme = getEraTheme(stop.eraId)
+  const samplePageAsset = stop.type === 'design-sample' ? stop.sample?.pageAsset : null
+  const samplePageTreatment = stop.type === 'design-sample' ? stop.sample?.pageTreatment : null
   let content = null
 
   switch (stop.type) {
@@ -84,11 +86,14 @@ export default function CourseStop({
       id={stop.id}
       data-stop-index={index}
       ref={sectionRef}
-      className={`course-stop stop-${stop.type} stop-era-${stop.eraId}`}
+      className={`course-stop stop-${stop.type} stop-era-${stop.eraId}${samplePageAsset ? ' design-sample-page-textured' : ''}`}
       data-era-theme={eraTheme?.designPackId ?? stop.eraId}
       data-heading-variant={eraTheme?.designPack?.variants.heading}
       data-surface-variant={eraTheme?.designPack?.variants.surface}
       data-frame-variant={eraTheme?.designPack?.variants.frame}
+      data-sample-variant={stop.sample?.variant}
+      data-page-treatment={samplePageTreatment}
+      style={samplePageAsset ? { '--design-sample-page-asset': `url(\"${samplePageAsset}\")` } : undefined}
       aria-labelledby={`${stop.id}-title`}
     >
       <div className="stop-inner">

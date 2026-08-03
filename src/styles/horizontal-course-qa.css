@@ -264,3 +264,536 @@
   .bottom-timeline { grid-template-columns: repeat(8, 108px); overflow-x: auto; }
 }
 
+
+/* --------------------------------------------------------------------------
+   VISUAL SYSTEM PASS A — FIXED-VIEWPORT STRUCTURAL STABILIZATION
+
+   These rules do not select or reinterpret era assets. They give development
+   material studies a reliable vertical budget inside the fixed course canvas,
+   remove inherited specimen spans that created clipped second rows, and keep
+   every required review region visible above the integrated navigation.
+   -------------------------------------------------------------------------- */
+
+.stop-design-sample {
+  overflow: hidden;
+}
+
+.stop-design-sample .stop-inner {
+  height: 100%;
+  min-height: 0;
+  padding-top: clamp(0.8rem, 1.5vh, 1.25rem);
+  padding-bottom: clamp(0.8rem, 1.5vh, 1.15rem);
+}
+
+.stop-design-sample .stop-heading {
+  max-width: 1050px;
+  margin-bottom: clamp(0.55rem, 1vh, 0.8rem);
+}
+
+.stop-design-sample .stop-heading h1 {
+  max-width: 1000px;
+  margin-bottom: 0.3rem;
+  font-size: clamp(2rem, 3.15vw, 3.55rem);
+  line-height: 0.96;
+}
+
+.stop-design-sample .stop-summary {
+  max-width: 960px;
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  line-height: 1.32;
+}
+
+.stop-design-sample .design-sample-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.95fr) minmax(0, 0.95fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: clamp(0.75rem, 1.2vw, 1.15rem);
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.stop-design-sample .design-sample-card,
+.stop-design-sample .design-sample-source .design-sample-information-card,
+.stop-design-sample .design-sample-interaction .design-sample-response-card {
+  grid-column: auto;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  box-sizing: border-box;
+  padding: clamp(0.8rem, 1.15vw, 1.15rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.stop-design-sample .design-sample-card-inset {
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: clamp(0.8rem, 1.15vw, 1.15rem);
+}
+
+.stop-design-sample .design-sample-card h2 {
+  margin: 0.22rem 0 0.55rem;
+  font-size: clamp(1.2rem, 1.55vw, 1.65rem);
+  line-height: 1.08;
+}
+
+.stop-design-sample .design-sample-card p {
+  margin: 0.45rem 0;
+  line-height: 1.38;
+}
+
+.stop-design-sample .design-sample-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.65rem;
+}
+
+.stop-design-sample .design-sample-actions button,
+.stop-design-sample .design-sample-card button + button {
+  margin: 0;
+}
+
+.stop-design-sample .design-sample-card label {
+  margin-top: 0.45rem;
+}
+
+.stop-design-sample .design-sample-card textarea,
+.stop-design-sample .design-sample-interaction textarea {
+  min-height: 0;
+  height: clamp(4.5rem, 11vh, 7rem);
+  margin-bottom: 0.45rem;
+  resize: none;
+  line-height: 1.35;
+}
+
+.stop-design-sample .design-sample-asset-note {
+  margin-top: 0.7rem;
+  padding-top: 0.65rem;
+}
+
+/* Keep real learner-facing activity stops compact enough that the response,
+   save action, and saved-state message remain visible as one composition. */
+.stop-activity .activity-prototype {
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.stop-activity .activity-prototype textarea {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 8rem;
+  max-height: min(30vh, 15rem);
+}
+
+/* Transition layouts are already a distinct archetype. This only prevents the
+   before/after panels from consuming more vertical space than the viewport. */
+.stop-transition .transition-experience {
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-content: stretch;
+}
+
+.stop-transition .transition-domestic,
+.stop-transition .transition-institutional {
+  min-height: 0;
+  align-content: center;
+}
+
+@media (max-width: 1180px) {
+  .stop-design-sample .design-sample-grid {
+    grid-template-columns: minmax(0, 1.35fr) repeat(2, minmax(0, 1fr));
+  }
+
+  .stop-design-sample .design-sample-card {
+    font-size: 0.94rem;
+  }
+}
+
+@media (max-height: 760px) {
+  .stop-design-sample .stop-heading h1 {
+    font-size: clamp(1.75rem, 2.75vw, 2.8rem);
+  }
+
+  .stop-design-sample .stop-summary {
+    font-size: 0.88rem;
+  }
+
+  .stop-design-sample .design-sample-card {
+    padding: 0.7rem;
+    font-size: 0.88rem;
+  }
+
+  .stop-design-sample .design-sample-card-inset {
+    padding: 0.75rem;
+  }
+
+  .stop-design-sample .design-sample-card h2 {
+    font-size: 1.12rem;
+  }
+
+  .stop-design-sample .design-sample-card textarea,
+  .stop-design-sample .design-sample-interaction textarea {
+    height: 4.2rem;
+  }
+}
+
+/* Side-panel mode has less horizontal room. Preserve all three functions by
+   reducing the lead-card advantage rather than creating a clipped second row. */
+.course-app.notebook-mode-side .stop-design-sample .design-sample-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.course-app.notebook-mode-side .stop-design-sample .design-sample-card {
+  font-size: 0.88rem;
+}
+
+/* --------------------------------------------------------------------------
+   VISUAL SYSTEM PASS A2 — NO INTERNAL SCROLL / HARD TIMELINE CLEARANCE
+
+   Course stops are single-screen compositions. No stop panel, card, source,
+   media region, transcript, or development fixture may create its own vertical
+   scrolling context. Optional long-form content belongs in an explicit overlay
+   or notebook view, not inside the course canvas.
+   -------------------------------------------------------------------------- */
+
+/* Reserve a small visual safety gap above the integrated timeline so cards do
+   not appear to continue underneath it. */
+.horizontal-course {
+  inset: 72px 0 104px 0;
+}
+
+.course-navigation {
+  min-height: 104px;
+}
+
+.course-app .notebook-launcher {
+  bottom: 118px;
+}
+
+/* Remove every internal vertical scroller introduced by earlier QA rules. */
+.course-stop,
+.stop-inner,
+.intro-layout,
+.era-threshold,
+.source-stop-layout,
+.synthesis-layout,
+.next-era-landing,
+.media-pair,
+.media-pair-card,
+.resource-grid,
+.resource-card,
+.activity-prototype,
+.transition-experience,
+.navigation-tutorial,
+.source-stage,
+.source-guidance,
+.transcript-panel,
+.placeholder-video details,
+.stop-design-sample .design-sample-grid,
+.stop-design-sample .design-sample-card,
+.stop-design-sample .design-sample-card-inset,
+.stop-transition .transition-domestic,
+.stop-transition .transition-institutional {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+/* The fixed canvas must always end visibly above the timeline. */
+.stop-inner {
+  padding-bottom: clamp(1rem, 1.8vh, 1.35rem);
+}
+
+/* Development material studies: content-sized cards, no full-height empty
+   columns, and no scrollbars. The row itself fits the remaining canvas. */
+.stop-design-sample .design-sample-grid {
+  align-items: stretch;
+  grid-auto-rows: minmax(0, 1fr);
+}
+
+.stop-design-sample .design-sample-card {
+  height: auto;
+  max-height: 100%;
+}
+
+.stop-design-sample .design-sample-card-inset {
+  min-height: 0;
+}
+
+.stop-design-sample .design-sample-card p {
+  line-height: 1.28;
+}
+
+.stop-design-sample .design-sample-asset-note {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+.stop-design-sample .design-sample-card textarea,
+.stop-design-sample .design-sample-interaction textarea {
+  height: clamp(3.9rem, 8.5vh, 5.4rem);
+}
+
+/* Media stops must fit as a complete two-panel composition. Keep playback,
+   essential description, transcript action, and commentary heading visible;
+   long transcript/commentary text opens elsewhere rather than scrolling here. */
+.stop-media .stop-heading {
+  margin-bottom: 0.5rem;
+}
+
+.stop-media .media-pair {
+  gap: clamp(0.75rem, 1.2vw, 1rem);
+}
+
+.stop-media .media-pair-card {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(0.75rem, 1.1vw, 1rem);
+}
+
+.stop-media .media-pair-card p {
+  margin: 0.3rem 0;
+  line-height: 1.28;
+}
+
+.stop-media .media-pair-card h2 {
+  margin: 0.35rem 0;
+  font-size: clamp(1.05rem, 1.4vw, 1.3rem);
+}
+
+.stop-media .artifact-av-media,
+.stop-media .artifact-media {
+  margin: 0.35rem 0;
+}
+
+.stop-media .artifact-av-media video {
+  width: 100%;
+  max-height: min(28vh, 250px);
+  object-fit: contain;
+}
+
+.stop-media audio {
+  width: 100%;
+  height: 42px;
+}
+
+.stop-media .transcript-panel {
+  max-height: none;
+}
+
+/* Real activity stop: fit prompt, response, and action without any internal
+   scrolling. The response field flexes within the remaining height. */
+.stop-activity .activity-prototype {
+  max-height: calc(100% - 0.25rem);
+}
+
+.stop-activity .activity-prototype textarea {
+  min-height: 6.5rem;
+  max-height: min(24vh, 12rem);
+}
+
+/* Source and resource panels are complete compositions, not scroll regions. */
+.source-stage,
+.source-guidance,
+.resource-card,
+.navigation-tutorial,
+.era-threshold > div:last-child,
+.synthesis-card,
+.next-era-landing > div:last-child {
+  overflow: hidden !important;
+}
+
+@media (max-height: 820px) {
+  .horizontal-course { inset-bottom: 100px; }
+  .course-navigation { min-height: 100px; }
+  .course-app .notebook-launcher { bottom: 114px; }
+
+  .stop-inner {
+    padding-top: 0.65rem;
+    padding-bottom: 0.85rem;
+  }
+
+  .stop-media .artifact-av-media video {
+    max-height: min(24vh, 205px);
+  }
+
+  .stop-media .media-pair-card p {
+    font-size: 0.88rem;
+  }
+
+  .stop-design-sample .design-sample-card {
+    font-size: 0.84rem;
+  }
+
+  .stop-design-sample .design-sample-card p {
+    margin: 0.3rem 0;
+  }
+
+  .stop-design-sample .design-sample-actions {
+    margin-top: 0.45rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   VISUAL SYSTEM PASS A3 — TIMELINE AS A TRUE LAYOUT FLOOR
+
+   The course canvas and integrated timeline now share one authoritative height
+   contract. Navigation padding and borders are included inside the declared
+   navigation height, so the course canvas cannot continue behind it.
+   -------------------------------------------------------------------------- */
+
+.course-app {
+  --course-header-height: 72px;
+  --course-navigation-height: 104px;
+}
+
+.course-header {
+  box-sizing: border-box;
+  height: var(--course-header-height);
+  min-height: var(--course-header-height);
+}
+
+.horizontal-course {
+  top: var(--course-header-height);
+  right: 0;
+  bottom: var(--course-navigation-height);
+  left: 0;
+  height: auto;
+  max-height: calc(100vh - var(--course-header-height) - var(--course-navigation-height));
+}
+
+.course-navigation {
+  top: calc(100vh - var(--course-navigation-height));
+  right: 0;
+  bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+  width: auto;
+  height: var(--course-navigation-height);
+  min-height: 0;
+  max-height: var(--course-navigation-height);
+  overflow: hidden;
+}
+
+.course-stop,
+.stop-inner {
+  box-sizing: border-box;
+  height: 100%;
+  max-height: 100%;
+}
+
+/* The content grid may use all space above the floor, but never more. */
+.stop-design-sample .design-sample-grid,
+.stop-media .media-pair,
+.stop-activity .activity-prototype,
+.stop-transition .transition-experience {
+  max-height: 100%;
+}
+
+.course-app .notebook-launcher {
+  bottom: calc(var(--course-navigation-height) + 14px);
+}
+
+/* Notebook side mode must preserve the same vertical contract. */
+.course-app.notebook-mode-side .horizontal-course {
+  bottom: var(--course-navigation-height);
+}
+
+@media (max-height: 820px) {
+  .course-app {
+    --course-navigation-height: 100px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   VISUAL SYSTEM PASS A4 — CONTENT-SIZED PANELS ABOVE THE TIMELINE FLOOR
+
+   The timeline top edge is a hard floor. Panels are content-sized and align to
+   the top of the course canvas; they must not stretch to fill the remaining
+   row because that visually buries their lower edge behind the navigation.
+   -------------------------------------------------------------------------- */
+
+/* Keep a visible clearance strip between every stop composition and the fixed
+   navigation. The stop remains exactly the height of the course canvas. */
+.stop-inner {
+  padding-bottom: max(1rem, 2vh);
+}
+
+/* Material-study fixtures must show complete card boundaries. Their earlier
+   1fr row + height:100% contract deliberately stretched every card to the
+   canvas floor, which made the bottom border disappear behind the timeline. */
+.stop-design-sample .design-sample-grid {
+  flex: 0 1 auto;
+  grid-template-rows: auto;
+  grid-auto-rows: auto;
+  align-items: start;
+  align-content: start;
+  max-height: none;
+}
+
+.stop-design-sample .design-sample-card,
+.stop-design-sample .design-sample-source .design-sample-information-card,
+.stop-design-sample .design-sample-interaction .design-sample-response-card {
+  align-self: start;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  overflow: hidden !important;
+}
+
+.stop-design-sample .design-sample-card-inset {
+  height: auto;
+  min-height: 0;
+}
+
+/* Real paired-media cards follow the same rule: complete content-sized panels,
+   never full-row stretch. */
+.stop-media .media-pair {
+  flex: 0 1 auto;
+  align-items: start;
+  align-content: start;
+  grid-auto-rows: auto;
+  max-height: none;
+}
+
+.stop-media .media-pair-card {
+  align-self: start;
+  height: auto;
+  max-height: none;
+  overflow: hidden !important;
+}
+
+.stop-media .artifact-av-media video {
+  max-height: min(24vh, 220px);
+}
+
+/* Activity and transition containers also end above the navigation rather than
+   stretching their surface to the floor. */
+.stop-activity .activity-prototype,
+.stop-transition .transition-experience {
+  flex: 0 1 auto;
+  height: auto;
+  max-height: none;
+  align-self: start;
+}
+
+@media (max-height: 820px) {
+  .stop-design-sample .stop-heading {
+    margin-bottom: 0.45rem;
+  }
+
+  .stop-design-sample .design-sample-card {
+    padding: 0.65rem;
+  }
+
+  .stop-design-sample .design-sample-card-inset {
+    padding: 0.7rem;
+  }
+
+  .stop-media .artifact-av-media video {
+    max-height: min(21vh, 185px);
+  }
+}
